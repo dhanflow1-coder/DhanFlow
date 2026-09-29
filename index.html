@@ -476,114 +476,7 @@
 
   <script>
 
-    async function login() {
-
-      const email =
-        document
-          .getElementById("username")
-          .value
-          .trim();
-
-      const password =
-        document
-          .getElementById("password")
-          .value;
-
-      const message =
-        document.getElementById("loginMessage");
-
-
-      if (!email || !password) {
-
-        message.textContent =
-          "Please enter email and password.";
-
-        message.style.color = "#d13c3c";
-
-        return;
-      }
-
-
-      message.textContent =
-        "Logging in...";
-
-      message.style.color =
-        "#687386";
-
-
-      const { data, error } =
-        await supabase.auth.signInWithPassword({
-
-          email: email,
-
-          password: password
-
-        });
-
-
-      if (error) {
-
-        message.textContent =
-          "Invalid email or password.";
-
-        message.style.color =
-          "#d13c3c";
-
-        return;
-      }
-
-
-      await loadUserProfile(
-        data.user
-      );
-
-    }
-
-
-    async function loadUserProfile(user) {
-
-      const { data, error } =
-        await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-
-
-      if (error || !data) {
-
-        await supabase.auth.signOut();
-
-        const message =
-          document.getElementById(
-            "loginMessage"
-          );
-
-        message.textContent =
-          "Profile not found.";
-
-        message.style.color =
-          "#d13c3c";
-
-        return;
-      }
-
-
-      if (data.status !== "active") {
-
-        await supabase.auth.signOut();
-
-        const message =
-          document.getElementById(
-            "loginMessage"
-          );
-
-        message.textContent =
-          "This account is blocked.";
-
-        message.style.color =
-          "#d13c3c";
-
+    
         return;
       }
 
@@ -704,3 +597,60 @@
 </body>
 
 </html>
+async function login() {
+
+  const email =
+    document.getElementById("username").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  const message =
+    document.getElementById("loginMessage");
+
+  if (!email || !password) {
+    message.textContent =
+      "Please enter email and password.";
+    message.style.color = "#d13c3c";
+    return;
+  }
+
+  message.textContent = "Connecting to DhanFlow...";
+  message.style.color = "#687386";
+
+  try {
+
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+    if (error) {
+      message.textContent =
+        "Login error: " + error.message;
+      message.style.color = "#d13c3c";
+      return;
+    }
+
+    if (!data || !data.user) {
+      message.textContent =
+        "Login failed: User data not received.";
+      message.style.color = "#d13c3c";
+      return;
+    }
+
+    message.textContent =
+      "Login successful. Loading profile...";
+    message.style.color = "#16834b";
+
+    await loadUserProfile(data.user);
+
+  } catch (err) {
+
+    message.textContent =
+      "Connection error: " + err.message;
+    message.style.color = "#d13c3c";
+
+  }
+}
