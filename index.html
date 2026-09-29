@@ -119,6 +119,66 @@ body{
   margin-bottom:15px;
 }
 
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+}
+
+.form-group{
+  display:flex;
+  flex-direction:column;
+}
+
+.form-group label{
+  font-size:14px;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+
+.form-group input{
+  width:100%;
+  padding:13px;
+  border:1px solid #dce2eb;
+  border-radius:10px;
+  outline:none;
+  font-size:15px;
+}
+
+.form-group input:focus{
+  border-color:#172033;
+}
+
+.create-button{
+  margin-top:18px;
+  padding:13px 20px;
+  background:#172033;
+  color:white;
+  border:none;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.create-button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.form-message{
+  margin-top:15px;
+  font-size:14px;
+  font-weight:bold;
+}
+
+.success{
+  color:#16834b;
+}
+
+.error{
+  color:#d13c3c;
+}
+
 .table-wrap{
   overflow-x:auto;
 }
@@ -168,9 +228,20 @@ th{
   padding:9px 14px;
   border-radius:9px;
   font-weight:bold;
+  cursor:pointer;
+}
+
+.refresh{
+  float:right;
+  padding:8px 12px;
+  border:1px solid #dce2eb;
+  background:white;
+  border-radius:8px;
+  cursor:pointer;
 }
 
 @media(max-width:700px){
+
   .stats{
     grid-template-columns:repeat(2,1fr);
   }
@@ -179,9 +250,14 @@ th{
     grid-template-columns:1fr;
   }
 
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
   .welcome h1{
     font-size:24px;
   }
+
 }
 </style>
 </head>
@@ -242,6 +318,7 @@ th{
         border:none;
         border-radius:10px;
         font-weight:bold;
+        cursor:pointer;
       "
     >
       Login
@@ -261,6 +338,7 @@ th{
 
     <div>
       <div class="logo">DhanFlow Admin</div>
+
       <div style="font-size:12px;opacity:.7;">
         Wallet Management System
       </div>
@@ -354,32 +432,154 @@ th{
     </div>
 
 
+    <!-- ADD CUSTOMER -->
+
+    <div class="section">
+
+      <h2>➕ Add Customer</h2>
+
+      <p style="
+        color:#687386;
+        margin-bottom:18px;
+        font-size:14px;
+      ">
+        Admin can create a customer account manually.
+      </p>
+
+
+      <div class="form-grid">
+
+        <div class="form-group">
+
+          <label>User ID</label>
+
+          <input
+            id="customerUserId"
+            type="text"
+            placeholder="Example: USER001"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>Username</label>
+
+          <input
+            id="customerUsername"
+            type="text"
+            placeholder="Example: rahim"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>Email</label>
+
+          <input
+            id="customerEmail"
+            type="email"
+            placeholder="customer@email.com"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>Password</label>
+
+          <input
+            id="customerPassword"
+            type="password"
+            placeholder="Minimum 6 characters"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label>Initial Balance</label>
+
+          <input
+            id="customerBalance"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0"
+          >
+
+        </div>
+
+      </div>
+
+
+      <button
+        id="createCustomerButton"
+        class="create-button"
+      >
+        Create Customer
+      </button>
+
+
+      <div
+        id="createCustomerMessage"
+        class="form-message"
+      ></div>
+
+    </div>
+
+
     <!-- CUSTOMERS -->
 
     <div class="section">
 
+      <button
+        id="refreshCustomers"
+        class="refresh"
+      >
+        🔄 Refresh
+      </button>
+
       <h2>Customers</h2>
 
-      <div id="customerMessage" class="empty">
+      <div
+        id="customerMessage"
+        class="empty"
+      >
         Loading customers...
       </div>
 
       <div class="table-wrap">
 
-        <table id="customerTable" class="hidden">
+        <table
+          id="customerTable"
+          class="hidden"
+        >
 
           <thead>
 
             <tr>
+
               <th>User ID</th>
+
               <th>Username</th>
+
               <th>Balance</th>
+
               <th>Status</th>
+
             </tr>
 
           </thead>
 
-          <tbody id="customerTableBody"></tbody>
+          <tbody
+            id="customerTableBody"
+          ></tbody>
 
         </table>
 
@@ -387,6 +587,8 @@ th{
 
     </div>
 
+
+    <!-- ADMIN INFORMATION -->
 
     <div class="section">
 
@@ -481,8 +683,11 @@ async function login(){
 
     const {data,error} =
       await supabaseClient.auth.signInWithPassword({
+
         email:email,
+
         password:password
+
       });
 
 
@@ -646,8 +851,10 @@ async function loadStatistics(){
 
     customers.forEach(
       p => {
+
         totalBalance +=
           Number(p.balance || 0);
+
       }
     );
 
@@ -675,7 +882,10 @@ async function loadStatistics(){
   const {count:transferCount} =
     await supabaseClient
       .from("transactions")
-      .select("*",{count:"exact",head:true})
+      .select("*",{
+        count:"exact",
+        head:true
+      })
       .eq("type","transfer")
       .eq("status","pending");
 
@@ -689,7 +899,10 @@ async function loadStatistics(){
   const {count:withdrawalCount} =
     await supabaseClient
       .from("withdrawals")
-      .select("*",{count:"exact",head:true})
+      .select("*",{
+        count:"exact",
+        head:true
+      })
       .eq("status","pending");
 
 
@@ -719,6 +932,17 @@ async function loadCustomers(){
     document.getElementById(
       "customerTableBody"
     );
+
+
+  message.classList.remove("hidden");
+
+  message.textContent =
+    "Loading customers...";
+
+  message.style.color =
+    "#687386";
+
+  table.classList.add("hidden");
 
 
   const {data,error} =
@@ -776,13 +1000,17 @@ async function loadCustomers(){
 
     row.innerHTML = `
 
-      <td>${customer.user_id}</td>
+      <td>
+        ${escapeHtml(customer.user_id)}
+      </td>
 
-      <td>${customer.username}</td>
+      <td>
+        ${escapeHtml(customer.username)}
+      </td>
 
       <td>
         ₹${Number(
-          customer.balance
+          customer.balance || 0
         ).toLocaleString(
           "en-IN",
           {
@@ -792,9 +1020,11 @@ async function loadCustomers(){
       </td>
 
       <td>
+
         <span class="badge ${statusClass}">
-          ${customer.status}
+          ${escapeHtml(customer.status)}
         </span>
+
       </td>
 
     `;
@@ -803,6 +1033,245 @@ async function loadCustomers(){
     tbody.appendChild(row);
 
   });
+
+}
+
+
+/* HTML SAFETY */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* CREATE CUSTOMER */
+
+async function createCustomer(){
+
+  const userId =
+    document
+      .getElementById("customerUserId")
+      .value.trim();
+
+  const username =
+    document
+      .getElementById("customerUsername")
+      .value.trim();
+
+  const email =
+    document
+      .getElementById("customerEmail")
+      .value.trim();
+
+  const password =
+    document
+      .getElementById("customerPassword")
+      .value;
+
+  const balanceValue =
+    document
+      .getElementById("customerBalance")
+      .value.trim();
+
+  const message =
+    document
+      .getElementById("createCustomerMessage");
+
+  const button =
+    document
+      .getElementById("createCustomerButton");
+
+
+  message.textContent = "";
+  message.className =
+    "form-message";
+
+
+  if(
+    !userId ||
+    !username ||
+    !email ||
+    !password
+  ){
+
+    message.textContent =
+      "Please fill all required fields.";
+
+    message.classList.add("error");
+
+    return;
+  }
+
+
+  if(password.length < 6){
+
+    message.textContent =
+      "Password must be at least 6 characters.";
+
+    message.classList.add("error");
+
+    return;
+  }
+
+
+  const balance =
+    balanceValue === ""
+    ? 0
+    : Number(balanceValue);
+
+
+  if(
+    !Number.isFinite(balance) ||
+    balance < 0
+  ){
+
+    message.textContent =
+      "Initial balance must be 0 or greater.";
+
+    message.classList.add("error");
+
+    return;
+  }
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "Creating Customer...";
+
+
+  try{
+
+    const {
+      data:sessionData
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    const accessToken =
+      sessionData.session?.access_token;
+
+
+    if(!accessToken){
+
+      throw new Error(
+        "Admin session expired. Please login again."
+      );
+
+    }
+
+
+    const response =
+      await fetch(
+        SUPABASE_URL +
+        "/functions/v1/create-customer",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json",
+
+            "Authorization":
+              "Bearer " +
+              accessToken,
+
+            "apikey":
+              SUPABASE_PUBLISHABLE_KEY
+          },
+
+          body:JSON.stringify({
+
+            user_id:userId,
+
+            username:username,
+
+            email:email,
+
+            password:password,
+
+            initial_balance:balance
+
+          })
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if(!response.ok){
+
+      throw new Error(
+        result.error ||
+        "Customer creation failed."
+      );
+
+    }
+
+
+    message.textContent =
+      "✅ Customer created successfully!";
+
+    message.classList.add(
+      "success"
+    );
+
+
+    // Clear form
+    document
+      .getElementById("customerUserId")
+      .value = "";
+
+    document
+      .getElementById("customerUsername")
+      .value = "";
+
+    document
+      .getElementById("customerEmail")
+      .value = "";
+
+    document
+      .getElementById("customerPassword")
+      .value = "";
+
+    document
+      .getElementById("customerBalance")
+      .value = "";
+
+
+    // Refresh dashboard
+    await loadStatistics();
+
+    await loadCustomers();
+
+
+  }catch(error){
+
+    message.textContent =
+      "❌ " +
+      error.message;
+
+    message.classList.add(
+      "error"
+    );
+
+  }finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "Create Customer";
+
+  }
 
 }
 
@@ -859,55 +1328,32 @@ document
 
 
 document
+  .getElementById("refreshCustomers")
+  .addEventListener(
+    "click",
+    async function(){
+
+      await loadStatistics();
+
+      await loadCustomers();
+
+    }
+  );
+
+
+document
+  .getElementById("createCustomerButton")
+  .addEventListener(
+    "click",
+    createCustomer
+  );
+
+
+document
   .getElementById("transactionsButton")
   .addEventListener(
     "click",
     function(){
+
       alert(
-        "Transaction Management will be added next."
-      );
-    }
-  );
-
-
-document
-  .getElementById("transfersButton")
-  .addEventListener(
-    "click",
-    function(){
-      alert(
-        "Transfer Management will be added next."
-      );
-    }
-  );
-
-
-document
-  .getElementById("withdrawalsButton")
-  .addEventListener(
-    "click",
-    function(){
-      alert(
-        "Withdrawal Management will be added next."
-      );
-    }
-  );
-
-
-document
-  .getElementById("password")
-  .addEventListener(
-    "keydown",
-    function(event){
-
-      if(event.key === "Enter"){
-        login();
-      }
-
-    }
-  );
-
-</script>
-
-</body>
-</html>
+        "Transaction Management w
