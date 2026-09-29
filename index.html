@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL = "https://oxwjnravklpcdhfxibya.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
+
+    const supabase = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DhanFlow - Wallet Management</title>
