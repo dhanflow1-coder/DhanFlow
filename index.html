@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -10,19 +8,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
-    const SUPABASE_URL = "https://oxwjnravklpcdhfxibya.supabase.co";
-
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
-
-    const supabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
-  </script>
-
   <style>
-
     * {
       box-sizing: border-box;
       margin: 0;
@@ -157,38 +143,6 @@
       margin-bottom: 15px;
     }
 
-    .transaction {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 0;
-      border-bottom: 1px solid #edf0f5;
-    }
-
-    .transaction:last-child {
-      border-bottom: none;
-    }
-
-    .transaction-title {
-      font-weight: bold;
-    }
-
-    .transaction-date {
-      font-size: 12px;
-      color: #8a94a6;
-      margin-top: 4px;
-    }
-
-    .credit {
-      color: #16834b;
-      font-weight: bold;
-    }
-
-    .debit {
-      color: #d13c3c;
-      font-weight: bold;
-    }
-
     .login-box {
       max-width: 420px;
       margin: 80px auto;
@@ -208,7 +162,12 @@
     }
 
     .hidden {
-      display: none;
+      display: none !important;
+    }
+
+    .credit {
+      color: #16834b;
+      font-weight: bold;
     }
 
     .footer {
@@ -219,7 +178,6 @@
     }
 
     @media (max-width: 700px) {
-
       .cards {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -231,17 +189,13 @@
       .balance {
         font-size: 30px;
       }
-
     }
-
   </style>
-
 </head>
 
 <body>
 
-  <!-- LOGIN -->
-
+  <!-- LOGIN PAGE -->
   <div id="loginPage">
 
     <div class="login-box">
@@ -257,6 +211,7 @@
         id="username"
         class="input"
         placeholder="Email"
+        autocomplete="email"
       >
 
       <input
@@ -264,12 +219,14 @@
         id="password"
         class="input"
         placeholder="Password"
+        autocomplete="current-password"
       >
 
       <button
+        id="loginButton"
         class="btn-primary"
         style="width:100%;"
-        onclick="login()"
+        type="button"
       >
         Login
       </button>
@@ -285,24 +242,22 @@
 
 
   <!-- DASHBOARD -->
-
   <div id="dashboard" class="hidden">
 
     <div class="header">
 
       <div>
-
         <div class="logo">DhanFlow</div>
 
         <div class="tagline">
           Simple. Secure. In Control.
         </div>
-
       </div>
 
       <button
-        onclick="logout()"
+        id="logoutButton"
         style="background:white;color:#172033;padding:9px 13px;"
+        type="button"
       >
         Logout
       </button>
@@ -340,46 +295,23 @@
       <div class="cards">
 
         <div class="card">
-
           <h3>Total Balance</h3>
-
-          <strong id="totalBalance">
-            ₹0.00
-          </strong>
-
+          <strong id="totalBalance">₹0.00</strong>
         </div>
 
-
         <div class="card">
-
           <h3>Money Received</h3>
-
-          <strong id="moneyReceived">
-            ₹0.00
-          </strong>
-
+          <strong id="moneyReceived">₹0.00</strong>
         </div>
 
-
         <div class="card">
-
           <h3>Money Sent</h3>
-
-          <strong id="moneySent">
-            ₹0.00
-          </strong>
-
+          <strong id="moneySent">₹0.00</strong>
         </div>
 
-
         <div class="card">
-
           <h3>Account Status</h3>
-
-          <strong id="accountStatus">
-            Active
-          </strong>
-
+          <strong id="accountStatus">Active</strong>
         </div>
 
       </div>
@@ -388,24 +320,25 @@
       <div class="actions">
 
         <button
+          id="transferButton"
           class="btn-primary"
-          onclick="transferMoney()"
+          type="button"
         >
           💸 Transfer Money
         </button>
 
-
         <button
+          id="withdrawButton"
           class="btn-secondary"
-          onclick="withdrawMoney()"
+          type="button"
         >
           🏦 Bank Withdrawal
         </button>
 
-
         <button
+          id="historyButton"
           class="btn-secondary"
-          onclick="showHistory()"
+          type="button"
         >
           📋 Transaction History
         </button>
@@ -466,17 +399,228 @@
 
 
     <div class="footer">
-
       DhanFlow © 2026 · Internal Wallet Management System
-
     </div>
 
   </div>
 
 
+  <!-- ALL JAVASCRIPT IS INSIDE THIS SCRIPT TAG -->
   <script>
 
-    
+    const SUPABASE_URL =
+      "https://oxwjnravklpcdhfxibya.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+
+    async function login() {
+
+      const email =
+        document
+          .getElementById("username")
+          .value
+          .trim();
+
+      const password =
+        document
+          .getElementById("password")
+          .value;
+
+      const message =
+        document.getElementById("loginMessage");
+
+      const button =
+        document.getElementById("loginButton");
+
+
+      if (!email || !password) {
+
+        message.textContent =
+          "Please enter email and password.";
+
+        message.style.color =
+          "#d13c3c";
+
+        return;
+      }
+
+
+      button.disabled = true;
+
+      button.textContent =
+        "Logging in...";
+
+      message.textContent =
+        "Connecting to DhanFlow...";
+
+      message.style.color =
+        "#687386";
+
+
+      try {
+
+        const result =
+          await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+          });
+
+
+        const data = result.data;
+        const error = result.error;
+
+
+        if (error) {
+
+          message.textContent =
+            "Login error: " + error.message;
+
+          message.style.color =
+            "#d13c3c";
+
+          button.disabled = false;
+
+          button.textContent =
+            "Login";
+
+          return;
+        }
+
+
+        if (!data || !data.user) {
+
+          message.textContent =
+            "Login failed: User data not received.";
+
+          message.style.color =
+            "#d13c3c";
+
+          button.disabled = false;
+
+          button.textContent =
+            "Login";
+
+          return;
+        }
+
+
+        message.textContent =
+          "Login successful. Loading profile...";
+
+        message.style.color =
+          "#16834b";
+
+
+        await loadUserProfile(
+          data.user
+        );
+
+
+      } catch (error) {
+
+        message.textContent =
+          "Connection error: " +
+          error.message;
+
+        message.style.color =
+          "#d13c3c";
+
+        button.disabled = false;
+
+        button.textContent =
+          "Login";
+
+      }
+
+    }
+
+
+    async function loadUserProfile(user) {
+
+      const result =
+        await supabaseClient
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+
+      const data = result.data;
+      const error = result.error;
+
+
+      if (error) {
+
+        await supabaseClient.auth.signOut();
+
+        const message =
+          document.getElementById(
+            "loginMessage"
+          );
+
+        message.textContent =
+          "Profile error: " +
+          error.message;
+
+        message.style.color =
+          "#d13c3c";
+
+        const button =
+          document.getElementById(
+            "loginButton"
+          );
+
+        button.disabled = false;
+
+        button.textContent =
+          "Login";
+
+        return;
+      }
+
+
+      if (!data) {
+
+        await supabaseClient.auth.signOut();
+
+        const message =
+          document.getElementById(
+            "loginMessage"
+          );
+
+        message.textContent =
+          "Profile not found.";
+
+        message.style.color =
+          "#d13c3c";
+
+        return;
+      }
+
+
+      if (data.status !== "active") {
+
+        await supabaseClient.auth.signOut();
+
+        const message =
+          document.getElementById(
+            "loginMessage"
+          );
+
+        message.textContent =
+          "This account is blocked.";
+
+        message.style.color =
+          "#d13c3c";
+
         return;
       }
 
@@ -515,31 +659,45 @@
           data.status;
 
 
+      const formattedBalance =
+        "₹" +
+        Number(data.balance)
+          .toLocaleString(
+            "en-IN",
+            {
+              minimumFractionDigits: 2
+            }
+          );
+
+
       document
         .getElementById("balance")
         .textContent =
-          "₹" +
-          Number(data.balance)
-            .toLocaleString("en-IN", {
-              minimumFractionDigits: 2
-            });
+          formattedBalance;
 
 
       document
         .getElementById("totalBalance")
         .textContent =
-          "₹" +
-          Number(data.balance)
-            .toLocaleString("en-IN", {
-              minimumFractionDigits: 2
-            });
+          formattedBalance;
+
+
+      document
+        .getElementById("loginButton")
+        .disabled = false;
+
+
+      document
+        .getElementById("loginButton")
+        .textContent =
+          "Login";
 
     }
 
 
     async function logout() {
 
-      await supabase.auth.signOut();
+      await supabaseClient.auth.signOut();
 
       document
         .getElementById("dashboard")
@@ -592,65 +750,61 @@
 
     }
 
+
+    document
+      .getElementById("loginButton")
+      .addEventListener(
+        "click",
+        login
+      );
+
+
+    document
+      .getElementById("logoutButton")
+      .addEventListener(
+        "click",
+        logout
+      );
+
+
+    document
+      .getElementById("transferButton")
+      .addEventListener(
+        "click",
+        transferMoney
+      );
+
+
+    document
+      .getElementById("withdrawButton")
+      .addEventListener(
+        "click",
+        withdrawMoney
+      );
+
+
+    document
+      .getElementById("historyButton")
+      .addEventListener(
+        "click",
+        showHistory
+      );
+
+
+    document
+      .getElementById("password")
+      .addEventListener(
+        "keydown",
+        function(event) {
+
+          if (event.key === "Enter") {
+            login();
+          }
+
+        }
+      );
+
   </script>
 
 </body>
-
 </html>
-async function login() {
-
-  const email =
-    document.getElementById("username").value.trim();
-
-  const password =
-    document.getElementById("password").value;
-
-  const message =
-    document.getElementById("loginMessage");
-
-  if (!email || !password) {
-    message.textContent =
-      "Please enter email and password.";
-    message.style.color = "#d13c3c";
-    return;
-  }
-
-  message.textContent = "Connecting to DhanFlow...";
-  message.style.color = "#687386";
-
-  try {
-
-    const { data, error } =
-      await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
-    if (error) {
-      message.textContent =
-        "Login error: " + error.message;
-      message.style.color = "#d13c3c";
-      return;
-    }
-
-    if (!data || !data.user) {
-      message.textContent =
-        "Login failed: User data not received.";
-      message.style.color = "#d13c3c";
-      return;
-    }
-
-    message.textContent =
-      "Login successful. Loading profile...";
-    message.style.color = "#16834b";
-
-    await loadUserProfile(data.user);
-
-  } catch (err) {
-
-    message.textContent =
-      "Connection error: " + err.message;
-    message.style.color = "#d13c3c";
-
-  }
-}
