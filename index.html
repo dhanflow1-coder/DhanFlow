@@ -1194,3 +1194,574 @@
 
         console.error(
           "CUSTOMER LOAD ERROR:"
+                    error
+        );
+
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty">
+              Error loading customers:
+              ${escapeHtml(error.message)}
+            </td>
+          </tr>
+        `;
+
+      }
+
+    }
+
+
+    /* ==============================
+       LOAD STATS
+    ============================== */
+
+    async function loadStats() {
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .from("profiles")
+            .select(
+              "balance,status,role"
+            )
+            .eq(
+              "role",
+              "customer"
+            );
+
+
+        if (error) {
+
+          throw new Error(
+            error.message
+          );
+
+        }
+
+
+        const customers =
+          data || [];
+
+
+        const total =
+          customers.length;
+
+
+        const active =
+          customers.filter(
+            customer =>
+              customer.status === "active"
+          ).length;
+
+
+        const balance =
+          customers.reduce(
+            (sum, customer) =>
+              sum +
+              Number(
+                customer.balance || 0
+              ),
+            0
+          );
+
+
+        document
+          .getElementById(
+            "totalCustomers"
+          )
+          .textContent =
+          total;
+
+
+        document
+          .getElementById(
+            "activeCustomers"
+          )
+          .textContent =
+          active;
+
+
+        document
+          .getElementById(
+            "totalBalance"
+          )
+          .textContent =
+          money(balance);
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "STATS ERROR:",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* ==============================
+       CREATE CUSTOMER
+    ============================== */
+
+    async function createCustomer() {
+
+      hideMessage("createMessage");
+
+      const user_id =
+        document
+          .getElementById(
+            "customerUserId"
+          )
+          .value
+          .trim();
+
+
+      const username =
+        document
+          .getElementById(
+            "customerUsername"
+          )
+          .value
+          .trim();
+
+
+      const email =
+        document
+          .getElementById(
+            "customerEmail"
+          )
+          .value
+          .trim();
+
+
+      const password =
+        document
+          .getElementById(
+            "customerPassword"
+          )
+          .value;
+
+
+      const initial_balance =
+        Number(
+          document
+            .getElementById(
+              "customerBalance"
+            )
+            .value || 0
+        );
+
+
+      if (
+        !user_id ||
+        !username ||
+        !email ||
+        !password
+      ) {
+
+        showCreateMessage(
+          "User ID, Username, Email এবং Password দিন।"
+        );
+
+        return;
+
+      }
+
+
+      if (password.length < 6) {
+
+        showCreateMessage(
+          "Password কমপক্ষে 6 characters হতে হবে।"
+        );
+
+        return;
+
+      }
+
+
+      if (
+        !Number.isFinite(
+          initial_balance
+        ) ||
+        initial_balance < 0
+      ) {
+
+        showCreateMessage(
+          "Initial Balance সঠিকভাবে দিন।"
+        );
+
+        return;
+
+      }
+
+
+      const button =
+        document.getElementById(
+          "createCustomerButton"
+        );
+
+
+      button.disabled = true;
+
+      button.textContent =
+        "Creating...";
+
+
+      try {
+
+        const {
+          data: sessionData,
+          error: sessionError
+        } =
+          await supabaseClient.auth
+            .getSession();
+
+
+        if (
+          sessionError ||
+          !sessionData ||
+          !sessionData.session
+        ) {
+
+          throw new Error(
+            "Admin login session পাওয়া যায়নি।"
+          );
+
+        }
+
+
+        const accessToken =
+          sessionData.session
+            .access_token;
+
+
+        const response =
+          await fetch(
+            SUPABASE_URL +
+            "/functions/v1/create-customer",
+            {
+              method: "POST",
+
+              headers: {
+
+                "Content-Type":
+                  "application/json",
+
+                "Authorization":
+                  "Bearer " +
+                  accessToken,
+
+                "apikey":
+                  SUPABASE_KEY
+
+              },
+
+              body: JSON.stringify({
+
+                user_id:
+                  user_id,
+
+                username:
+                  username,
+
+                email:
+                  email,
+
+                password:
+                  password,
+
+                initial_balance:
+                  initial_balance
+
+              })
+
+            }
+          );
+
+
+        const result =
+          await response.json();
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            result.error ||
+            "Customer create failed"
+          );
+
+        }
+
+
+        showCreateMessage(
+          "Customer successfully created.",
+          true
+        );
+
+
+        document
+          .getElementById(
+            "customerUserId"
+          )
+          .value = "";
+
+
+        document
+          .getElementById(
+            "customerUsername"
+          )
+          .value = "";
+
+
+        document
+          .getElementById(
+            "customerEmail"
+          )
+          .value = "";
+
+
+        document
+          .getElementById(
+            "customerPassword"
+          )
+          .value = "";
+
+
+        document
+          .getElementById(
+            "customerBalance"
+          )
+          .value = "0";
+
+
+        await loadDashboard();
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "CREATE CUSTOMER ERROR:",
+          error
+        );
+
+
+        showCreateMessage(
+          "Customer create failed: " +
+          (
+            error.message ||
+            "Unknown error"
+          )
+        );
+
+      }
+
+      finally {
+
+        button.disabled =
+          false;
+
+        button.textContent =
+          "Create Customer";
+
+      }
+
+    }
+
+
+    /* ==============================
+       SESSION CHECK
+    ============================== */
+
+    async function checkSession() {
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.auth
+            .getSession();
+
+
+        if (error) {
+
+          console.error(
+            "SESSION ERROR:",
+            error
+          );
+
+          return;
+
+        }
+
+
+        if (
+          data &&
+          data.session
+        ) {
+
+          const {
+            data: profile,
+            error: profileError
+          } =
+            await supabaseClient
+              .from("profiles")
+              .select(
+                "id,user_id,username,role,balance,status"
+              )
+              .eq(
+                "id",
+                data.session.user.id
+              )
+              .single();
+
+
+          if (
+            profileError ||
+            !profile
+          ) {
+
+            await supabaseClient.auth
+              .signOut();
+
+            return;
+
+          }
+
+
+          if (
+            profile.role === "admin" &&
+            profile.status === "active"
+          ) {
+
+            document
+              .getElementById(
+                "loginPage"
+              )
+              .classList
+              .add("hidden");
+
+
+            document
+              .getElementById(
+                "dashboardPage"
+              )
+              .classList
+              .remove("hidden");
+
+
+            document
+              .getElementById(
+                "adminInfo"
+              )
+              .textContent =
+              "Logged in as: " +
+              profile.username;
+
+
+            await loadDashboard();
+
+          }
+
+        }
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "SESSION ERROR:",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* ==============================
+       BUTTON EVENTS
+    ============================== */
+
+    document
+      .getElementById(
+        "loginButton"
+      )
+      .addEventListener(
+        "click",
+        login
+      );
+
+
+    document
+      .getElementById(
+        "logoutButton"
+      )
+      .addEventListener(
+        "click",
+        logout
+      );
+
+
+    document
+      .getElementById(
+        "createCustomerButton"
+      )
+      .addEventListener(
+        "click",
+        createCustomer
+      );
+
+
+    document
+      .getElementById(
+        "refreshButton"
+      )
+      .addEventListener(
+        "click",
+        loadDashboard
+      );
+
+
+    document
+      .getElementById(
+        "customerTableBody"
+      )
+      .addEventListener(
+        "click",
+        function(event) {
+
+          const button =
+            event.target.closest(
+              "[data-action]"
+            );
+
+          if (!button) return;
+
+          alert(
+            "Customer management module will be added next."
+          );
+
+        }
+      );
+
+
+    /* ==============================
+       START APPLICATION
+    ============================== */
+
+    checkSession();
+
+  </script>
+
+</body>
+</html>
