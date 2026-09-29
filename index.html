@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DhanFlow - Wallet Management</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f4f7fb;
+      color: #172033;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: #172033;
+      color: white;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .tagline {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 25px 18px;
+    }
+
+    .welcome {
+      margin-bottom: 20px;
+    }
+
+    .welcome h1 {
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+
+    .welcome p {
+      color: #687386;
+    }
+
+    .balance-card {
+      background: #172033;
+      color: white;
+      border-radius: 18px;
+      padding: 25px;
+      margin-bottom: 22px;
+    }
+
+    .balance-label {
+      opacity: 0.75;
+      font-size: 14px;
+    }
+
+    .balance {
+      font-size: 36px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+    }
+
+    .card h3 {
+      font-size: 15px;
+      color: #687386;
+      margin-bottom: 10px;
+    }
+
+    .card strong {
+      font-size: 22px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #172033;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #172033;
+      border: 1px solid #dce2eb;
+    }
+
+    .section {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .section h2 {
+      font-size: 19px;
+      margin-bottom: 15px;
+    }
+
+    .transaction {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #edf0f5;
+    }
+
+    .transaction:last-child {
+      border-bottom: none;
+    }
+
+    .transaction-title {
+      font-weight: bold;
+    }
+
+    .transaction-date {
+      font-size: 12px;
+      color: #8a94a6;
+      margin-top: 4px;
+    }
+
+    .credit {
+      color: #16834b;
+      font-weight: bold;
+    }
+
+    .debit {
+      color: #d13c3c;
+      font-weight: bold;
+    }
+
+    .login-box {
+      max-width: 420px;
+      margin: 80px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+
+    .login-box h1 {
+      margin-bottom: 8px;
+    }
+
+    .login-box p {
+      color: #687386;
+      margin-bottom: 25px;
+    }
+
+    .input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #dce2eb;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .footer {
+      text-align: center;
+      color: #8a94a6;
+      padding: 25px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 700px) {
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .balance {
+        font-size: 30px;
+      }
+
+      .welcome h1 {
+        font-size: 23px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN PAGE -->
+  <div id="loginPage">
+
+    <div class="login-box">
+      <div class="logo">DhanFlow</div>
+      <p>Simple. Secure. In Control.</p>
+
+      <input
+        type="text"
+        id="username"
+        class="input"
+        placeholder="Username"
+      >
+
+      <input
+        type="password"
+        id="password"
+        class="input"
+        placeholder="Password"
+      >
+
+      <button class="btn-primary" style="width:100%;" onclick="login()">
+        Login
+      </button>
+
+      <p id="loginMessage" style="margin-top:15px;"></p>
+    </div>
+
+  </div>
+
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="hidden">
+
+    <div class="header">
+      <div>
+        <div class="logo">DhanFlow</div>
+        <div class="tagline">Simple. Secure. In Control.</div>
+      </div>
+
+      <button
+        onclick="logout()"
+        style="background:white;color:#172033;padding:9px 13px;"
+      >
+        Logout
+      </button>
+    </div>
+
+
+    <div class="container">
+
+      <div class="welcome">
+        <h1>Welcome, <span id="userNameDisplay">User</span></h1>
+        <p>Your wallet overview</p>
+      </div>
+
+
+      <!-- BALANCE -->
+      <div class="balance-card">
+        <div class="balance-label">Available Balance</div>
+        <div class="balance" id="balance">
+          ₹10,000.00
+        </div>
+      </div>
+
+
+      <!-- SUMMARY -->
+      <div class="cards">
+
+        <div class="card">
+          <h3>Total Balance</h3>
+          <strong>₹10,000</strong>
+        </div>
+
+        <div class="card">
+          <h3>Money Received</h3>
+          <strong>₹15,000</strong>
+        </div>
+
+        <div class="card">
+          <h3>Money Sent</h3>
+          <strong>₹5,000</strong>
+        </div>
+
+        <div class="card">
+          <h3>Account Status</h3>
+          <strong>Active</strong>
+        </div>
+
+      </div>
+
+
+      <!-- ACTIONS -->
+      <div class="actions">
+
+        <button class="btn-primary" onclick="transferMoney()">
+          💸 Transfer Money
+        </button>
+
+        <button class="btn-secondary" onclick="withdrawMoney()">
+          🏦 Bank Withdrawal
+        </button>
+
+        <button class="btn-secondary" onclick="showHistory()">
+          📋 Transaction History
+        </button>
+
+      </div>
+
+
+      <!-- TRANSACTIONS -->
+      <div class="section" id="history">
+
+        <h2>Recent Transactions</h2>
+
+        <div class="transaction">
+          <div>
+            <div class="transaction-title">
+              Money Received
+            </div>
+            <div class="transaction-date">
+              TXN-DF10001 · Today
+            </div>
+          </div>
+
+          <div class="credit">
+            +₹2,000
+          </div>
+        </div>
+
+
+        <div class="transaction">
+          <div>
+            <div class="transaction-title">
+              Transfer to User
+            </div>
+            <div class="transaction-date">
+              TXN-DF10002 · Yesterday
+            </div>
+          </div>
+
+          <div class="debit">
+            -₹1,000
+          </div>
+        </div>
+
+
+        <div class="transaction">
+          <div>
+            <div class="transaction-title">
+              Money Received
+            </div>
+            <div class="transaction-date">
+              TXN-DF10003 · 2 days ago
+            </div>
+          </div>
+
+          <div class="credit">
+            +₹3,000
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="section">
+        <h2>Account Information</h2>
+
+        <p><b>User ID:</b> DF-1001</p>
+        <p style="margin-top:8px;">
+          <b>Status:</b> <span class="credit">Active</span>
+        </p>
+        <p style="margin-top:8px;">
+          <b>Wallet Type:</b> Internal Ledger
+        </p>
+      </div>
+
+    </div>
+
+
+    <div class="footer">
+      DhanFlow © 2026 · Internal Wallet Management System
+    </div>
+
+  </div>
+
+
+  <script>
+
+    function login() {
+
+      const username =
+        document.getElementById("username").value;
+
+      const password =
+        document.getElementById("password").value;
+
+      const message =
+        document.getElementById("loginMessage");
+
+
+      if (username === "demo" && password === "1234") {
+
+        document.getElementById("loginPage")
+          .classList.add("hidden");
+
+        document.getElementById("dashboard")
+          .classList.remove("hidden");
+
+        document.getElementById("userNameDisplay")
+          .textContent = username;
+
+      } else {
+
+        message.textContent =
+          "Demo login: username = demo, password = 1234";
+
+        message.style.color = "#d13c3c";
+      }
+    }
+
+
+    function logout() {
+
+      document.getElementById("dashboard")
+        .classList.add("hidden");
+
+      document.getElementById("loginPage")
+        .classList.remove("hidden");
+
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+    }
+
+
+    function transferMoney() {
+
+      alert(
+        "Transfer Money module will be connected to the DhanFlow database in the next version."
+      );
+    }
+
+
+    function withdrawMoney() {
+
+      alert(
+        "Bank Withdrawal module will be added in the next version."
+      );
+    }
+
+
+    function showHistory() {
+
+      document.getElementById("history")
+        .scrollIntoView({
+          behavior: "smooth"
+        });
+    }
+
+  </script>
+
+</body>
+</html>
