@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>DhanFlow - Wallet Management</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     const SUPABASE_URL = "https://oxwjnravklpcdhfxibya.supabase.co";
+
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
 
     const supabase = window.supabase.createClient(
@@ -14,11 +21,8 @@
     );
   </script>
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DhanFlow - Wallet Management</title>
-
   <style>
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -194,15 +198,6 @@
       box-shadow: 0 8px 30px rgba(0,0,0,0.08);
     }
 
-    .login-box h1 {
-      margin-bottom: 8px;
-    }
-
-    .login-box p {
-      color: #687386;
-      margin-bottom: 25px;
-    }
-
     .input {
       width: 100%;
       padding: 14px;
@@ -224,6 +219,7 @@
     }
 
     @media (max-width: 700px) {
+
       .cards {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -236,27 +232,31 @@
         font-size: 30px;
       }
 
-      .welcome h1 {
-        font-size: 23px;
-      }
     }
+
   </style>
+
 </head>
 
 <body>
 
-  <!-- LOGIN PAGE -->
+  <!-- LOGIN -->
+
   <div id="loginPage">
 
     <div class="login-box">
+
       <div class="logo">DhanFlow</div>
-      <p>Simple. Secure. In Control.</p>
+
+      <p style="color:#687386;margin:8px 0 25px;">
+        Simple. Secure. In Control.
+      </p>
 
       <input
-        type="text"
+        type="email"
         id="username"
         class="input"
-        placeholder="Username"
+        placeholder="Email"
       >
 
       <input
@@ -266,23 +266,38 @@
         placeholder="Password"
       >
 
-      <button class="btn-primary" style="width:100%;" onclick="login()">
+      <button
+        class="btn-primary"
+        style="width:100%;"
+        onclick="login()"
+      >
         Login
       </button>
 
-      <p id="loginMessage" style="margin-top:15px;"></p>
+      <p
+        id="loginMessage"
+        style="margin-top:15px;color:#687386;"
+      ></p>
+
     </div>
 
   </div>
 
 
   <!-- DASHBOARD -->
+
   <div id="dashboard" class="hidden">
 
     <div class="header">
+
       <div>
+
         <div class="logo">DhanFlow</div>
-        <div class="tagline">Simple. Secure. In Control.</div>
+
+        <div class="tagline">
+          Simple. Secure. In Control.
+        </div>
+
       </div>
 
       <button
@@ -291,142 +306,169 @@
       >
         Logout
       </button>
+
     </div>
 
 
     <div class="container">
 
       <div class="welcome">
-        <h1>Welcome, <span id="userNameDisplay">User</span></h1>
+
+        <h1>
+          Welcome,
+          <span id="userNameDisplay">User</span>
+        </h1>
+
         <p>Your wallet overview</p>
+
       </div>
 
 
-      <!-- BALANCE -->
       <div class="balance-card">
-        <div class="balance-label">Available Balance</div>
-        <div class="balance" id="balance">
-          ₹10,000.00
+
+        <div class="balance-label">
+          Available Balance
         </div>
+
+        <div class="balance" id="balance">
+          ₹0.00
+        </div>
+
       </div>
 
 
-      <!-- SUMMARY -->
       <div class="cards">
 
         <div class="card">
+
           <h3>Total Balance</h3>
-          <strong>₹10,000</strong>
+
+          <strong id="totalBalance">
+            ₹0.00
+          </strong>
+
         </div>
 
+
         <div class="card">
+
           <h3>Money Received</h3>
-          <strong>₹15,000</strong>
+
+          <strong id="moneyReceived">
+            ₹0.00
+          </strong>
+
         </div>
 
+
         <div class="card">
+
           <h3>Money Sent</h3>
-          <strong>₹5,000</strong>
+
+          <strong id="moneySent">
+            ₹0.00
+          </strong>
+
         </div>
 
+
         <div class="card">
+
           <h3>Account Status</h3>
-          <strong>Active</strong>
+
+          <strong id="accountStatus">
+            Active
+          </strong>
+
         </div>
 
       </div>
 
 
-      <!-- ACTIONS -->
       <div class="actions">
 
-        <button class="btn-primary" onclick="transferMoney()">
+        <button
+          class="btn-primary"
+          onclick="transferMoney()"
+        >
           💸 Transfer Money
         </button>
 
-        <button class="btn-secondary" onclick="withdrawMoney()">
+
+        <button
+          class="btn-secondary"
+          onclick="withdrawMoney()"
+        >
           🏦 Bank Withdrawal
         </button>
 
-        <button class="btn-secondary" onclick="showHistory()">
+
+        <button
+          class="btn-secondary"
+          onclick="showHistory()"
+        >
           📋 Transaction History
         </button>
 
       </div>
 
 
-      <!-- TRANSACTIONS -->
-      <div class="section" id="history">
+      <div
+        class="section"
+        id="history"
+      >
 
         <h2>Recent Transactions</h2>
 
-        <div class="transaction">
-          <div>
-            <div class="transaction-title">
-              Money Received
-            </div>
-            <div class="transaction-date">
-              TXN-DF10001 · Today
-            </div>
-          </div>
+        <div id="transactionList">
 
-          <div class="credit">
-            +₹2,000
-          </div>
-        </div>
+          <p style="color:#687386;">
+            No transactions yet.
+          </p>
 
-
-        <div class="transaction">
-          <div>
-            <div class="transaction-title">
-              Transfer to User
-            </div>
-            <div class="transaction-date">
-              TXN-DF10002 · Yesterday
-            </div>
-          </div>
-
-          <div class="debit">
-            -₹1,000
-          </div>
-        </div>
-
-
-        <div class="transaction">
-          <div>
-            <div class="transaction-title">
-              Money Received
-            </div>
-            <div class="transaction-date">
-              TXN-DF10003 · 2 days ago
-            </div>
-          </div>
-
-          <div class="credit">
-            +₹3,000
-          </div>
         </div>
 
       </div>
 
 
       <div class="section">
+
         <h2>Account Information</h2>
 
-        <p><b>User ID:</b> DF-1001</p>
-        <p style="margin-top:8px;">
-          <b>Status:</b> <span class="credit">Active</span>
+        <p>
+          <b>User ID:</b>
+          <span id="userIdDisplay">-</span>
         </p>
+
         <p style="margin-top:8px;">
-          <b>Wallet Type:</b> Internal Ledger
+
+          <b>Status:</b>
+
+          <span
+            id="statusDisplay"
+            class="credit"
+          >
+            Active
+          </span>
+
         </p>
+
+        <p style="margin-top:8px;">
+
+          <b>Wallet Type:</b>
+          Internal Ledger
+
+        </p>
+
       </div>
 
     </div>
 
 
     <div class="footer">
+
       DhanFlow © 2026 · Internal Wallet Management System
+
     </div>
 
   </div>
@@ -434,77 +476,231 @@
 
   <script>
 
-    function login() {
+    async function login() {
 
-      const username =
-        document.getElementById("username").value;
+      const email =
+        document
+          .getElementById("username")
+          .value
+          .trim();
 
       const password =
-        document.getElementById("password").value;
+        document
+          .getElementById("password")
+          .value;
 
       const message =
         document.getElementById("loginMessage");
 
 
-      if (username === "demo" && password === "1234") {
-
-        document.getElementById("loginPage")
-          .classList.add("hidden");
-
-        document.getElementById("dashboard")
-          .classList.remove("hidden");
-
-        document.getElementById("userNameDisplay")
-          .textContent = username;
-
-      } else {
+      if (!email || !password) {
 
         message.textContent =
-          "Invalid username or password.";
+          "Please enter email and password.";
 
         message.style.color = "#d13c3c";
+
+        return;
       }
+
+
+      message.textContent =
+        "Logging in...";
+
+      message.style.color =
+        "#687386";
+
+
+      const { data, error } =
+        await supabase.auth.signInWithPassword({
+
+          email: email,
+
+          password: password
+
+        });
+
+
+      if (error) {
+
+        message.textContent =
+          "Invalid email or password.";
+
+        message.style.color =
+          "#d13c3c";
+
+        return;
+      }
+
+
+      await loadUserProfile(
+        data.user
+      );
+
     }
 
 
-    function logout() {
+    async function loadUserProfile(user) {
 
-      document.getElementById("dashboard")
+      const { data, error } =
+        await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+
+
+      if (error || !data) {
+
+        await supabase.auth.signOut();
+
+        const message =
+          document.getElementById(
+            "loginMessage"
+          );
+
+        message.textContent =
+          "Profile not found.";
+
+        message.style.color =
+          "#d13c3c";
+
+        return;
+      }
+
+
+      if (data.status !== "active") {
+
+        await supabase.auth.signOut();
+
+        const message =
+          document.getElementById(
+            "loginMessage"
+          );
+
+        message.textContent =
+          "This account is blocked.";
+
+        message.style.color =
+          "#d13c3c";
+
+        return;
+      }
+
+
+      document
+        .getElementById("loginPage")
         .classList.add("hidden");
 
-      document.getElementById("loginPage")
+
+      document
+        .getElementById("dashboard")
         .classList.remove("hidden");
 
-      document.getElementById("username").value = "";
-      document.getElementById("password").value = "";
+
+      document
+        .getElementById("userNameDisplay")
+        .textContent =
+          data.username;
+
+
+      document
+        .getElementById("userIdDisplay")
+        .textContent =
+          data.user_id;
+
+
+      document
+        .getElementById("accountStatus")
+        .textContent =
+          data.status;
+
+
+      document
+        .getElementById("statusDisplay")
+        .textContent =
+          data.status;
+
+
+      document
+        .getElementById("balance")
+        .textContent =
+          "₹" +
+          Number(data.balance)
+            .toLocaleString("en-IN", {
+              minimumFractionDigits: 2
+            });
+
+
+      document
+        .getElementById("totalBalance")
+        .textContent =
+          "₹" +
+          Number(data.balance)
+            .toLocaleString("en-IN", {
+              minimumFractionDigits: 2
+            });
+
+    }
+
+
+    async function logout() {
+
+      await supabase.auth.signOut();
+
+      document
+        .getElementById("dashboard")
+        .classList.add("hidden");
+
+      document
+        .getElementById("loginPage")
+        .classList.remove("hidden");
+
+      document
+        .getElementById("username")
+        .value = "";
+
+      document
+        .getElementById("password")
+        .value = "";
+
+      document
+        .getElementById("loginMessage")
+        .textContent = "";
+
     }
 
 
     function transferMoney() {
 
       alert(
-        "Transfer Money module will be connected to the DhanFlow database in the next version."
+        "Transfer Money module will be added next."
       );
+
     }
 
 
     function withdrawMoney() {
 
       alert(
-        "Bank Withdrawal module will be added in the next version."
+        "Bank Withdrawal module will be added next."
       );
+
     }
 
 
     function showHistory() {
 
-      document.getElementById("history")
+      document
+        .getElementById("history")
         .scrollIntoView({
           behavior: "smooth"
         });
+
     }
 
   </script>
 
 </body>
+
 </html>
