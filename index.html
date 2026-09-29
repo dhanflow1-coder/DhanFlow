@@ -1,810 +1,913 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DhanFlow - Admin Panel</title>
 
-  <title>DhanFlow - Wallet Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+body{
+  background:#f4f7fb;
+  color:#172033;
+  min-height:100vh;
+}
 
-    body {
-      background: #f4f7fb;
-      color: #172033;
-      min-height: 100vh;
-    }
+.hidden{
+  display:none!important;
+}
 
-    .header {
-      background: #172033;
-      color: white;
-      padding: 18px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.header{
+  background:#172033;
+  color:white;
+  padding:18px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-    .logo {
-      font-size: 24px;
-      font-weight: bold;
-    }
+.logo{
+  font-size:24px;
+  font-weight:bold;
+}
 
-    .tagline {
-      font-size: 12px;
-      opacity: 0.7;
-    }
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:25px 18px;
+}
 
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 25px 18px;
-    }
+.welcome{
+  margin-bottom:25px;
+}
 
-    .welcome {
-      margin-bottom: 20px;
-    }
+.welcome h1{
+  font-size:28px;
+  margin-bottom:6px;
+}
 
-    .welcome h1 {
-      font-size: 28px;
-      margin-bottom: 6px;
-    }
+.welcome p{
+  color:#687386;
+}
 
-    .welcome p {
-      color: #687386;
-    }
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:25px;
+}
 
-    .balance-card {
-      background: #172033;
-      color: white;
-      border-radius: 18px;
-      padding: 25px;
-      margin-bottom: 22px;
-    }
+.card{
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 4px 15px rgba(0,0,0,.06);
+}
 
-    .balance-label {
-      opacity: 0.75;
-      font-size: 14px;
-    }
+.card h3{
+  color:#687386;
+  font-size:14px;
+  margin-bottom:10px;
+}
 
-    .balance {
-      font-size: 36px;
-      font-weight: bold;
-      margin-top: 8px;
-    }
+.card strong{
+  font-size:24px;
+}
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      margin-bottom: 25px;
-    }
+.menu{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+  margin-bottom:25px;
+}
 
-    .card {
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-    }
+.menu button{
+  padding:20px;
+  border:none;
+  border-radius:14px;
+  background:white;
+  color:#172033;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 15px rgba(0,0,0,.06);
+  text-align:left;
+}
 
-    .card h3 {
-      font-size: 15px;
-      color: #687386;
-      margin-bottom: 10px;
-    }
+.menu button:hover{
+  background:#eef2f7;
+}
 
-    .card strong {
-      font-size: 22px;
-    }
+.section{
+  background:white;
+  border-radius:15px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 4px 15px rgba(0,0,0,.05);
+}
 
-    .actions {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-bottom: 25px;
-    }
+.section h2{
+  font-size:20px;
+  margin-bottom:15px;
+}
 
-    button {
-      border: none;
-      border-radius: 12px;
-      padding: 15px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.table-wrap{
+  overflow-x:auto;
+}
 
-    .btn-primary {
-      background: #172033;
-      color: white;
-    }
+table{
+  width:100%;
+  border-collapse:collapse;
+}
 
-    .btn-secondary {
-      background: white;
-      color: #172033;
-      border: 1px solid #dce2eb;
-    }
+th,td{
+  padding:13px 10px;
+  text-align:left;
+  border-bottom:1px solid #edf0f5;
+}
 
-    .section {
-      background: white;
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
+th{
+  color:#687386;
+  font-size:13px;
+}
 
-    .section h2 {
-      font-size: 19px;
-      margin-bottom: 15px;
-    }
+.badge{
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
 
-    .login-box {
-      max-width: 420px;
-      margin: 80px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 18px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    }
+.active{
+  background:#e7f7ef;
+  color:#16834b;
+}
 
-    .input {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #dce2eb;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      font-size: 15px;
-    }
+.blocked{
+  background:#fdeaea;
+  color:#d13c3c;
+}
 
-    .hidden {
-      display: none !important;
-    }
+.empty{
+  color:#687386;
+  padding:15px 0;
+}
 
-    .credit {
-      color: #16834b;
-      font-weight: bold;
-    }
+.logout{
+  background:white;
+  color:#172033;
+  border:none;
+  padding:9px 14px;
+  border-radius:9px;
+  font-weight:bold;
+}
 
-    .footer {
-      text-align: center;
-      color: #8a94a6;
-      padding: 25px;
-      font-size: 13px;
-    }
+@media(max-width:700px){
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
 
-    @media (max-width: 700px) {
-      .cards {
-        grid-template-columns: repeat(2, 1fr);
-      }
+  .menu{
+    grid-template-columns:1fr;
+  }
 
-      .actions {
-        grid-template-columns: 1fr;
-      }
-
-      .balance {
-        font-size: 30px;
-      }
-    }
-  </style>
+  .welcome h1{
+    font-size:24px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <!-- LOGIN PAGE -->
-  <div id="loginPage">
+<!-- LOGIN -->
+<div id="loginPage">
 
-    <div class="login-box">
+  <div style="
+    max-width:420px;
+    margin:80px auto;
+    background:white;
+    padding:30px;
+    border-radius:18px;
+    box-shadow:0 8px 30px rgba(0,0,0,.08);
+  ">
 
-      <div class="logo">DhanFlow</div>
+    <div class="logo">DhanFlow</div>
 
-      <p style="color:#687386;margin:8px 0 25px;">
-        Simple. Secure. In Control.
+    <p style="color:#687386;margin:8px 0 25px;">
+      Admin Login
+    </p>
+
+    <input
+      id="username"
+      type="email"
+      placeholder="Admin Email"
+      style="
+        width:100%;
+        padding:14px;
+        margin-bottom:15px;
+        border:1px solid #dce2eb;
+        border-radius:10px;
+      "
+    >
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Password"
+      style="
+        width:100%;
+        padding:14px;
+        margin-bottom:15px;
+        border:1px solid #dce2eb;
+        border-radius:10px;
+      "
+    >
+
+    <button
+      id="loginButton"
+      style="
+        width:100%;
+        padding:14px;
+        background:#172033;
+        color:white;
+        border:none;
+        border-radius:10px;
+        font-weight:bold;
+      "
+    >
+      Login
+    </button>
+
+    <p id="loginMessage" style="margin-top:15px;"></p>
+
+  </div>
+
+</div>
+
+
+<!-- ADMIN DASHBOARD -->
+<div id="dashboard" class="hidden">
+
+  <div class="header">
+
+    <div>
+      <div class="logo">DhanFlow Admin</div>
+      <div style="font-size:12px;opacity:.7;">
+        Wallet Management System
+      </div>
+    </div>
+
+    <button id="logoutButton" class="logout">
+      Logout
+    </button>
+
+  </div>
+
+
+  <div class="container">
+
+    <div class="welcome">
+
+      <h1>
+        Welcome, <span id="adminName">Admin</span>
+      </h1>
+
+      <p>
+        Manage customers, balances and transactions.
       </p>
 
-      <input
-        type="email"
-        id="username"
-        class="input"
-        placeholder="Email"
-        autocomplete="email"
-      >
+    </div>
 
-      <input
-        type="password"
-        id="password"
-        class="input"
-        placeholder="Password"
-        autocomplete="current-password"
-      >
 
-      <button
-        id="loginButton"
-        class="btn-primary"
-        style="width:100%;"
-        type="button"
-      >
-        Login
+    <!-- STATISTICS -->
+
+    <div class="stats">
+
+      <div class="card">
+        <h3>Total Customers</h3>
+        <strong id="totalCustomers">0</strong>
+      </div>
+
+      <div class="card">
+        <h3>Total Balance</h3>
+        <strong id="totalBalance">₹0.00</strong>
+      </div>
+
+      <div class="card">
+        <h3>Pending Transfers</h3>
+        <strong id="pendingTransfers">0</strong>
+      </div>
+
+      <div class="card">
+        <h3>Pending Withdrawals</h3>
+        <strong id="pendingWithdrawals">0</strong>
+      </div>
+
+    </div>
+
+
+    <!-- MENU -->
+
+    <div class="menu">
+
+      <button id="customersButton">
+        👥 Customers
+        <br>
+        <small style="color:#687386;">
+          View and manage customers
+        </small>
       </button>
 
-      <p
-        id="loginMessage"
-        style="margin-top:15px;color:#687386;"
-      ></p>
+      <button id="transactionsButton">
+        📋 Transactions
+        <br>
+        <small style="color:#687386;">
+          View transaction history
+        </small>
+      </button>
+
+      <button id="transfersButton">
+        🔄 Transfers
+        <br>
+        <small style="color:#687386;">
+          Approve / Reject / Freeze
+        </small>
+      </button>
+
+      <button id="withdrawalsButton">
+        🏦 Withdrawals
+        <br>
+        <small style="color:#687386;">
+          Manage bank withdrawals
+        </small>
+      </button>
+
+    </div>
+
+
+    <!-- CUSTOMERS -->
+
+    <div class="section">
+
+      <h2>Customers</h2>
+
+      <div id="customerMessage" class="empty">
+        Loading customers...
+      </div>
+
+      <div class="table-wrap">
+
+        <table id="customerTable" class="hidden">
+
+          <thead>
+
+            <tr>
+              <th>User ID</th>
+              <th>Username</th>
+              <th>Balance</th>
+              <th>Status</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="customerTableBody"></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <div class="section">
+
+      <h2>Admin Information</h2>
+
+      <p>
+        <b>Role:</b>
+        Administrator
+      </p>
+
+      <p style="margin-top:8px;">
+        <b>System:</b>
+        Internal Ledger
+      </p>
+
+      <p style="margin-top:8px;">
+        <b>Real Bank Transfer:</b>
+        Not connected
+      </p>
 
     </div>
 
   </div>
 
 
-  <!-- DASHBOARD -->
-  <div id="dashboard" class="hidden">
-
-    <div class="header">
-
-      <div>
-        <div class="logo">DhanFlow</div>
-
-        <div class="tagline">
-          Simple. Secure. In Control.
-        </div>
-      </div>
-
-      <button
-        id="logoutButton"
-        style="background:white;color:#172033;padding:9px 13px;"
-        type="button"
-      >
-        Logout
-      </button>
-
-    </div>
-
-
-    <div class="container">
-
-      <div class="welcome">
-
-        <h1>
-          Welcome,
-          <span id="userNameDisplay">User</span>
-        </h1>
-
-        <p>Your wallet overview</p>
-
-      </div>
-
-
-      <div class="balance-card">
-
-        <div class="balance-label">
-          Available Balance
-        </div>
-
-        <div class="balance" id="balance">
-          ₹0.00
-        </div>
-
-      </div>
-
-
-      <div class="cards">
-
-        <div class="card">
-          <h3>Total Balance</h3>
-          <strong id="totalBalance">₹0.00</strong>
-        </div>
-
-        <div class="card">
-          <h3>Money Received</h3>
-          <strong id="moneyReceived">₹0.00</strong>
-        </div>
-
-        <div class="card">
-          <h3>Money Sent</h3>
-          <strong id="moneySent">₹0.00</strong>
-        </div>
-
-        <div class="card">
-          <h3>Account Status</h3>
-          <strong id="accountStatus">Active</strong>
-        </div>
-
-      </div>
-
-
-      <div class="actions">
-
-        <button
-          id="transferButton"
-          class="btn-primary"
-          type="button"
-        >
-          💸 Transfer Money
-        </button>
-
-        <button
-          id="withdrawButton"
-          class="btn-secondary"
-          type="button"
-        >
-          🏦 Bank Withdrawal
-        </button>
-
-        <button
-          id="historyButton"
-          class="btn-secondary"
-          type="button"
-        >
-          📋 Transaction History
-        </button>
-
-      </div>
-
-
-      <div
-        class="section"
-        id="history"
-      >
-
-        <h2>Recent Transactions</h2>
-
-        <div id="transactionList">
-
-          <p style="color:#687386;">
-            No transactions yet.
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div class="section">
-
-        <h2>Account Information</h2>
-
-        <p>
-          <b>User ID:</b>
-          <span id="userIdDisplay">-</span>
-        </p>
-
-        <p style="margin-top:8px;">
-
-          <b>Status:</b>
-
-          <span
-            id="statusDisplay"
-            class="credit"
-          >
-            Active
-          </span>
-
-        </p>
-
-        <p style="margin-top:8px;">
-
-          <b>Wallet Type:</b>
-          Internal Ledger
-
-        </p>
-
-      </div>
-
-    </div>
-
-
-    <div class="footer">
-      DhanFlow © 2026 · Internal Wallet Management System
-    </div>
-
+  <div style="
+    text-align:center;
+    color:#8a94a6;
+    padding:25px;
+    font-size:13px;
+  ">
+    DhanFlow © 2026 · Admin Panel
   </div>
 
-
-  <!-- ALL JAVASCRIPT IS INSIDE THIS SCRIPT TAG -->
-  <script>
-
-    const SUPABASE_URL =
-      "https://oxwjnravklpcdhfxibya.supabase.co";
-
-    const SUPABASE_PUBLISHABLE_KEY =
-      "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
-
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-      );
+</div>
 
 
-    async function login() {
+<script>
 
-      const email =
-        document
-          .getElementById("username")
-          .value
-          .trim();
+const SUPABASE_URL =
+"https://oxwjnravklpcdhfxibya.supabase.co";
 
-      const password =
-        document
-          .getElementById("password")
-          .value;
+const SUPABASE_PUBLISHABLE_KEY =
+"sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
 
-      const message =
-        document.getElementById("loginMessage");
-
-      const button =
-        document.getElementById("loginButton");
+const supabaseClient =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 
 
-      if (!email || !password) {
+/* LOGIN */
 
-        message.textContent =
-          "Please enter email and password.";
+async function login(){
 
-        message.style.color =
-          "#d13c3c";
+  const email =
+    document.getElementById("username").value.trim();
 
-        return;
-      }
+  const password =
+    document.getElementById("password").value;
+
+  const message =
+    document.getElementById("loginMessage");
+
+  const button =
+    document.getElementById("loginButton");
 
 
-      button.disabled = true;
+  if(!email || !password){
 
-      button.textContent =
-        "Logging in...";
+    message.textContent =
+      "Please enter email and password.";
+
+    message.style.color =
+      "#d13c3c";
+
+    return;
+  }
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "Logging in...";
+
+  message.textContent =
+    "Connecting...";
+
+
+  try{
+
+    const {data,error} =
+      await supabaseClient.auth.signInWithPassword({
+        email:email,
+        password:password
+      });
+
+
+    if(error){
 
       message.textContent =
-        "Connecting to DhanFlow...";
+        error.message;
 
       message.style.color =
-        "#687386";
+        "#d13c3c";
+
+      button.disabled = false;
+
+      button.textContent =
+        "Login";
+
+      return;
+    }
 
 
-      try {
+    if(!data.user){
 
-        const result =
-          await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: password
-          });
+      throw new Error(
+        "User data not received."
+      );
 
-
-        const data = result.data;
-        const error = result.error;
+    }
 
 
-        if (error) {
-
-          message.textContent =
-            "Login error: " + error.message;
-
-          message.style.color =
-            "#d13c3c";
-
-          button.disabled = false;
-
-          button.textContent =
-            "Login";
-
-          return;
-        }
+    await loadAdminProfile(
+      data.user
+    );
 
 
-        if (!data || !data.user) {
+  }catch(error){
 
-          message.textContent =
-            "Login failed: User data not received.";
+    message.textContent =
+      error.message;
 
-          message.style.color =
-            "#d13c3c";
+    message.style.color =
+      "#d13c3c";
 
-          button.disabled = false;
+    button.disabled = false;
 
-          button.textContent =
-            "Login";
+    button.textContent =
+      "Login";
 
-          return;
-        }
+  }
 
-
-        message.textContent =
-          "Login successful. Loading profile...";
-
-        message.style.color =
-          "#16834b";
+}
 
 
-        await loadUserProfile(
-          data.user
+/* LOAD ADMIN */
+
+async function loadAdminProfile(user){
+
+  const {data,error} =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id",user.id)
+      .single();
+
+
+  if(error){
+
+    await supabaseClient.auth.signOut();
+
+    document.getElementById(
+      "loginMessage"
+    ).textContent =
+      "Profile error: " +
+      error.message;
+
+    return;
+  }
+
+
+  if(!data){
+
+    await supabaseClient.auth.signOut();
+
+    document.getElementById(
+      "loginMessage"
+    ).textContent =
+      "Profile not found.";
+
+    return;
+  }
+
+
+  if(data.role !== "admin"){
+
+    await supabaseClient.auth.signOut();
+
+    document.getElementById(
+      "loginMessage"
+    ).textContent =
+      "This account is not an admin account.";
+
+    return;
+  }
+
+
+  if(data.status !== "active"){
+
+    await supabaseClient.auth.signOut();
+
+    document.getElementById(
+      "loginMessage"
+    ).textContent =
+      "Admin account is blocked.";
+
+    return;
+  }
+
+
+  document
+    .getElementById("loginPage")
+    .classList.add("hidden");
+
+
+  document
+    .getElementById("dashboard")
+    .classList.remove("hidden");
+
+
+  document
+    .getElementById("adminName")
+    .textContent =
+      data.username;
+
+
+  await loadStatistics();
+
+  await loadCustomers();
+
+}
+
+
+/* STATISTICS */
+
+async function loadStatistics(){
+
+  const {data:profiles,error} =
+    await supabaseClient
+      .from("profiles")
+      .select("role,balance");
+
+
+  if(!error && profiles){
+
+    const customers =
+      profiles.filter(
+        p => p.role === "customer"
+      );
+
+
+    let totalBalance = 0;
+
+
+    customers.forEach(
+      p => {
+        totalBalance +=
+          Number(p.balance || 0);
+      }
+    );
+
+
+    document
+      .getElementById("totalCustomers")
+      .textContent =
+        customers.length;
+
+
+    document
+      .getElementById("totalBalance")
+      .textContent =
+        "₹" +
+        totalBalance.toLocaleString(
+          "en-IN",
+          {
+            minimumFractionDigits:2
+          }
         );
 
+  }
 
-      } catch (error) {
 
-        message.textContent =
-          "Connection error: " +
-          error.message;
+  const {count:transferCount} =
+    await supabaseClient
+      .from("transactions")
+      .select("*",{count:"exact",head:true})
+      .eq("type","transfer")
+      .eq("status","pending");
 
-        message.style.color =
-          "#d13c3c";
 
-        button.disabled = false;
+  document
+    .getElementById("pendingTransfers")
+    .textContent =
+      transferCount || 0;
 
-        button.textContent =
-          "Login";
 
-      }
+  const {count:withdrawalCount} =
+    await supabaseClient
+      .from("withdrawals")
+      .select("*",{count:"exact",head:true})
+      .eq("status","pending");
 
-    }
 
+  document
+    .getElementById("pendingWithdrawals")
+    .textContent =
+      withdrawalCount || 0;
 
-    async function loadUserProfile(user) {
+}
 
-      const result =
-        await supabaseClient
-          .from("profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
 
+/* CUSTOMERS */
 
-      const data = result.data;
-      const error = result.error;
+async function loadCustomers(){
 
+  const message =
+    document.getElementById(
+      "customerMessage"
+    );
 
-      if (error) {
+  const table =
+    document.getElementById(
+      "customerTable"
+    );
 
-        await supabaseClient.auth.signOut();
+  const tbody =
+    document.getElementById(
+      "customerTableBody"
+    );
 
-        const message =
-          document.getElementById(
-            "loginMessage"
-          );
 
-        message.textContent =
-          "Profile error: " +
-          error.message;
+  const {data,error} =
+    await supabaseClient
+      .from("profiles")
+      .select(
+        "user_id,username,balance,status,role"
+      )
+      .eq("role","customer")
+      .order("created_at",{
+        ascending:false
+      });
 
-        message.style.color =
-          "#d13c3c";
 
-        const button =
-          document.getElementById(
-            "loginButton"
-          );
+  if(error){
 
-        button.disabled = false;
+    message.textContent =
+      "Customer loading error: " +
+      error.message;
 
-        button.textContent =
-          "Login";
+    message.style.color =
+      "#d13c3c";
 
-        return;
-      }
+    return;
+  }
 
 
-      if (!data) {
+  if(!data || data.length === 0){
 
-        await supabaseClient.auth.signOut();
+    message.textContent =
+      "No customers found.";
 
-        const message =
-          document.getElementById(
-            "loginMessage"
-          );
+    return;
+  }
 
-        message.textContent =
-          "Profile not found.";
 
-        message.style.color =
-          "#d13c3c";
+  message.classList.add("hidden");
 
-        return;
-      }
+  table.classList.remove("hidden");
 
+  tbody.innerHTML = "";
 
-      if (data.status !== "active") {
 
-        await supabaseClient.auth.signOut();
+  data.forEach(customer => {
 
-        const message =
-          document.getElementById(
-            "loginMessage"
-          );
+    const row =
+      document.createElement("tr");
 
-        message.textContent =
-          "This account is blocked.";
 
-        message.style.color =
-          "#d13c3c";
+    const statusClass =
+      customer.status === "active"
+      ? "active"
+      : "blocked";
 
-        return;
-      }
 
+    row.innerHTML = `
 
-      document
-        .getElementById("loginPage")
-        .classList.add("hidden");
+      <td>${customer.user_id}</td>
 
+      <td>${customer.username}</td>
 
-      document
-        .getElementById("dashboard")
-        .classList.remove("hidden");
-
-
-      document
-        .getElementById("userNameDisplay")
-        .textContent =
-          data.username;
-
-
-      document
-        .getElementById("userIdDisplay")
-        .textContent =
-          data.user_id;
-
-
-      document
-        .getElementById("accountStatus")
-        .textContent =
-          data.status;
-
-
-      document
-        .getElementById("statusDisplay")
-        .textContent =
-          data.status;
-
-
-      const formattedBalance =
-        "₹" +
-        Number(data.balance)
-          .toLocaleString(
-            "en-IN",
-            {
-              minimumFractionDigits: 2
-            }
-          );
-
-
-      document
-        .getElementById("balance")
-        .textContent =
-          formattedBalance;
-
-
-      document
-        .getElementById("totalBalance")
-        .textContent =
-          formattedBalance;
-
-
-      document
-        .getElementById("loginButton")
-        .disabled = false;
-
-
-      document
-        .getElementById("loginButton")
-        .textContent =
-          "Login";
-
-    }
-
-
-    async function logout() {
-
-      await supabaseClient.auth.signOut();
-
-      document
-        .getElementById("dashboard")
-        .classList.add("hidden");
-
-      document
-        .getElementById("loginPage")
-        .classList.remove("hidden");
-
-      document
-        .getElementById("username")
-        .value = "";
-
-      document
-        .getElementById("password")
-        .value = "";
-
-      document
-        .getElementById("loginMessage")
-        .textContent = "";
-
-    }
-
-
-    function transferMoney() {
-
-      alert(
-        "Transfer Money module will be added next."
-      );
-
-    }
-
-
-    function withdrawMoney() {
-
-      alert(
-        "Bank Withdrawal module will be added next."
-      );
-
-    }
-
-
-    function showHistory() {
-
-      document
-        .getElementById("history")
-        .scrollIntoView({
-          behavior: "smooth"
-        });
-
-    }
-
-
-    document
-      .getElementById("loginButton")
-      .addEventListener(
-        "click",
-        login
-      );
-
-
-    document
-      .getElementById("logoutButton")
-      .addEventListener(
-        "click",
-        logout
-      );
-
-
-    document
-      .getElementById("transferButton")
-      .addEventListener(
-        "click",
-        transferMoney
-      );
-
-
-    document
-      .getElementById("withdrawButton")
-      .addEventListener(
-        "click",
-        withdrawMoney
-      );
-
-
-    document
-      .getElementById("historyButton")
-      .addEventListener(
-        "click",
-        showHistory
-      );
-
-
-    document
-      .getElementById("password")
-      .addEventListener(
-        "keydown",
-        function(event) {
-
-          if (event.key === "Enter") {
-            login();
+      <td>
+        ₹${Number(
+          customer.balance
+        ).toLocaleString(
+          "en-IN",
+          {
+            minimumFractionDigits:2
           }
+        )}
+      </td>
 
-        }
+      <td>
+        <span class="badge ${statusClass}">
+          ${customer.status}
+        </span>
+      </td>
+
+    `;
+
+
+    tbody.appendChild(row);
+
+  });
+
+}
+
+
+/* LOGOUT */
+
+async function logout(){
+
+  await supabaseClient.auth.signOut();
+
+  document
+    .getElementById("dashboard")
+    .classList.add("hidden");
+
+  document
+    .getElementById("loginPage")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("username")
+    .value = "";
+
+  document
+    .getElementById("password")
+    .value = "";
+
+}
+
+
+/* BUTTONS */
+
+document
+  .getElementById("loginButton")
+  .addEventListener(
+    "click",
+    login
+  );
+
+
+document
+  .getElementById("logoutButton")
+  .addEventListener(
+    "click",
+    logout
+  );
+
+
+document
+  .getElementById("customersButton")
+  .addEventListener(
+    "click",
+    loadCustomers
+  );
+
+
+document
+  .getElementById("transactionsButton")
+  .addEventListener(
+    "click",
+    function(){
+      alert(
+        "Transaction Management will be added next."
       );
+    }
+  );
 
-  </script>
+
+document
+  .getElementById("transfersButton")
+  .addEventListener(
+    "click",
+    function(){
+      alert(
+        "Transfer Management will be added next."
+      );
+    }
+  );
+
+
+document
+  .getElementById("withdrawalsButton")
+  .addEventListener(
+    "click",
+    function(){
+      alert(
+        "Withdrawal Management will be added next."
+      );
+    }
+  );
+
+
+document
+  .getElementById("password")
+  .addEventListener(
+    "keydown",
+    function(event){
+
+      if(event.key === "Enter"){
+        login();
+      }
+
+    }
+  );
+
+</script>
 
 </body>
 </html>
