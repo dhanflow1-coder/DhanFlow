@@ -1,319 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DhanFlow Admin Panel</title>
 
-  <title>DhanFlow Admin Panel</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{
+  box-sizing:border-box;
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f1f5f9;
+  color:#0f172a;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f1f5f9;
-      color: #0f172a;
-    }
+.hidden{
+  display:none!important;
+}
 
-    .hidden {
-      display: none !important;
-    }
+button{
+  border:0;
+  border-radius:8px;
+  padding:10px 14px;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    button {
-      cursor: pointer;
-    }
+.primary{
+  background:#2563eb;
+  color:white;
+}
 
-    /* LOGIN */
+.success{
+  background:#16a34a;
+  color:white;
+}
 
-    #loginPage {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      background: linear-gradient(135deg, #0f172a, #2563eb);
-    }
+.danger{
+  background:#dc2626;
+  color:white;
+}
 
-    .loginBox {
-      width: 100%;
-      max-width: 400px;
-      background: white;
-      padding: 30px;
-      border-radius: 18px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
-    }
+.warning{
+  background:#d97706;
+  color:white;
+}
 
-    .logo {
-      text-align: center;
-      font-size: 32px;
-      font-weight: bold;
-      color: #2563eb;
-    }
+.gray{
+  background:#475569;
+  color:white;
+}
 
-    .subtitle {
-      text-align: center;
-      color: #64748b;
-      margin: 8px 0 25px;
-    }
+.full{
+  width:100%;
+}
 
-    label {
-      display: block;
-      font-weight: bold;
-      font-size: 14px;
-      margin: 12px 0 6px;
-    }
+.loginPage{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  background:linear-gradient(135deg,#0f172a,#2563eb);
+}
 
-    input {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid #cbd5e1;
-      border-radius: 9px;
-      font-size: 15px;
-      outline: none;
-    }
+.loginBox{
+  width:100%;
+  max-width:420px;
+  background:white;
+  padding:28px;
+  border-radius:18px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
 
-    input:focus {
-      border-color: #2563eb;
-    }
+.logo{
+  text-align:center;
+  font-size:32px;
+  font-weight:bold;
+  color:#2563eb;
+}
 
-    .btn {
-      border: none;
-      border-radius: 9px;
-      padding: 12px 18px;
-      color: white;
-      background: #2563eb;
-      font-weight: bold;
-      font-size: 15px;
-    }
+.subtitle{
+  text-align:center;
+  color:#64748b;
+  margin:7px 0 25px;
+}
 
-    .btn:hover {
-      opacity: 0.9;
-    }
+label{
+  display:block;
+  font-size:14px;
+  font-weight:bold;
+  margin:12px 0 6px;
+}
 
-    .full {
-      width: 100%;
-      margin-top: 18px;
-    }
+input,select{
+  width:100%;
+  padding:12px;
+  border:1px solid #cbd5e1;
+  border-radius:8px;
+  font-size:15px;
+  outline:none;
+}
 
-    .success {
-      background: #16a34a;
-    }
+input:focus,select:focus{
+  border-color:#2563eb;
+}
 
-    .danger {
-      background: #dc2626;
-    }
+.message{
+  display:none;
+  margin-top:12px;
+  padding:11px;
+  border-radius:8px;
+  white-space:pre-wrap;
+  font-size:14px;
+}
 
-    .warning {
-      background: #d97706;
-    }
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#0f172a;
+  color:white;
+  padding:14px 18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-    .gray {
-      background: #475569;
-    }
+.topbarTitle{
+  font-size:21px;
+  font-weight:bold;
+}
 
-    .message {
-      display: none;
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      white-space: pre-wrap;
-    }
+.container{
+  max-width:1250px;
+  margin:auto;
+  padding:18px;
+}
 
-    /* DASHBOARD */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:18px;
+}
 
-    .topbar {
-      background: #0f172a;
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+.card{
+  background:white;
+  padding:18px;
+  border-radius:14px;
+  box-shadow:0 3px 12px rgba(0,0,0,.06);
+}
 
-    .topbarTitle {
-      font-size: 22px;
-      font-weight: bold;
-    }
+.cardTitle{
+  color:#64748b;
+  font-size:14px;
+}
 
-    .logout {
-      background: #dc2626;
-      color: white;
-      border: none;
-      padding: 9px 15px;
-      border-radius: 8px;
-      font-weight: bold;
-    }
+.cardValue{
+  font-size:25px;
+  font-weight:bold;
+  margin-top:7px;
+}
 
-    .container {
-      max-width: 1200px;
-      margin: auto;
-      padding: 20px;
-    }
+.section{
+  background:white;
+  padding:18px;
+  border-radius:14px;
+  margin-bottom:18px;
+  box-shadow:0 3px 12px rgba(0,0,0,.06);
+}
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      margin-bottom: 20px;
-    }
+.section h2{
+  margin-top:0;
+}
 
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 14px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-    }
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+}
 
-    .cardTitle {
-      color: #64748b;
-      font-size: 14px;
-    }
+.tableWrap{
+  overflow-x:auto;
+}
 
-    .cardValue {
-      font-size: 25px;
-      font-weight: bold;
-      margin-top: 8px;
-    }
+table{
+  width:100%;
+  min-width:900px;
+  border-collapse:collapse;
+}
 
-    .section {
-      background: white;
-      padding: 20px;
-      border-radius: 14px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-    }
+th,td{
+  padding:10px;
+  border-bottom:1px solid #e2e8f0;
+  text-align:left;
+  font-size:13px;
+}
 
-    .section h2 {
-      margin-top: 0;
-    }
+th{
+  background:#f8fafc;
+}
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-    }
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:bold;
+}
 
-    .tableWrap {
-      overflow-x: auto;
-    }
+.active,
+.approved{
+  background:#dcfce7;
+  color:#166534;
+}
 
-    table {
-      width: 100%;
-      min-width: 750px;
-      border-collapse: collapse;
-    }
+.blocked,
+.rejected{
+  background:#fee2e2;
+  color:#991b1b;
+}
 
-    th,
-    td {
-      padding: 11px;
-      border-bottom: 1px solid #e2e8f0;
-      text-align: left;
-      font-size: 14px;
-    }
+.pending{
+  background:#fef3c7;
+  color:#92400e;
+}
 
-    th {
-      background: #f8fafc;
-    }
+.frozen{
+  background:#e0e7ff;
+  color:#3730a3;
+}
 
-    .badge {
-      display: inline-block;
-      padding: 5px 9px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
-    }
+.actionBtn{
+  padding:6px 9px;
+  font-size:11px;
+  margin:2px;
+}
 
-    .active {
-      background: #dcfce7;
-      color: #166534;
-    }
+.empty{
+  text-align:center;
+  color:#64748b;
+  padding:20px;
+}
 
-    .blocked {
-      background: #fee2e2;
-      color: #991b1b;
-    }
+.loading{
+  text-align:center;
+  padding:20px;
+  color:#64748b;
+}
 
-    .pending {
-      background: #fef3c7;
-      color: #92400e;
-    }
+@media(max-width:850px){
 
-    .approved {
-      background: #dcfce7;
-      color: #166534;
-    }
+  .cards{
+    grid-template-columns:repeat(2,1fr);
+  }
 
-    .rejected {
-      background: #fee2e2;
-      color: #991b1b;
-    }
+  .grid{
+    grid-template-columns:1fr;
+  }
+}
 
-    .frozen {
-      background: #e0e7ff;
-      color: #3730a3;
-    }
+@media(max-width:500px){
 
-    .smallBtn {
-      border: none;
-      border-radius: 6px;
-      padding: 6px 9px;
-      color: white;
-      font-size: 12px;
-      margin: 2px;
-    }
+  .cards{
+    grid-template-columns:1fr;
+  }
 
-    .empty {
-      text-align: center;
-      color: #64748b;
-      padding: 20px;
-    }
+  .container{
+    padding:10px;
+  }
 
-    @media(max-width:800px) {
-      .cards {
-        grid-template-columns: repeat(2,1fr);
-      }
+  .section{
+    padding:14px;
+  }
 
-      .grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media(max-width:480px) {
-      .cards {
-        grid-template-columns: 1fr;
-      }
-
-      .container {
-        padding: 12px;
-      }
-
-      .section {
-        padding: 15px;
-      }
-
-      .topbarTitle {
-        font-size: 18px;
-      }
-    }
-  </style>
+  .topbarTitle{
+    font-size:18px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-<!-- =========================
-     ADMIN LOGIN
-========================= -->
+<!-- ================= LOGIN ================= -->
 
-<div id="loginPage">
+<div id="loginPage" class="loginPage">
 
   <div class="loginBox">
 
@@ -332,7 +310,7 @@
     <input
       id="email"
       type="email"
-      placeholder="Enter admin email"
+      placeholder="dhanflow1@gmail.com"
       autocomplete="username"
     >
 
@@ -343,33 +321,30 @@
     <input
       id="password"
       type="password"
-      placeholder="Enter password"
+      placeholder="Enter admin password"
       autocomplete="current-password"
     >
 
     <button
       id="loginButton"
-      class="btn full"
+      class="primary full"
       type="button"
+      onclick="login()"
+      style="margin-top:18px;"
     >
       Login
     </button>
 
-    <div
-      id="loginMessage"
-      class="message"
-    ></div>
+    <div id="loginMessage" class="message"></div>
 
   </div>
 
 </div>
 
 
-<!-- =========================
-     ADMIN DASHBOARD
-========================= -->
+<!-- ================= ADMIN APP ================= -->
 
-<div id="dashboard" class="hidden">
+<div id="adminApp" class="hidden">
 
   <div class="topbar">
 
@@ -379,8 +354,9 @@
 
     <button
       id="logoutButton"
-      class="logout"
+      class="danger"
       type="button"
+      onclick="logout()"
     >
       Logout
     </button>
@@ -391,7 +367,7 @@
   <div class="container">
 
 
-    <!-- STAT CARDS -->
+    <!-- DASHBOARD CARDS -->
 
     <div class="cards">
 
@@ -410,6 +386,7 @@
 
 
       <div class="card">
+
         <div class="cardTitle">
           Total Balance
         </div>
@@ -420,10 +397,12 @@
         >
           ₹0.00
         </div>
+
       </div>
 
 
       <div class="card">
+
         <div class="cardTitle">
           Pending Transfers
         </div>
@@ -434,10 +413,12 @@
         >
           0
         </div>
+
       </div>
 
 
       <div class="card">
+
         <div class="cardTitle">
           Pending Withdrawals
         </div>
@@ -448,6 +429,7 @@
         >
           0
         </div>
+
       </div>
 
     </div>
@@ -542,8 +524,10 @@
 
       <button
         id="createCustomerButton"
-        class="btn success"
+        class="success"
         type="button"
+        style="margin-top:15px;"
+        onclick="createCustomer()"
       >
         Create Customer
       </button>
@@ -572,20 +556,51 @@
           <thead>
 
             <tr>
-              <th>User ID</th>
-              <th>Username</th>
-              <th>Role</th>
-              <th>Balance</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th>Action</th>
+
+              <th>
+                User ID
+              </th>
+
+              <th>
+                Username
+              </th>
+
+              <th>
+                Auth ID
+              </th>
+
+              <th>
+                Balance
+              </th>
+
+              <th>
+                Status
+              </th>
+
+              <th>
+                Created
+              </th>
+
+              <th>
+                Actions
+              </th>
+
             </tr>
 
           </thead>
 
-          <tbody
-            id="customerTableBody"
-          ></tbody>
+          <tbody id="customerTableBody">
+
+            <tr>
+              <td
+                colspan="7"
+                class="loading"
+              >
+                Loading...
+              </td>
+            </tr>
+
+          </tbody>
 
         </table>
 
@@ -609,20 +624,50 @@
           <thead>
 
             <tr>
-              <th>Transaction ID</th>
-              <th>Type</th>
-              <th>Sender</th>
-              <th>Receiver</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Date</th>
+
+              <th>
+                Transaction ID
+              </th>
+
+              <th>
+                Type
+              </th>
+
+              <th>
+                Sender
+              </th>
+
+              <th>
+                Receiver
+              </th>
+
+              <th>
+                Amount
+              </th>
+
+              <th>
+                Status
+              </th>
+
+              <th>
+                Admin Note
+              </th>
+
+              <th>
+                Date
+              </th>
+
+              <th>
+                Action
+              </th>
+
             </tr>
 
           </thead>
 
-          <tbody
-            id="transactionTableBody"
-          ></tbody>
+          <tbody id="transactionTableBody">
+
+          </tbody>
 
         </table>
 
@@ -646,22 +691,50 @@
           <thead>
 
             <tr>
-              <th>Withdrawal ID</th>
-              <th>User</th>
-              <th>Bank</th>
-              <th>Account Holder</th>
-              <th>Account Number</th>
-              <th>IFSC</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Action</th>
+
+              <th>
+                Withdrawal ID
+              </th>
+
+              <th>
+                User
+              </th>
+
+              <th>
+                Bank
+              </th>
+
+              <th>
+                Account Holder
+              </th>
+
+              <th>
+                Account Number
+              </th>
+
+              <th>
+                IFSC
+              </th>
+
+              <th>
+                Amount
+              </th>
+
+              <th>
+                Status
+              </th>
+
+              <th>
+                Action
+              </th>
+
             </tr>
 
           </thead>
 
-          <tbody
-            id="withdrawalTableBody"
-          ></tbody>
+          <tbody id="withdrawalTableBody">
+
+          </tbody>
 
         </table>
 
@@ -670,7 +743,7 @@
     </div>
 
 
-    <!-- ADMIN LOG -->
+    <!-- ADMIN ACTION LOG -->
 
     <div class="section">
 
@@ -685,19 +758,42 @@
           <thead>
 
             <tr>
-              <th>Action ID</th>
-              <th>Action</th>
-              <th>Amount</th>
-              <th>Reason</th>
-              <th>Transaction ID</th>
-              <th>Date</th>
+
+              <th>
+                Action ID
+              </th>
+
+              <th>
+                Action
+              </th>
+
+              <th>
+                Target User
+              </th>
+
+              <th>
+                Amount
+              </th>
+
+              <th>
+                Reason
+              </th>
+
+              <th>
+                Transaction ID
+              </th>
+
+              <th>
+                Date
+              </th>
+
             </tr>
 
           </thead>
 
-          <tbody
-            id="actionTableBody"
-          ></tbody>
+          <tbody id="actionTableBody">
+
+          </tbody>
 
         </table>
 
@@ -713,37 +809,70 @@
 
 <script>
 
-/* =====================================
-   SUPABASE CONFIGURATION
-===================================== */
+/* =====================================================
+   DHANFLOW SUPABASE CONFIG
+===================================================== */
 
 const SUPABASE_URL =
-  "https://oxwjnravklpcdhfxibya.supabase.co";
+"https://oxwjnravklpcdhfxibya.supabase.co";
 
 const SUPABASE_KEY =
-  "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
+"sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
 
 
-/* =====================================
+/* =====================================================
+   SUPABASE CLIENT
+===================================================== */
+
+let supabaseClient = null;
+
+
+function initSupabase(){
+
+  if(!window.supabase){
+
+    showMessage(
+      "loginMessage",
+      "Supabase library load হয়নি। Internet connection check করুন।"
+    );
+
+    return false;
+  }
+
+  if(!supabaseClient){
+
+    supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
+  }
+
+  return true;
+}
+
+
+/* =====================================================
    HELPERS
-===================================== */
+===================================================== */
+
+function $(id){
+
+  return document.getElementById(id);
+
+}
+
 
 function showMessage(
   elementId,
   message,
-  success = false
-) {
+  success=false
+){
 
-  const element =
-    document.getElementById(elementId);
+  const element = $(elementId);
 
-  if (!element) {
+  if(!element){
     return;
   }
 
@@ -751,102 +880,203 @@ function showMessage(
 
   element.textContent = message;
 
-  if (success) {
+  if(success){
 
-    element.style.background =
-      "#dcfce7";
+    element.style.background = "#dcfce7";
+    element.style.color = "#166534";
 
-    element.style.color =
-      "#166534";
+  }else{
 
-  } else {
+    element.style.background = "#fee2e2";
+    element.style.color = "#991b1b";
 
-    element.style.background =
-      "#fee2e2";
-
-    element.style.color =
-      "#991b1b";
   }
+
 }
 
 
-function money(value) {
+function money(value){
 
   return "₹" +
     Number(value || 0).toLocaleString(
       "en-IN",
       {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
       }
     );
+
 }
 
 
-function statusClass(status) {
+function statusBadge(status){
 
-  const value =
+  const s =
     String(status || "").toLowerCase();
 
-  if (value === "active")
-    return "active";
+  return `
+    <span class="badge ${s}">
+      ${status || "-"}
+    </span>
+  `;
 
-  if (value === "blocked")
-    return "blocked";
-
-  if (value === "pending")
-    return "pending";
-
-  if (value === "approved")
-    return "approved";
-
-  if (value === "rejected")
-    return "rejected";
-
-  if (value === "frozen")
-    return "frozen";
-
-  return "";
 }
 
 
-/* =====================================
-   ADMIN LOGIN
-===================================== */
+function escapeHtml(value){
 
-async function login() {
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
-  const email =
-    document
-      .getElementById("email")
-      .value
-      .trim();
-
-  const password =
-    document
-      .getElementById("password")
-      .value;
+}
 
 
-  if (!email) {
+/* =====================================================
+   CURRENT SESSION
+===================================================== */
 
-    showMessage(
-      "loginMessage",
-      "Please enter admin email."
+async function getSession(){
+
+  if(!initSupabase()){
+    return null;
+  }
+
+  const result =
+    await supabaseClient.auth.getSession();
+
+  if(result.error){
+
+    console.error(
+      "SESSION ERROR:",
+      result.error
     );
 
+    return null;
+  }
+
+  return result.data.session;
+
+}
+
+
+/* =====================================================
+   ADMIN API CALL
+===================================================== */
+
+async function adminApi(
+  action,
+  data={}
+){
+
+  const session =
+    await getSession();
+
+  if(!session){
+
+    throw new Error(
+      "Admin session expired. Please login again."
+    );
+
+  }
+
+  const response =
+    await fetch(
+      SUPABASE_URL +
+      "/functions/v1/admin-api",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json",
+
+          "Authorization":
+            "Bearer " +
+            session.access_token
+        },
+
+        body:JSON.stringify({
+          action,
+          ...data
+        })
+      }
+    );
+
+
+  let result;
+
+  try{
+
+    result =
+      await response.json();
+
+  }catch{
+
+    throw new Error(
+      "Server returned an invalid response."
+    );
+
+  }
+
+
+  if(!response.ok){
+
+    throw new Error(
+      result.error ||
+      "Admin API request failed."
+    );
+
+  }
+
+
+  return result;
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+async function login(){
+
+  if(!initSupabase()){
     return;
   }
 
 
-  if (!password) {
+  const email =
+    $("email").value.trim();
+
+  const password =
+    $("password").value;
+
+
+  if(!email){
 
     showMessage(
       "loginMessage",
-      "Please enter password."
+      "Admin email দিন।"
     );
 
     return;
+
+  }
+
+
+  if(!password){
+
+    showMessage(
+      "loginMessage",
+      "Password দিন।"
+    );
+
+    return;
+
   }
 
 
@@ -857,16 +1087,17 @@ async function login() {
   );
 
 
-  try {
+  try{
 
     const result =
-      await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
+      await supabaseClient.auth
+        .signInWithPassword({
+          email,
+          password
+        });
 
 
-    if (result.error) {
+    if(result.error){
 
       console.error(
         "LOGIN ERROR:",
@@ -880,10 +1111,11 @@ async function login() {
       );
 
       return;
+
     }
 
 
-    if (!result.data.user) {
+    if(!result.data.user){
 
       showMessage(
         "loginMessage",
@@ -891,6 +1123,7 @@ async function login() {
       );
 
       return;
+
     }
 
 
@@ -907,7 +1140,7 @@ async function login() {
         .single();
 
 
-    if (profileResult.error) {
+    if(profileResult.error){
 
       console.error(
         "PROFILE ERROR:",
@@ -923,6 +1156,7 @@ async function login() {
       );
 
       return;
+
     }
 
 
@@ -930,7 +1164,9 @@ async function login() {
       profileResult.data;
 
 
-    if (profile.role !== "admin") {
+    if(
+      profile.role !== "admin"
+    ){
 
       await supabaseClient.auth.signOut();
 
@@ -940,10 +1176,13 @@ async function login() {
       );
 
       return;
+
     }
 
 
-    if (profile.status !== "active") {
+    if(
+      profile.status !== "active"
+    ){
 
       await supabaseClient.auth.signOut();
 
@@ -953,26 +1192,23 @@ async function login() {
       );
 
       return;
+
     }
 
 
-    document
-      .getElementById("loginPage")
+    $("loginPage")
       .classList
       .add("hidden");
 
 
-    document
-      .getElementById("dashboard")
+    $("adminApp")
       .classList
       .remove("hidden");
 
 
     await loadDashboard();
 
-  }
-
-  catch (error) {
+  }catch(error){
 
     console.error(
       "LOGIN ERROR:",
@@ -982,7 +1218,10 @@ async function login() {
     showMessage(
       "loginMessage",
       "Unexpected error:\n" +
-      (error.message || "Unknown error")
+      (
+        error.message ||
+        "Unknown error"
+      )
     );
 
   }
@@ -990,230 +1229,136 @@ async function login() {
 }
 
 
-/* =====================================
+/* =====================================================
    LOGOUT
-===================================== */
+===================================================== */
 
-async function logout() {
+async function logout(){
 
-  await supabaseClient.auth.signOut();
+  try{
 
+    if(initSupabase()){
 
-  document
-    .getElementById("dashboard")
-    .classList
-    .add("hidden");
+      await supabaseClient.auth.signOut();
 
+    }
 
-  document
-    .getElementById("loginPage")
-    .classList
-    .remove("hidden");
+  }finally{
 
+    location.reload();
 
-  document
-    .getElementById("password")
-    .value = "";
+  }
 
 }
 
 
-/* =====================================
-   CREATE CUSTOMER
-===================================== */
+/* =====================================================
+   LOAD DASHBOARD
+===================================================== */
 
-async function createCustomer() {
+async function loadDashboard(){
 
-  const user_id =
-    document
-      .getElementById("newUserId")
-      .value
-      .trim();
+  try{
 
-
-  const username =
-    document
-      .getElementById("newUsername")
-      .value
-      .trim();
-
-
-  const email =
-    document
-      .getElementById("newEmail")
-      .value
-      .trim();
-
-
-  const password =
-    document
-      .getElementById("newPassword")
-      .value;
-
-
-  const initial_balance =
-    Number(
-      document
-        .getElementById("newBalance")
-        .value || 0
-    );
-
-
-  if (
-    !user_id ||
-    !username ||
-    !email ||
-    !password
-  ) {
-
-    showMessage(
-      "customerMessage",
-      "Please fill all required fields."
-    );
-
-    return;
-  }
-
-
-  if (password.length < 6) {
-
-    showMessage(
-      "customerMessage",
-      "Password must be at least 6 characters."
-    );
-
-    return;
-  }
-
-
-  if (
-    !Number.isFinite(initial_balance) ||
-    initial_balance < 0
-  ) {
-
-    showMessage(
-      "customerMessage",
-      "Initial balance must be 0 or greater."
-    );
-
-    return;
-  }
-
-
-  showMessage(
-    "customerMessage",
-    "Creating customer...",
-    true
-  );
-
-
-  try {
-
-    const sessionResult =
-      await supabaseClient.auth.getSession();
-
-
-    const session =
-      sessionResult.data.session;
-
-
-    if (!session) {
-
-      showMessage(
-        "customerMessage",
-        "Admin session expired. Please login again."
-      );
-
-      return;
-    }
-
-
-    const response =
-      await fetch(
-        SUPABASE_URL +
-        "/functions/v1/create-customer",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-
-            "Authorization":
-              "Bearer " +
-              session.access_token
-          },
-
-          body: JSON.stringify({
-            user_id,
-            username,
-            email,
-            password,
-            initial_balance
-          })
-        }
+    const data =
+      await adminApi(
+        "dashboard"
       );
 
 
-    const result =
-      await response.json();
+    const profiles =
+      data.profiles || [];
+
+    const transactions =
+      data.transactions || [];
+
+    const withdrawals =
+      data.withdrawals || [];
+
+    const actions =
+      data.actions || [];
 
 
-    if (!response.ok) {
-
-      showMessage(
-        "customerMessage",
-        result.error ||
-        "Customer creation failed."
-      );
-
-      return;
-    }
-
-
-    showMessage(
-      "customerMessage",
-      "Customer created successfully.",
-      true
+    loadCustomerTable(
+      profiles
     );
 
 
-    document
-      .getElementById("newUserId")
-      .value = "";
-
-    document
-      .getElementById("newUsername")
-      .value = "";
-
-    document
-      .getElementById("newEmail")
-      .value = "";
-
-    document
-      .getElementById("newPassword")
-      .value = "";
-
-    document
-      .getElementById("newBalance")
-      .value = "0";
+    loadTransactionTable(
+      transactions
+    );
 
 
-    await loadCustomers();
+    loadWithdrawalTable(
+      withdrawals
+    );
 
-  }
 
-  catch (error) {
+    loadActionTable(
+      actions
+    );
+
+
+    const customers =
+      profiles.filter(
+        x => x.role === "customer"
+      );
+
+
+    const totalBalance =
+      customers.reduce(
+        (sum,user) =>
+          sum +
+          Number(user.balance || 0),
+        0
+      );
+
+
+    const pendingTransfers =
+      transactions.filter(
+        x =>
+          x.type === "transfer" &&
+          x.status === "pending"
+      ).length;
+
+
+    const pendingWithdrawals =
+      withdrawals.filter(
+        x =>
+          x.status === "pending"
+      ).length;
+
+
+    $("totalCustomers")
+      .textContent =
+      customers.length;
+
+
+    $("totalBalance")
+      .textContent =
+      money(totalBalance);
+
+
+    $("pendingTransfers")
+      .textContent =
+      pendingTransfers;
+
+
+    $("pendingWithdrawals")
+      .textContent =
+      pendingWithdrawals;
+
+
+  }catch(error){
 
     console.error(
-      "CREATE CUSTOMER ERROR:",
+      "DASHBOARD ERROR:",
       error
     );
 
-    showMessage(
-      "customerMessage",
-      error.message ||
-      "Customer creation failed."
+    alert(
+      "Dashboard load failed:\n" +
+      error.message
     );
 
   }
@@ -1221,122 +1366,83 @@ async function createCustomer() {
 }
 
 
-/* =====================================
-   DASHBOARD
-===================================== */
+/* =====================================================
+   CUSTOMER TABLE
+===================================================== */
 
-async function loadDashboard() {
+function loadCustomerTable(
+  profiles
+){
 
-  await loadCustomers();
-
-  await loadTransactions();
-
-  await loadWithdrawals();
-
-  await loadAdminActions();
-
-}
-
-
-/* =====================================
-   CUSTOMERS
-===================================== */
-
-async function loadCustomers() {
-
-  const result =
-    await supabaseClient
-      .from("profiles")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
-
-  if (result.error) {
-
-    console.error(
-      "CUSTOMER LOAD ERROR:",
-      result.error
+  const customers =
+    profiles.filter(
+      x => x.role === "customer"
     );
-
-    return;
-  }
-
-
-  const users =
-    result.data || [];
 
 
   const tbody =
-    document.getElementById(
-      "customerTableBody"
-    );
+    $("customerTableBody");
 
 
-  tbody.innerHTML = "";
+  if(!customers.length){
 
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="empty">
+          No customers found.
+        </td>
+      </tr>
+    `;
 
-  let customerCount = 0;
-
-  let totalBalance = 0;
-
-
-  if (users.length === 0) {
-
-    tbody.innerHTML =
-      '<tr><td colspan="7" class="empty">No customers found.</td></tr>';
+    return;
 
   }
 
 
-  users.forEach(function(user) {
+  tbody.innerHTML =
+    customers.map(
+      user => `
 
-    if (user.role === "customer") {
+      <tr>
 
-      customerCount++;
+        <td>
+          ${escapeHtml(user.user_id)}
+        </td>
 
-      totalBalance +=
-        Number(user.balance || 0);
+        <td>
+          ${escapeHtml(user.username)}
+        </td>
 
-    }
+        <td>
+          ${escapeHtml(user.id)}
+        </td>
 
+        <td>
+          ${money(user.balance)}
+        </td>
 
-    const row =
-      document.createElement("tr");
+        <td>
+          ${statusBadge(user.status)}
+        </td>
 
+        <td>
+          ${new Date(
+            user.created_at
+          ).toLocaleString("en-IN")}
+        </td>
 
-    let action = "";
+        <td>
 
-
-    if (user.role === "customer") {
-
-      action =
-        '<button class="smallBtn ' +
-        (
-          user.status === "active"
-            ? "danger"
-            : "success"
-        ) +
-        '" onclick="toggleUserStatus(\'' +
-        user.id +
-        '\',\'' +
-        user.status +
-        '\')">' +
-        (
-          user.status === "active"
-            ? "Block"
-            : "Unblock"
-        ) +
-        "</button>";
-
-    }
-
-
-    row.innerHTML =
-
-      "<td>" +
-      user.
+          <button
+            class="${
+              user.status === "active"
+              ? "danger"
+              : "success"
+            } actionBtn"
+            onclick="changeUserStatus(
+              '${user.user_id}',
+              '${user.status}'
+            )"
+          >
+            ${
+              user.status =
