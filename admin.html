@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>DhanFlow Admin Panel</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,21 +15,48 @@
 
 body{
   margin:0;
-  font-family:Arial,sans-serif;
-  background:#f1f5f9;
-  color:#0f172a;
+  font-family:Arial, sans-serif;
+  background:#0b1220;
+  color:#fff;
 }
 
-.hidden{
-  display:none!important;
+.container{
+  width:100%;
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+
+.card{
+  background:#121c2e;
+  border:1px solid #26344d;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:20px;
+}
+
+h1,h2,h3{
+  margin-top:0;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:13px;
+  margin:7px 0 12px;
+  border-radius:9px;
+  border:1px solid #34445f;
+  background:#0b1424;
+  color:#fff;
+  font-size:15px;
 }
 
 button{
   border:0;
-  border-radius:8px;
-  padding:10px 14px;
-  font-weight:bold;
+  border-radius:9px;
+  padding:12px 18px;
   cursor:pointer;
+  font-size:15px;
+  font-weight:bold;
 }
 
 .primary{
@@ -51,7 +79,7 @@ button{
   color:white;
 }
 
-.gray{
+.secondary{
   background:#475569;
   color:white;
 }
@@ -60,228 +88,94 @@ button{
   width:100%;
 }
 
-.loginPage{
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:20px;
-  background:linear-gradient(135deg,#0f172a,#2563eb);
-}
-
-.loginBox{
-  width:100%;
-  max-width:420px;
-  background:white;
-  padding:28px;
-  border-radius:18px;
-  box-shadow:0 20px 60px rgba(0,0,0,.25);
-}
-
-.logo{
-  text-align:center;
-  font-size:32px;
-  font-weight:bold;
-  color:#2563eb;
-}
-
-.subtitle{
-  text-align:center;
-  color:#64748b;
-  margin:7px 0 25px;
-}
-
-label{
-  display:block;
-  font-size:14px;
-  font-weight:bold;
-  margin:12px 0 6px;
-}
-
-input,select{
-  width:100%;
-  padding:12px;
-  border:1px solid #cbd5e1;
-  border-radius:8px;
-  font-size:15px;
-  outline:none;
-}
-
-input:focus,select:focus{
-  border-color:#2563eb;
+.hidden{
+  display:none !important;
 }
 
 .message{
-  display:none;
   margin-top:12px;
-  padding:11px;
+  padding:12px;
   border-radius:8px;
-  white-space:pre-wrap;
-  font-size:14px;
+  background:#1e293b;
+}
+
+.login-box{
+  max-width:430px;
+  margin:70px auto;
 }
 
 .topbar{
-  position:sticky;
-  top:0;
-  z-index:10;
-  background:#0f172a;
-  color:white;
-  padding:14px 18px;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
 }
 
-.topbarTitle{
-  font-size:21px;
-  font-weight:bold;
-}
-
-.container{
-  max-width:1250px;
-  margin:auto;
-  padding:18px;
-}
-
-.cards{
+.stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:18px;
+  gap:15px;
 }
 
-.card{
-  background:white;
+.stat{
+  background:#172338;
   padding:18px;
-  border-radius:14px;
-  box-shadow:0 3px 12px rgba(0,0,0,.06);
+  border-radius:12px;
 }
 
-.cardTitle{
-  color:#64748b;
-  font-size:14px;
+.stat strong{
+  display:block;
+  font-size:28px;
+  margin-top:8px;
 }
 
-.cardValue{
-  font-size:25px;
-  font-weight:bold;
-  margin-top:7px;
-}
-
-.section{
-  background:white;
-  padding:18px;
-  border-radius:14px;
-  margin-bottom:18px;
-  box-shadow:0 3px 12px rgba(0,0,0,.06);
-}
-
-.section h2{
-  margin-top:0;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:14px;
-}
-
-.tableWrap{
+.table-wrap{
   overflow-x:auto;
 }
 
 table{
   width:100%;
-  min-width:900px;
   border-collapse:collapse;
+  min-width:700px;
 }
 
 th,td{
-  padding:10px;
-  border-bottom:1px solid #e2e8f0;
+  padding:11px;
+  border-bottom:1px solid #29364c;
   text-align:left;
-  font-size:13px;
 }
 
 th{
-  background:#f8fafc;
+  background:#18253a;
 }
 
-.badge{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:20px;
-  font-size:11px;
-  font-weight:bold;
+.small{
+  font-size:13px;
+  color:#aebbd0;
 }
 
-.active,
-.approved{
-  background:#dcfce7;
-  color:#166534;
+.actions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
 }
 
-.blocked,
-.rejected{
-  background:#fee2e2;
-  color:#991b1b;
+.section-title{
+  margin-top:30px;
 }
 
-.pending{
-  background:#fef3c7;
-  color:#92400e;
-}
-
-.frozen{
-  background:#e0e7ff;
-  color:#3730a3;
-}
-
-.actionBtn{
-  padding:6px 9px;
-  font-size:11px;
-  margin:2px;
-}
-
-.empty{
-  text-align:center;
-  color:#64748b;
-  padding:20px;
-}
-
-.loading{
-  text-align:center;
-  padding:20px;
-  color:#64748b;
-}
-
-@media(max-width:850px){
-
-  .cards{
+@media(max-width:700px){
+  .stats{
     grid-template-columns:repeat(2,1fr);
   }
 
-  .grid{
-    grid-template-columns:1fr;
-  }
-}
-
-@media(max-width:500px){
-
-  .cards{
-    grid-template-columns:1fr;
-  }
-
   .container{
-    padding:10px;
+    padding:12px;
   }
 
-  .section{
-    padding:14px;
-  }
-
-  .topbarTitle{
-    font-size:18px;
+  .card{
+    padding:15px;
   }
 }
 </style>
@@ -289,510 +183,310 @@ th{
 
 <body>
 
-<!-- ================= LOGIN ================= -->
+<!-- LOGIN -->
+<div id="loginPage" class="container">
 
-<div id="loginPage" class="loginPage">
+  <div class="card login-box">
 
-  <div class="loginBox">
+    <h1>DhanFlow</h1>
+    <p class="small">Admin Login</p>
 
-    <div class="logo">
-      DhanFlow
-    </div>
-
-    <div class="subtitle">
-      Admin Secure Login
-    </div>
-
-    <label for="email">
-      Admin Email
-    </label>
-
+    <label>Email</label>
     <input
-      id="email"
+      id="loginEmail"
       type="email"
-      placeholder="dhanflow1@gmail.com"
+      placeholder="Admin email"
       autocomplete="username"
     >
 
-    <label for="password">
-      Password
-    </label>
-
+    <label>Password</label>
     <input
-      id="password"
+      id="loginPassword"
       type="password"
-      placeholder="Enter admin password"
+      placeholder="Admin password"
       autocomplete="current-password"
     >
 
-    <button class="primary full" type="button" onclick="alert('BUTTON WORKING'); login();">Login</button>
+    <button
+      id="loginButton"
+      class="primary full"
+      type="button"
+      onclick="login()"
+    >
+      Login
+    </button>
 
-    <div id="loginMessage" class="message"></div>
+    <div id="loginMessage" class="message hidden"></div>
 
   </div>
 
 </div>
 
 
-<!-- ================= ADMIN APP ================= -->
+<!-- ADMIN APP -->
+<div id="adminApp" class="container hidden">
 
-<div id="adminApp" class="hidden">
+  <div class="card">
 
-  <div class="topbar">
+    <div class="topbar">
 
-    <div class="topbarTitle">
-      DhanFlow Admin
+      <div>
+        <h1>DhanFlow Admin</h1>
+        <div id="adminInfo" class="small"></div>
+      </div>
+
+      <button
+        class="danger"
+        type="button"
+        onclick="logout()"
+      >
+        Logout
+      </button>
+
     </div>
 
+  </div>
+
+
+  <!-- STATS -->
+  <div class="stats">
+
+    <div class="stat">
+      <div class="small">Customers</div>
+      <strong id="statCustomers">0</strong>
+    </div>
+
+    <div class="stat">
+      <div class="small">Total Balance</div>
+      <strong id="statBalance">₹0.00</strong>
+    </div>
+
+    <div class="stat">
+      <div class="small">Transactions</div>
+      <strong id="statTransactions">0</strong>
+    </div>
+
+    <div class="stat">
+      <div class="small">Withdrawals</div>
+      <strong id="statWithdrawals">0</strong>
+    </div>
+
+  </div>
+
+
+  <!-- REFRESH -->
+  <div class="card">
+
     <button
-      id="logoutButton"
-      class="danger"
+      class="primary"
       type="button"
-      onclick="logout()"
+      onclick="loadDashboard()"
     >
-      Logout
+      Refresh Dashboard
+    </button>
+
+    <div id="appMessage" class="message hidden"></div>
+
+  </div>
+
+
+  <!-- CREATE CUSTOMER -->
+  <div class="card">
+
+    <h2>Create Customer</h2>
+
+    <input
+      id="newUserId"
+      placeholder="User ID e.g. USER001"
+    >
+
+    <input
+      id="newUsername"
+      placeholder="Username"
+    >
+
+    <input
+      id="newEmail"
+      type="email"
+      placeholder="Customer Email"
+    >
+
+    <input
+      id="newPassword"
+      type="password"
+      placeholder="Customer Password"
+    >
+
+    <input
+      id="newBalance"
+      type="number"
+      min="0"
+      step="0.01"
+      placeholder="Initial Balance"
+    >
+
+    <button
+      class="success"
+      type="button"
+      onclick="createCustomer()"
+    >
+      Create Customer
     </button>
 
   </div>
 
 
-  <div class="container">
+  <!-- BALANCE ADJUSTMENT -->
+  <div class="card">
+
+    <h2>Balance Adjustment</h2>
+
+    <input
+      id="adjustUserId"
+      placeholder="Customer UUID"
+    >
+
+    <input
+      id="adjustAmount"
+      type="number"
+      step="0.01"
+      placeholder="Amount (+ deposit / - deduction)"
+    >
+
+    <textarea
+      id="adjustReason"
+      placeholder="Reason"
+    ></textarea>
+
+    <button
+      class="warning"
+      type="button"
+      onclick="adjustBalance()"
+    >
+      Adjust Balance
+    </button>
+
+  </div>
 
 
-    <!-- DASHBOARD CARDS -->
+  <!-- CUSTOMERS -->
+  <div class="card">
 
-    <div class="cards">
+    <h2>Customers</h2>
 
-      <div class="card">
-        <div class="cardTitle">
-          Total Customers
-        </div>
+    <div class="table-wrap">
 
-        <div
-          id="totalCustomers"
-          class="cardValue"
-        >
-          0
-        </div>
-      </div>
+      <table>
 
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Balance</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Action</th>
+          </tr>
+        </thead>
 
-      <div class="card">
+        <tbody id="customersBody">
+        </tbody>
 
-        <div class="cardTitle">
-          Total Balance
-        </div>
-
-        <div
-          id="totalBalance"
-          class="cardValue"
-        >
-          ₹0.00
-        </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <div class="cardTitle">
-          Pending Transfers
-        </div>
-
-        <div
-          id="pendingTransfers"
-          class="cardValue"
-        >
-          0
-        </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <div class="cardTitle">
-          Pending Withdrawals
-        </div>
-
-        <div
-          id="pendingWithdrawals"
-          class="cardValue"
-        >
-          0
-        </div>
-
-      </div>
+      </table>
 
     </div>
 
-
-    <!-- CREATE CUSTOMER -->
-
-    <div class="section">
-
-      <h2>
-        Create Customer
-      </h2>
-
-      <div class="grid">
-
-        <div>
-
-          <label>
-            User ID
-          </label>
-
-          <input
-            id="newUserId"
-            placeholder="USER001"
-          >
-
-        </div>
+  </div>
 
 
-        <div>
+  <!-- TRANSACTIONS -->
+  <div class="card">
 
-          <label>
-            Username
-          </label>
+    <h2>Transactions</h2>
 
-          <input
-            id="newUsername"
-            placeholder="username"
-          >
+    <div class="table-wrap">
 
-        </div>
+      <table>
 
+        <thead>
+          <tr>
+            <th>Transaction ID</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
 
-        <div>
+        <tbody id="transactionsBody">
+        </tbody>
 
-          <label>
-            Email
-          </label>
-
-          <input
-            id="newEmail"
-            type="email"
-            placeholder="customer@email.com"
-          >
-
-        </div>
-
-
-        <div>
-
-          <label>
-            Password
-          </label>
-
-          <input
-            id="newPassword"
-            type="password"
-            placeholder="Minimum 6 characters"
-          >
-
-        </div>
-
-
-        <div>
-
-          <label>
-            Initial Balance
-          </label>
-
-          <input
-            id="newBalance"
-            type="number"
-            min="0"
-            step="0.01"
-            value="0"
-          >
-
-        </div>
-
-      </div>
-
-
-      <button
-        id="createCustomerButton"
-        class="success"
-        type="button"
-        style="margin-top:15px;"
-        onclick="createCustomer()"
-      >
-        Create Customer
-      </button>
-
-
-      <div
-        id="customerMessage"
-        class="message"
-      ></div>
+      </table>
 
     </div>
 
+  </div>
 
-    <!-- CUSTOMERS -->
 
-    <div class="section">
+  <!-- WITHDRAWALS -->
+  <div class="card">
 
-      <h2>
-        Customers
-      </h2>
+    <h2>Bank Withdrawals</h2>
 
-      <div class="tableWrap">
+    <div class="table-wrap">
 
-        <table>
+      <table>
 
-          <thead>
+        <thead>
+          <tr>
+            <th>Withdrawal ID</th>
+            <th>Amount</th>
+            <th>Bank</th>
+            <th>Account Holder</th>
+            <th>IFSC</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
 
-            <tr>
+        <tbody id="withdrawalsBody">
+        </tbody>
 
-              <th>
-                User ID
-              </th>
-
-              <th>
-                Username
-              </th>
-
-              <th>
-                Auth ID
-              </th>
-
-              <th>
-                Balance
-              </th>
-
-              <th>
-                Status
-              </th>
-
-              <th>
-                Created
-              </th>
-
-              <th>
-                Actions
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody id="customerTableBody">
-
-            <tr>
-              <td
-                colspan="7"
-                class="loading"
-              >
-                Loading...
-              </td>
-            </tr>
-
-          </tbody>
-
-        </table>
-
-      </div>
+      </table>
 
     </div>
 
+  </div>
 
-    <!-- TRANSACTIONS -->
 
-    <div class="section">
+  <!-- ADMIN LOG -->
+  <div class="card">
 
-      <h2>
-        Transactions
-      </h2>
+    <h2>Admin Action Log</h2>
 
-      <div class="tableWrap">
+    <div class="table-wrap">
 
-        <table>
+      <table>
 
-          <thead>
+        <thead>
+          <tr>
+            <th>Action ID</th>
+            <th>Action</th>
+            <th>Amount</th>
+            <th>Reason</th>
+            <th>Date</th>
+          </tr>
+        </thead>
 
-            <tr>
+        <tbody id="actionsBody">
+        </tbody>
 
-              <th>
-                Transaction ID
-              </th>
-
-              <th>
-                Type
-              </th>
-
-              <th>
-                Sender
-              </th>
-
-              <th>
-                Receiver
-              </th>
-
-              <th>
-                Amount
-              </th>
-
-              <th>
-                Status
-              </th>
-
-              <th>
-                Admin Note
-              </th>
-
-              <th>
-                Date
-              </th>
-
-              <th>
-                Action
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody id="transactionTableBody">
-
-          </tbody>
-
-        </table>
-
-      </div>
+      </table>
 
     </div>
-
-
-    <!-- WITHDRAWALS -->
-
-    <div class="section">
-
-      <h2>
-        Bank Withdrawals
-      </h2>
-
-      <div class="tableWrap">
-
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>
-                Withdrawal ID
-              </th>
-
-              <th>
-                User
-              </th>
-
-              <th>
-                Bank
-              </th>
-
-              <th>
-                Account Holder
-              </th>
-
-              <th>
-                Account Number
-              </th>
-
-              <th>
-                IFSC
-              </th>
-
-              <th>
-                Amount
-              </th>
-
-              <th>
-                Status
-              </th>
-
-              <th>
-                Action
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody id="withdrawalTableBody">
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-
-    <!-- ADMIN ACTION LOG -->
-
-    <div class="section">
-
-      <h2>
-        Admin Action Log
-      </h2>
-
-      <div class="tableWrap">
-
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>
-                Action ID
-              </th>
-
-              <th>
-                Action
-              </th>
-
-              <th>
-                Target User
-              </th>
-
-              <th>
-                Amount
-              </th>
-
-              <th>
-                Reason
-              </th>
-
-              <th>
-                Transaction ID
-              </th>
-
-              <th>
-                Date
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody id="actionTableBody">
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
 
   </div>
 
@@ -801,9 +495,9 @@ th{
 
 <script>
 
-/* =====================================================
-   DHANFLOW SUPABASE CONFIG
-===================================================== */
+/* =========================
+   SUPABASE CONFIG
+========================= */
 
 const SUPABASE_URL =
 "https://oxwjnravklpcdhfxibya.supabase.co";
@@ -811,13 +505,12 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
 "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
 
-
-/* =====================================================
-   SUPABASE CLIENT
-===================================================== */
-
 let supabaseClient = null;
 
+
+/* =========================
+   INITIALIZE
+========================= */
 
 function initSupabase(){
 
@@ -838,215 +531,42 @@ function initSupabase(){
         SUPABASE_URL,
         SUPABASE_KEY
       );
-
   }
 
   return true;
 }
 
 
-/* =====================================================
-   HELPERS
-===================================================== */
+/* =========================
+   MESSAGE
+========================= */
 
-function $(id){
+function showMessage(id,text){
 
-  return document.getElementById(id);
+  const el = document.getElementById(id);
 
+  if(!el) return;
+
+  el.textContent = text;
+  el.classList.remove("hidden");
 }
 
 
-function showMessage(
-  elementId,
-  message,
-  success=false
-){
-
-  const element = $(elementId);
-
-  if(!element){
-    return;
-  }
-
-  element.style.display = "block";
-
-  element.textContent = message;
-
-  if(success){
-
-    element.style.background = "#dcfce7";
-    element.style.color = "#166534";
-
-  }else{
-
-    element.style.background = "#fee2e2";
-    element.style.color = "#991b1b";
-
-  }
-
-}
-
-
-function money(value){
-
-  return "₹" +
-    Number(value || 0).toLocaleString(
-      "en-IN",
-      {
-        minimumFractionDigits:2,
-        maximumFractionDigits:2
-      }
-    );
-
-}
-
-
-function statusBadge(status){
-
-  const s =
-    String(status || "").toLowerCase();
-
-  return `
-    <span class="badge ${s}">
-      ${status || "-"}
-    </span>
-  `;
-
-}
-
-
-function escapeHtml(value){
-
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-
-/* =====================================================
-   CURRENT SESSION
-===================================================== */
-
-async function getSession(){
-
-  if(!initSupabase()){
-    return null;
-  }
-
-  const result =
-    await supabaseClient.auth.getSession();
-
-  if(result.error){
-
-    console.error(
-      "SESSION ERROR:",
-      result.error
-    );
-
-    return null;
-  }
-
-  return result.data.session;
-
-}
-
-
-/* =====================================================
-   ADMIN API CALL
-===================================================== */
-
-async function adminApi(
-  action,
-  data={}
-){
-
-  const session =
-    await getSession();
-
-  if(!session){
-
-    throw new Error(
-      "Admin session expired. Please login again."
-    );
-
-  }
-
-  const response =
-    await fetch(
-      SUPABASE_URL +
-      "/functions/v1/admin-api",
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/json",
-
-          "Authorization":
-            "Bearer " +
-            session.access_token
-        },
-
-        body:JSON.stringify({
-          action,
-          ...data
-        })
-      }
-    );
-
-
-  let result;
-
-  try{
-
-    result =
-      await response.json();
-
-  }catch{
-
-    throw new Error(
-      "Server returned an invalid response."
-    );
-
-  }
-
-
-  if(!response.ok){
-
-    throw new Error(
-      result.error ||
-      "Admin API request failed."
-    );
-
-  }
-
-
-  return result;
-
-}
-
-
-/* =====================================================
+/* =========================
    LOGIN
-===================================================== */
+========================= */
 
 async function login(){
 
-  if(!initSupabase()){
-    return;
-  }
+  console.log("LOGIN FUNCTION STARTED");
 
+  if(!initSupabase()) return;
 
   const email =
-    $("email").value.trim();
+    document.getElementById("loginEmail").value.trim();
 
   const password =
-    $("password").value;
-
+    document.getElementById("loginPassword").value;
 
   if(!email){
 
@@ -1056,99 +576,72 @@ async function login(){
     );
 
     return;
-
   }
-
 
   if(!password){
 
     showMessage(
       "loginMessage",
-      "Password দিন।"
+      "Admin password দিন।"
     );
 
     return;
-
   }
 
 
+  const button =
+    document.getElementById("loginButton");
+
+  button.disabled = true;
+  button.textContent = "Logging in...";
+
   showMessage(
     "loginMessage",
-    "Logging in...",
-    true
+    "Login হচ্ছে..."
   );
 
 
   try{
 
     const result =
-      await supabaseClient.auth
-        .signInWithPassword({
-          email,
-          password
-        });
+      await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
 
 
     if(result.error){
 
-      console.error(
-        "LOGIN ERROR:",
-        result.error
-      );
-
-      showMessage(
-        "loginMessage",
-        "Login failed:\n" +
-        result.error.message
-      );
-
-      return;
-
+      throw result.error;
     }
 
 
-    if(!result.data.user){
+    const user =
+      result.data.user;
 
-      showMessage(
-        "loginMessage",
-        "Login failed: user not found."
+
+    if(!user){
+
+      throw new Error(
+        "User পাওয়া যায়নি।"
       );
-
-      return;
-
     }
 
 
     const profileResult =
       await supabaseClient
-        .from("profiles")
-        .select(
-          "id,user_id,username,role,balance,status"
-        )
-        .eq(
-          "id",
-          result.data.user.id
-        )
-        .single();
+      .from("profiles")
+      .select("id,user_id,username,role,balance,status")
+      .eq("id",user.id)
+      .single();
 
 
     if(profileResult.error){
 
-      console.error(
-        "PROFILE ERROR:",
-        profileResult.error
-      );
-
-      await supabaseClient.auth.signOut();
-
-      showMessage(
-        "loginMessage",
-        "Profile error:\n" +
+      throw new Error(
+        "Admin profile পাওয়া যায়নি: " +
         profileResult.error.message
       );
-
-      return;
-
     }
 
 
@@ -1156,139 +649,233 @@ async function login(){
       profileResult.data;
 
 
-    if(
-      profile.role !== "admin"
-    ){
+    if(profile.role !== "admin"){
 
       await supabaseClient.auth.signOut();
 
-      showMessage(
-        "loginMessage",
-        "This account is not an admin account."
+      throw new Error(
+        "এই account-এর admin permission নেই।"
       );
-
-      return;
-
     }
 
 
-    if(
-      profile.status !== "active"
-    ){
+    if(profile.status !== "active"){
 
       await supabaseClient.auth.signOut();
 
-      showMessage(
-        "loginMessage",
-        "This admin account is blocked."
+      throw new Error(
+        "Admin account blocked/inactive।"
       );
-
-      return;
-
     }
 
 
-    $("loginPage")
-      .classList
-      .add("hidden");
+    document.getElementById(
+      "loginPage"
+    ).classList.add("hidden");
 
 
-    $("adminApp")
-      .classList
-      .remove("hidden");
+    document.getElementById(
+      "adminApp"
+    ).classList.remove("hidden");
+
+
+    document.getElementById(
+      "adminInfo"
+    ).textContent =
+      "Logged in as: " +
+      profile.username +
+      " | " +
+      profile.user_id;
+
+
+    document.getElementById(
+      "loginMessage"
+    ).classList.add("hidden");
 
 
     await loadDashboard();
 
-  }catch(error){
+  }
+  catch(error){
 
-    console.error(
-      "LOGIN ERROR:",
-      error
-    );
+    console.error("LOGIN ERROR:",error);
 
     showMessage(
       "loginMessage",
-      "Unexpected error:\n" +
-      (
-        error.message ||
-        "Unknown error"
-      )
+      "Login failed: " +
+      (error.message || "Unknown error")
     );
 
   }
+  finally{
 
-}
-
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
-async function logout(){
-
-  try{
-
-    if(initSupabase()){
-
-      await supabaseClient.auth.signOut();
-
-    }
-
-  }finally{
-
-    location.reload();
-
+    button.disabled = false;
+    button.textContent = "Login";
   }
 
 }
 
 
-/* =====================================================
-   LOAD DASHBOARD
-===================================================== */
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout(){
+
+  if(!initSupabase()) return;
+
+  await supabaseClient.auth.signOut();
+
+  location.reload();
+}
+
+
+/* =========================
+   ADMIN API
+========================= */
+
+async function adminApi(action,data={}){
+
+  if(!initSupabase()){
+
+    throw new Error(
+      "Supabase initialize হয়নি।"
+    );
+  }
+
+
+  const sessionResult =
+    await supabaseClient.auth.getSession();
+
+
+  const session =
+    sessionResult.data.session;
+
+
+  if(!session){
+
+    throw new Error(
+      "Admin session পাওয়া যায়নি। আবার Login করুন।"
+    );
+  }
+
+
+  const response =
+    await fetch(
+      SUPABASE_URL +
+      "/functions/v1/admin-api",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json",
+          "Authorization":
+            "Bearer " +
+            session.access_token
+        },
+
+        body:JSON.stringify({
+          action:action,
+          data:data
+        })
+      }
+    );
+
+
+  const text =
+    await response.text();
+
+
+  let result={};
+
+  try{
+
+    result =
+      text ? JSON.parse(text) : {};
+
+  }
+  catch(e){
+
+    result={
+      raw:text
+    };
+  }
+
+
+  if(!response.ok){
+
+    throw new Error(
+      result.error ||
+      result.message ||
+      result.raw ||
+      "Admin API error"
+    );
+  }
+
+
+  if(result.error){
+
+    throw new Error(
+      result.error
+    );
+  }
+
+
+  return result;
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
 
 async function loadDashboard(){
 
   try{
 
+    showMessage(
+      "appMessage",
+      "Dashboard loading..."
+    );
+
+
+    const result =
+      await adminApi("dashboard");
+
+
     const data =
-      await adminApi(
-        "dashboard"
-      );
+      result.data || result;
 
 
     const profiles =
-      data.profiles || [];
+      data.profiles ||
+      data.customers ||
+      [];
+
 
     const transactions =
-      data.transactions || [];
+      data.transactions ||
+      [];
+
 
     const withdrawals =
-      data.withdrawals || [];
+      data.withdrawals ||
+      [];
+
 
     const actions =
-      data.actions || [];
+      data.admin_actions ||
+      data.actions ||
+      [];
 
 
-    loadCustomerTable(
-      profiles
-    );
+    renderCustomers(profiles);
 
+    renderTransactions(transactions);
 
-    loadTransactionTable(
-      transactions
-    );
+    renderWithdrawals(withdrawals);
 
-
-    loadWithdrawalTable(
-      withdrawals
-    );
-
-
-    loadActionTable(
-      actions
-    );
+    renderActions(actions);
 
 
     const customers =
@@ -1299,58 +886,765 @@ async function loadDashboard(){
 
     const totalBalance =
       customers.reduce(
-        (sum,user) =>
-          sum +
-          Number(user.balance || 0),
+        (sum,x) =>
+          sum + Number(x.balance || 0),
         0
       );
 
 
-    const pendingTransfers =
-      transactions.filter(
-        x =>
-          x.type === "transfer" &&
-          x.status === "pending"
-      ).length;
-
-
-    const pendingWithdrawals =
-      withdrawals.filter(
-        x =>
-          x.status === "pending"
-      ).length;
-
-
-    $("totalCustomers")
-      .textContent =
+    document.getElementById(
+      "statCustomers"
+    ).textContent =
       customers.length;
 
 
-    $("totalBalance")
-      .textContent =
+    document.getElementById(
+      "statBalance"
+    ).textContent =
       money(totalBalance);
 
 
-    $("pendingTransfers")
-      .textContent =
-      pendingTransfers;
+    document.getElementById(
+      "statTransactions"
+    ).textContent =
+      transactions.length;
 
 
-    $("pendingWithdrawals")
-      .textContent =
-      pendingWithdrawals;
+    document.getElementById(
+      "statWithdrawals"
+    ).textContent =
+      withdrawals.length;
 
 
-  }catch(error){
-
-    console.error(
-      "DASHBOARD ERROR:",
-      error
+    showMessage(
+      "appMessage",
+      "Dashboard updated."
     );
 
-    alert(
-      "Dashboard load failed:\n" +
+  }
+  catch(error){
+
+    console.error(error);
+
+    showMessage(
+      "appMessage",
+      "Dashboard error: " +
       error.message
+    );
+  }
+
+}
+
+
+/* =========================
+   CREATE CUSTOMER
+========================= */
+
+async function createCustomer(){
+
+  const user_id =
+    document.getElementById(
+      "newUserId"
+    ).value.trim();
+
+  const username =
+    document.getElementById(
+      "newUsername"
+    ).value.trim();
+
+  const email =
+    document.getElementById(
+      "newEmail"
+    ).value.trim();
+
+  const password =
+    document.getElementById(
+      "newPassword"
+    ).value;
+
+  const initial_balance =
+    Number(
+      document.getElementById(
+        "newBalance"
+      ).value || 0
+    );
+
+
+  if(!user_id ||
+     !username ||
+     !email ||
+     !password){
+
+    showMessage(
+      "appMessage",
+      "Customer-এর সব তথ্য পূরণ করুন।"
+    );
+
+    return;
+  }
+
+
+  try{
+
+    showMessage(
+      "appMessage",
+      "Customer তৈরি হচ্ছে..."
+    );
+
+
+    const result =
+      await adminApi(
+        "create_customer",
+        {
+          user_id,
+          username,
+          email,
+          password,
+          initial_balance
+        }
+      );
+
+
+    showMessage(
+      "appMessage",
+      "Customer সফলভাবে তৈরি হয়েছে।"
+    );
+
+
+    document.getElementById(
+      "newUserId"
+    ).value="";
+
+    document.getElementById(
+      "newUsername"
+    ).value="";
+
+    document.getElementById(
+      "newEmail"
+    ).value="";
+
+    document.getElementById(
+      "newPassword"
+    ).value="";
+
+    document.getElementById(
+      "newBalance"
+    ).value="";
+
+
+    await loadDashboard();
+
+  }
+  catch(error){
+
+    console.error(error);
+
+    showMessage(
+      "appMessage",
+      "Customer create error: " +
+      error.message
+    );
+  }
+
+}
+
+
+/* =========================
+   BALANCE ADJUSTMENT
+========================= */
+
+async function adjustBalance(){
+
+  const userId =
+    document.getElementById(
+      "adjustUserId"
+    ).value.trim();
+
+  const amount =
+    Number(
+      document.getElementById(
+        "adjustAmount"
+      ).value
+    );
+
+  const reason =
+    document.getElementById(
+      "adjustReason"
+    ).value.trim();
+
+
+  if(!userId){
+
+    showMessage(
+      "appMessage",
+      "Customer UUID দিন।"
+    );
+
+    return;
+  }
+
+
+  if(!amount || amount === 0){
+
+    showMessage(
+      "appMessage",
+      "Valid amount দিন।"
+    );
+
+    return;
+  }
+
+
+  try{
+
+    await adminApi(
+      "adjust_balance",
+      {
+        user_id:userId,
+        amount:amount,
+        reason:reason
+      }
+    );
+
+
+    showMessage(
+      "appMessage",
+      "Balance successfully adjusted."
+    );
+
+
+    document.getElementById(
+      "adjustUserId"
+    ).value="";
+
+    document.getElementById(
+      "adjustAmount"
+    ).value="";
+
+    document.getElementById(
+      "adjustReason"
+    ).value="";
+
+
+    await loadDashboard();
+
+  }
+  catch(error){
+
+    showMessage(
+      "appMessage",
+      "Balance adjustment error: " +
+      error.message
+    );
+  }
+
+}
+
+
+/* =========================
+   USER STATUS
+========================= */
+
+async function changeUserStatus(
+  userId,
+  status
+){
+
+  try{
+
+    await adminApi(
+      "user_status",
+      {
+        user_id:userId,
+        status:status,
+        reason:
+          status === "blocked"
+          ? "Blocked by admin"
+          : "Unblocked by admin"
+      }
+    );
+
+
+    await loadDashboard();
+
+  }
+  catch(error){
+
+    showMessage(
+      "appMessage",
+      "Status update error: " +
+      error.message
+    );
+  }
+
+}
+
+
+/* =========================
+   TRANSACTION STATUS
+========================= */
+
+async function changeTransferStatus(
+  transactionId,
+  status
+){
+
+  const note =
+    prompt(
+      "Admin note/reason (optional):"
+    ) || "";
+
+
+  try{
+
+    await adminApi(
+      "transfer_status",
+      {
+        transaction_id:transactionId,
+        status:status,
+        note:note
+      }
+    );
+
+
+    await loadDashboard();
+
+  }
+  catch(error){
+
+    showMessage(
+      "appMessage",
+      "Transaction update error: " +
+      error.message
+    );
+  }
+
+}
+
+
+/* =========================
+   WITHDRAWAL STATUS
+========================= */
+
+async function changeWithdrawalStatus(
+  withdrawalId,
+  status
+){
+
+  const note =
+    prompt(
+      "Admin note/reason (optional):"
+    ) || "";
+
+
+  try{
+
+    await adminApi(
+      "withdrawal_status",
+      {
+        withdrawal_id:withdrawalId,
+        status:status,
+        note:note
+      }
+    );
+
+
+    await loadDashboard();
+
+  }
+  catch(error){
+
+    showMessage(
+      "appMessage",
+      "Withdrawal update error: " +
+      error.message
+    );
+  }
+
+}
+
+
+/* =========================
+   RENDER CUSTOMERS
+========================= */
+
+function renderCustomers(rows){
+
+  const body =
+    document.getElementById(
+      "customersBody"
+    );
+
+
+  body.innerHTML="";
+
+
+  rows.forEach(row=>{
+
+    const tr =
+      document.createElement("tr");
+
+
+    const statusButton =
+      row.status === "active"
+
+      ?
+
+      `<button
+        class="danger"
+        onclick="changeUserStatus('${row.id}','blocked')"
+      >
+        Block
+      </button>`
+
+      :
+
+      `<button
+        class="success"
+        onclick="changeUserStatus('${row.id}','active')"
+      >
+        Unblock
+      </button>`;
+
+
+    tr.innerHTML=`
+
+      <td>${esc(row.user_id)}</td>
+
+      <td>${esc(row.username)}</td>
+
+      <td>${esc(row.role)}</td>
+
+      <td>${money(row.balance)}</td>
+
+      <td>${esc(row.status)}</td>
+
+      <td>${formatDate(row.created_at)}</td>
+
+      <td>
+        <div class="actions">
+          ${statusButton}
+        </div>
+      </td>
+
+    `;
+
+
+    body.appendChild(tr);
+
+  });
+
+}
+
+
+/* =========================
+   RENDER TRANSACTIONS
+========================= */
+
+function renderTransactions(rows){
+
+  const body =
+    document.getElementById(
+      "transactionsBody"
+    );
+
+
+  body.innerHTML="";
+
+
+  rows.forEach(row=>{
+
+    const tr =
+      document.createElement("tr");
+
+
+    tr.innerHTML=`
+
+      <td>${esc(row.transaction_id)}</td>
+
+      <td>${money(row.amount)}</td>
+
+      <td>${esc(row.type)}</td>
+
+      <td>${esc(row.status)}</td>
+
+      <td>${formatDate(row.created_at)}</td>
+
+      <td>
+
+        <div class="actions">
+
+          <button
+            class="success"
+            onclick="changeTransferStatus('${row.transaction_id}','approved')"
+          >
+            Approve
+          </button>
+
+          <button
+            class="danger"
+            onclick="changeTransferStatus('${row.transaction_id}','rejected')"
+          >
+            Reject
+          </button>
+
+          <button
+            class="warning"
+            onclick="changeTransferStatus('${row.transaction_id}','frozen')"
+          >
+            Freeze
+          </button>
+
+        </div>
+
+      </td>
+
+    `;
+
+
+    body.appendChild(tr);
+
+  });
+
+}
+
+
+/* =========================
+   RENDER WITHDRAWALS
+========================= */
+
+function renderWithdrawals(rows){
+
+  const body =
+    document.getElementById(
+      "withdrawalsBody"
+    );
+
+
+  body.innerHTML="";
+
+
+  rows.forEach(row=>{
+
+    const tr =
+      document.createElement("tr");
+
+
+    tr.innerHTML=`
+
+      <td>${esc(row.withdrawal_id)}</td>
+
+      <td>${money(row.amount)}</td>
+
+      <td>${esc(row.bank_name)}</td>
+
+      <td>${esc(row.account_holder)}</td>
+
+      <td>${esc(row.ifsc)}</td>
+
+      <td>${esc(row.status)}</td>
+
+      <td>${formatDate(row.created_at)}</td>
+
+      <td>
+
+        <div class="actions">
+
+          <button
+            class="success"
+            onclick="changeWithdrawalStatus('${row.withdrawal_id}','approved')"
+          >
+            Approve
+          </button>
+
+          <button
+            class="danger"
+            onclick="changeWithdrawalStatus('${row.withdrawal_id}','rejected')"
+          >
+            Reject
+          </button>
+
+          <button
+            class="warning"
+            onclick="changeWithdrawalStatus('${row.withdrawal_id}','frozen')"
+          >
+            Freeze
+          </button>
+
+        </div>
+
+      </td>
+
+    `;
+
+
+    body.appendChild(tr);
+
+  });
+
+}
+
+
+/* =========================
+   RENDER ADMIN LOG
+========================= */
+
+function renderActions(rows){
+
+  const body =
+    document.getElementById(
+      "actionsBody"
+    );
+
+
+  body.innerHTML="";
+
+
+  rows.forEach(row=>{
+
+    const tr =
+      document.createElement("tr");
+
+
+    tr.innerHTML=`
+
+      <td>${esc(row.action_id)}</td>
+
+      <td>${esc(row.action)}</td>
+
+      <td>${money(row.amount)}</td>
+
+      <td>${esc(row.reason)}</td>
+
+      <td>${formatDate(row.created_at)}</td>
+
+    `;
+
+
+    body.appendChild(tr);
+
+  });
+
+}
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function money(value){
+
+  return "₹" +
+    Number(value || 0)
+    .toFixed(2);
+}
+
+
+function formatDate(value){
+
+  if(!value) return "-";
+
+  try{
+
+    return new Date(value)
+      .toLocaleString("en-IN");
+
+  }
+  catch(e){
+
+    return value;
+  }
+
+}
+
+
+function esc(value){
+
+  if(value === null ||
+     value === undefined){
+
+    return "";
+  }
+
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+
+/* =========================
+   AUTO SESSION CHECK
+========================= */
+
+async function checkExistingSession(){
+
+  if(!initSupabase()) return;
+
+
+  try{
+
+    const result =
+      await supabaseClient.auth.getSession();
+
+
+    const session =
+      result.data.session;
+
+
+    if(!session) return;
+
+
+    const profileResult =
+      await supabaseClient
+      .from("profiles")
+      .select("id,user_id,username,role,balance,status")
+      .eq("id",session.user.id)
+      .single();
+
+
+    if(
+      profileResult.error ||
+      !profileResult.data ||
+      profileResult.data.role !== "admin" ||
+      profileResult.data.status !== "active"
+    ){
+
+      await supabaseClient.auth.signOut();
+
+      return;
+    }
+
+
+    document.getElementById(
+      "loginPage"
+    ).classList.add("hidden");
+
+
+    document.getElementById(
+      "adminApp"
+    ).classList.remove("hidden");
+
+
+    document.getElementById(
+      "adminInfo"
+    ).textContent =
+      "Logged in as: " +
+      profileResult.data.username +
+      " | " +
+      profileResult.data.user_id;
+
+
+    await loadDashboard();
+
+  }
+  catch(error){
+
+    console.error(
+      "SESSION CHECK ERROR:",
+      error
     );
 
   }
@@ -1358,83 +1652,22 @@ async function loadDashboard(){
 }
 
 
-/* =====================================================
-   CUSTOMER TABLE
-===================================================== */
+/* =========================
+   START
+========================= */
 
-function loadCustomerTable(
-  profiles
-){
+window.addEventListener(
+  "load",
+  function(){
 
-  const customers =
-    profiles.filter(
-      x => x.role === "customer"
-    );
+    initSupabase();
 
-
-  const tbody =
-    $("customerTableBody");
-
-
-  if(!customers.length){
-
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7" class="empty">
-          No customers found.
-        </td>
-      </tr>
-    `;
-
-    return;
+    checkExistingSession();
 
   }
+);
 
+</script>
 
-  tbody.innerHTML =
-    customers.map(
-      user => `
-
-      <tr>
-
-        <td>
-          ${escapeHtml(user.user_id)}
-        </td>
-
-        <td>
-          ${escapeHtml(user.username)}
-        </td>
-
-        <td>
-          ${escapeHtml(user.id)}
-        </td>
-
-        <td>
-          ${money(user.balance)}
-        </td>
-
-        <td>
-          ${statusBadge(user.status)}
-        </td>
-
-        <td>
-          ${new Date(
-            user.created_at
-          ).toLocaleString("en-IN")}
-        </td>
-
-        <td>
-
-          <button
-            class="${
-              user.status === "active"
-              ? "danger"
-              : "success"
-            } actionBtn"
-            onclick="changeUserStatus(
-              '${user.user_id}',
-              '${user.status}'
-            )"
-          >
-            ${
-              user.status =
+</body>
+</html>
