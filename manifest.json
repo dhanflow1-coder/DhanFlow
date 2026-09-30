@@ -1,0 +1,10 @@
+{
+  "name": "DhanFlow User",
+  "short_name": "DhanFlow",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#0b1220",
+  "description": "DhanFlow secure user wallet"
+}
