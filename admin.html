@@ -74,8 +74,8 @@
     <label>Password</label>
     <input id="password" type="password" placeholder="••••••••">
     
-    <!-- বাটনে সরাসরি onclick যুক্ত করা হয়েছে -->
-    <button type="button" id="loginButton" class="btn full" onclick="login()">Login</button>
+    <!-- সরাসরি onclick ফাংশন যুক্ত করা হয়েছে -->
+    <button type="button" class="btn full" onclick="login()">Login</button>
     
     <div id="loginMessage" class="message"></div>
   </div>
@@ -196,25 +196,14 @@
 
 <script>
 /* ============================================
-   নিরাপদ SUPABASE CONFIG
+   SUPABASE CONFIG
 ============================================ */
-let supabaseClient = null;
+const SUPABASE_URL = "https://oxwjnravklpcdhfxibya.supabase.co";
+const SUPABASE_KEY = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let currentAdminId = "";
 let selectedUserId = ""; 
-
-function getSupabase() {
-  if (!supabaseClient) {
-    if (!window.supabase) {
-      alert("Error: Supabase লোড হয়নি। আপনার ইন্টারনেট কানেকশন চেক করুন।");
-      return null;
-    }
-    supabaseClient = window.supabase.createClient(
-      "https://oxwjnravklpcdhfxibya.supabase.co",
-      "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC"
-    );
-  }
-  return supabaseClient;
-}
 
 /* ============================================
    UTILITY FUNCTIONS
@@ -242,35 +231,32 @@ function openBalanceModal(id, username) {
 }
 
 /* ============================================
-   LOGIN & LOGOUT (WITH BULLETPROOF ALERTS)
+   LOGIN & LOGOUT (WITH ALERTS)
 ============================================ */
 async function login() {
-  alert("১. বাটন কাজ করছে!");
+  alert("১. Login Button Clicked successfully!");
   
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
   
   if (!email || !password) {
-    alert("Error: ইমেইল বা পাসওয়ার্ড দেওয়া হয়নি!");
+    alert("Error: ইমেইল বা পাসওয়ার্ড দেওয়া হয়নি!");
     return showMessage("loginMessage", "Please enter email and password");
   }
-
-  const client = getSupabase();
-  if (!client) return; // Supabase লোড না হলে এখানেই থেমে যাবে
 
   showMessage("loginMessage", "Logging in...", true);
   
   try {
-    alert("২. Supabase এ রিকোয়েস্ট পাঠানো হচ্ছে...");
-    const { data, error } = await client.auth.signInWithPassword({ email, password });
+    alert("২. Sending auth request to Supabase...");
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
     
     if (error) {
       alert("৩. Auth Error: " + error.message);
       throw error;
     }
     
-    alert("৪. লগইন সফল! প্রোফাইল চেক করা হচ্ছে...");
-    const profileRes = await client.from("profiles").select("*").eq("id", data.user.id).single();
+    alert("৪. Auth successful! Checking profile database...");
+    const profileRes = await supabaseClient.from("profiles").select("*").eq("id", data.user.id).single();
     
     if (profileRes.error) {
       alert("৫. Profile Error: " + profileRes.error.message);
@@ -279,17 +265,17 @@ async function login() {
     
     const profile = profileRes.data;
     if (profile.role !== "admin") {
-      alert("৬. Error: এটি অ্যাডমিন অ্যাকাউন্ট নয়!");
-      await client.auth.signOut();
+      alert("৬. Error: This is not an admin account!");
+      await supabaseClient.auth.signOut();
       return showMessage("loginMessage", "Access denied: Not an admin");
     }
     
     currentAdminId = profile.id;
-    alert("৭. ড্যাশবোর্ড ওপেন হচ্ছে...");
+    alert("৭. Admin Access Granted! Loading Dashboard...");
     
     document.getElementById("loginPage").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
-    loadDashboard(client);
+    loadDashboard();
     
   } catch (err) {
     alert("Catch Error: " + err.message);
@@ -298,28 +284,27 @@ async function login() {
 }
 
 async function logout() {
-  const client = getSupabase();
-  if (client) await client.auth.signOut();
+  await supabaseClient.auth.signOut();
   window.location.reload();
 }
 
 /* ============================================
    DASHBOARD DATA LOADER
 ============================================ */
-async function loadDashboard(client) {
+async function loadDashboard() {
   await Promise.all([
-    fetchCustomers(client),
-    fetchTransactions(client),
-    fetchWithdrawals(client),
-    fetchAdminLogs(client)
+    fetchCustomers(),
+    fetchTransactions(),
+    fetchWithdrawals(),
+    fetchAdminLogs()
   ]);
 }
 
 /* ============================================
    1. CUSTOMER MANAGEMENT
 ============================================ */
-async function fetchCustomers(client) {
-  const { data, error } = await client.from("profiles").select("*").order("created_at", { ascending: false });
+async function fetchCustomers() {
+  const { data, error } = await supabaseClient.from("profiles").select("*").order("created_at", { ascending: false });
   if (error) return console.error(error);
 
   const tbody = document.getElementById("customerTableBody");
@@ -331,10 +316,10 @@ async function fetchCustomers(client) {
     
     const statusClass = user.status === "active" ? "badgeActive" : "badgeBlocked";
     const toggleBtn = user.status === "active" 
-      ? `<button class="smallBtn danger" onclick="toggleStatus('${user.id}', 'blocked')">Block</button>`
-      : `<button class="smallBtn success" onclick="toggleStatus('${user.id}', 'active')">Unblock</button>`;
+      ? `<button type="button" class="smallBtn danger" onclick="toggleStatus('${user.id}', 'blocked')">Block</button>`
+      : `<button type="button" class="smallBtn success" onclick="toggleStatus('${user.id}', 'active')">Unblock</button>`;
     
-    const balanceBtn = `<button class="smallBtn warning" onclick="openBalanceModal('${user.id}', '${user.username}')">Adjust Bal</button>`;
+    const balanceBtn = `<button type="button" class="smallBtn warning" onclick="openBalanceModal('${user.id}', '${user.username}')">Adjust Bal</button>`;
 
     tbody.innerHTML += `
       <tr>
@@ -351,25 +336,23 @@ async function fetchCustomers(client) {
 }
 
 async function toggleStatus(userId, newStatus) {
-  const client = getSupabase();
   if(!confirm(`Are you sure you want to ${newStatus === 'blocked' ? 'Block' : 'Unblock'} this user?`)) return;
-  await client.from("profiles").update({ status: newStatus }).eq("id", userId);
+  await supabaseClient.from("profiles").update({ status: newStatus }).eq("id", userId);
   await logAction(`User ${newStatus}`, userId, null, `Changed status to ${newStatus}`, userId);
-  fetchCustomers(client);
+  fetchCustomers();
 }
 
 /* ============================================
    2. BALANCE ADJUSTMENT
 ============================================ */
 async function submitBalanceAdjustment() {
-  const client = getSupabase();
   const type = document.getElementById("adjType").value;
   const amount = Number(document.getElementById("adjAmount").value);
   const reason = document.getElementById("adjReason").value.trim() || "Admin Adjustment";
 
   if (amount <= 0) return alert("Amount must be greater than 0");
 
-  const { data: user } = await client.from("profiles").select("balance").eq("id", selectedUserId).single();
+  const { data: user } = await supabaseClient.from("profiles").select("balance").eq("id", selectedUserId).single();
   let newBalance = Number(user.balance);
   
   if (type === "add") newBalance += amount;
@@ -377,20 +360,20 @@ async function submitBalanceAdjustment() {
 
   if (newBalance < 0) return alert("Insufficient balance to deduct!");
 
-  await client.from("profiles").update({ balance: newBalance }).eq("id", selectedUserId);
+  await supabaseClient.from("profiles").update({ balance: newBalance }).eq("id", selectedUserId);
   await logAction(`Balance ${type === 'add' ? 'Deposit' : 'Deduction'}`, selectedUserId, amount, reason, `ADJ-${Date.now()}`);
   
   closeModal("balanceModal");
   alert("Balance adjusted successfully!");
-  fetchCustomers(client);
-  fetchAdminLogs(client);
+  fetchCustomers();
+  fetchAdminLogs();
 }
 
 /* ============================================
    3. TRANSACTIONS
 ============================================ */
-async function fetchTransactions(client) {
-  const { data, error } = await client.from("transactions").select(`*, sender:profiles!sender_id(user_id, username), receiver:profiles!receiver_id(user_id, username)`).order("created_at", { ascending: false });
+async function fetchTransactions() {
+  const { data, error } = await supabaseClient.from("transactions").select(`*, sender:profiles!sender_id(user_id, username), receiver:profiles!receiver_id(user_id, username)`).order("created_at", { ascending: false });
   if (error) return console.error(error);
 
   const tbody = document.getElementById("transactionTableBody");
@@ -404,9 +387,9 @@ async function fetchTransactions(client) {
     let actions = "-";
     if (txn.status === "pending") {
       actions = `
-        <button class="smallBtn success" onclick="updateTxn('${txn.id}', 'approved')">Approve</button>
-        <button class="smallBtn danger" onclick="updateTxn('${txn.id}', 'rejected')">Reject</button>
-        <button class="smallBtn warning" onclick="updateTxn('${txn.id}', 'frozen')">Freeze</button>
+        <button type="button" class="smallBtn success" onclick="updateTxn('${txn.id}', 'approved')">Approve</button>
+        <button type="button" class="smallBtn danger" onclick="updateTxn('${txn.id}', 'rejected')">Reject</button>
+        <button type="button" class="smallBtn warning" onclick="updateTxn('${txn.id}', 'frozen')">Freeze</button>
       `;
     }
 
@@ -425,19 +408,18 @@ async function fetchTransactions(client) {
 }
 
 async function updateTxn(txnId, newStatus) {
-  const client = getSupabase();
   if(!confirm(`Are you sure you want to ${newStatus.toUpperCase()} this transaction?`)) return;
-  await client.from("transactions").update({ status: newStatus }).eq("id", txnId);
+  await supabaseClient.from("transactions").update({ status: newStatus }).eq("id", txnId);
   await logAction(`Transaction ${newStatus}`, null, null, `Admin marked TXN as ${newStatus}`, txnId);
-  fetchTransactions(client);
-  fetchAdminLogs(client);
+  fetchTransactions();
+  fetchAdminLogs();
 }
 
 /* ============================================
    4. WITHDRAWALS
 ============================================ */
-async function fetchWithdrawals(client) {
-  const { data, error } = await client.from("withdrawals").select(`*, user:profiles(user_id, username)`).order("created_at", { ascending: false });
+async function fetchWithdrawals() {
+  const { data, error } = await supabaseClient.from("withdrawals").select(`*, user:profiles(user_id, username)`).order("created_at", { ascending: false });
   if (error) return console.error(error);
 
   const tbody = document.getElementById("withdrawalTableBody");
@@ -451,8 +433,8 @@ async function fetchWithdrawals(client) {
     let actions = "-";
     if (wd.status === "pending") {
       actions = `
-        <button class="smallBtn success" onclick="updateWd('${wd.id}', 'approved', '${wd.user_id}', ${wd.amount})">Approve</button>
-        <button class="smallBtn danger" onclick="updateWd('${wd.id}', 'rejected', null, null)">Reject</button>
+        <button type="button" class="smallBtn success" onclick="updateWd('${wd.id}', 'approved', '${wd.user_id}', ${wd.amount})">Approve</button>
+        <button type="button" class="smallBtn danger" onclick="updateWd('${wd.id}', 'rejected', null, null)">Reject</button>
       `;
     }
 
@@ -471,4 +453,8 @@ async function fetchWithdrawals(client) {
 }
 
 async function updateWd(wdId, newStatus, userId, amount) {
-  const client
+  if(!confirm(`Are you sure you want to ${newStatus.toUpperCase()} this withdrawal?`)) return;
+  
+  if (newStatus === 'approved') {
+    const { data: user } = await supabaseClient.from("profiles").select("balance").eq("id", userId).single();
+    if(user.balance < amount) return alert("User does not have e
