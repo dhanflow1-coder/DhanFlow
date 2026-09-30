@@ -200,7 +200,7 @@ const SUPABASE_KEY = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentAdminId = "";
-let selectedUserId = ""; // For balance adjustment
+let selectedUserId = ""; 
 
 /* ============================================
    UTILITY FUNCTIONS
@@ -228,32 +228,54 @@ function openBalanceModal(id, username) {
 }
 
 /* ============================================
-   LOGIN & LOGOUT
+   LOGIN & LOGOUT (WITH DEBUG ALERTS)
 ============================================ */
 async function login() {
+  alert("১. Login Button Clicked!");
+  
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
-  if (!email || !password) return showMessage("loginMessage", "Please enter email and password");
+  
+  if (!email || !password) {
+    alert("Error: ইমেইল বা পাসওয়ার্ড দেওয়া হয়নি!");
+    return showMessage("loginMessage", "Please enter email and password");
+  }
 
   showMessage("loginMessage", "Logging in...", true);
+  
   try {
+    alert("২. Sending auth request to Supabase...");
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    if (error) throw error;
     
+    if (error) {
+      alert("৩. Auth Error: " + error.message);
+      throw error;
+    }
+    
+    alert("৪. Auth successful! Checking profile database...");
     const profileRes = await supabaseClient.from("profiles").select("*").eq("id", data.user.id).single();
-    if (profileRes.error) throw profileRes.error;
+    
+    if (profileRes.error) {
+      alert("৫. Profile Database Error: " + profileRes.error.message);
+      throw profileRes.error;
+    }
     
     const profile = profileRes.data;
     if (profile.role !== "admin") {
+      alert("৬. Error: This is not an admin account!");
       await supabaseClient.auth.signOut();
       return showMessage("loginMessage", "Access denied: Not an admin");
     }
     
     currentAdminId = profile.id;
+    alert("৭. Admin Access Granted! Loading Dashboard...");
+    
     document.getElementById("loginPage").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
     loadDashboard();
+    
   } catch (err) {
+    alert("Catch Error: " + err.message);
     showMessage("loginMessage", err.message);
   }
 }
@@ -384,9 +406,6 @@ async function fetchTransactions() {
 
 async function updateTxn(txnId, newStatus) {
   if(!confirm(`Are you sure you want to ${newStatus.toUpperCase()} this transaction?`)) return;
-  
-  // Note: For advanced logic, if Approved, deduct from sender and add to receiver. 
-  // For now, updating status and logging. (Add backend edge function later for secure atomic updates)
   await supabaseClient.from("transactions").update({ status: newStatus }).eq("id", txnId);
   await logAction(`Transaction ${newStatus}`, null, null, `Admin marked TXN as ${newStatus}`, txnId);
   fetchTransactions();
@@ -434,21 +453,9 @@ async function updateWd(wdId, newStatus, userId, amount) {
   if(!confirm(`Are you sure you want to ${newStatus.toUpperCase()} this withdrawal?`)) return;
   
   if (newStatus === 'approved') {
-    // Deduct balance from user
     const { data: user } = await supabaseClient.from("profiles").select("balance").eq("id", userId).single();
     if(user.balance < amount) return alert("User does not have enough balance!");
     await supabaseClient.from("profiles").update({ balance: user.balance - amount }).eq("id", userId);
   }
 
-  await supabaseClient.from("withdrawals").update({ status: newStatus }).eq("id", wdId);
-  await logAction(`Withdrawal ${newStatus}`, userId, amount, `Admin marked WD as ${newStatus}`, wdId);
-  
-  fetchWithdrawals();
-  fetchCustomers();
-  fetchAdminLogs();
-}
-
-/* ============================================
-   5. ADMIN ACTION LOGS
-============================================ */
-async function logActi
+  await supabaseClient.from("withdrawals").update({ status: newStatus }).eq("id"
