@@ -1,1767 +1,1421 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>DhanFlow Admin</title>
+<title>DhanFlow</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
 
-    body {
-      background: #f4f7fb;
-      color: #1f2937;
-    }
+body{
+  background:#f3f6fb;
+  color:#172033;
+}
 
-    .hidden {
-      display: none !important;
-    }
+button{
+  cursor:pointer;
+}
 
-    button {
-      cursor: pointer;
-      border: none;
-    }
+.hidden{
+  display:none!important;
+}
 
-    /* LOGIN */
+/* LOGIN */
 
-    #loginPage {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: linear-gradient(135deg, #0f172a, #1d4ed8);
-    }
+#loginPage{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+  background:linear-gradient(135deg,#0f172a,#2563eb);
+}
 
-    .login-box {
-      width: 100%;
-      max-width: 400px;
-      background: white;
-      padding: 30px;
-      border-radius: 18px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-    }
+.login-box{
+  width:100%;
+  max-width:400px;
+  background:white;
+  padding:30px;
+  border-radius:18px;
+  box-shadow:0 20px 50px rgba(0,0,0,.2);
+}
 
-    .logo {
-      text-align: center;
-      font-size: 30px;
-      font-weight: bold;
-      color: #1d4ed8;
-      margin-bottom: 8px;
-    }
+.logo{
+  text-align:center;
+  font-size:32px;
+  font-weight:bold;
+  color:#2563eb;
+  margin-bottom:8px;
+}
 
-    .subtitle {
-      text-align: center;
-      color: #64748b;
-      margin-bottom: 25px;
-    }
+.subtitle{
+  text-align:center;
+  color:#64748b;
+  margin-bottom:25px;
+}
 
-    .form-group {
-      margin-bottom: 16px;
-    }
+label{
+  display:block;
+  margin:12px 0 6px;
+  font-weight:bold;
+  font-size:14px;
+}
 
-    label {
-      display: block;
-      margin-bottom: 7px;
-      font-weight: 600;
-      font-size: 14px;
-    }
+input,select,textarea{
+  width:100%;
+  padding:12px;
+  border:1px solid #cbd5e1;
+  border-radius:9px;
+  outline:none;
+  font-size:15px;
+}
 
-    input,
-    select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: 9px;
-      outline: none;
-      font-size: 15px;
-    }
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#2563eb;
+}
 
-    input:focus,
-    select:focus {
-      border-color: #2563eb;
-    }
+.btn{
+  border:0;
+  padding:12px 18px;
+  border-radius:9px;
+  background:#2563eb;
+  color:white;
+  font-weight:bold;
+  margin-top:15px;
+}
 
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border-radius: 9px;
-      font-size: 15px;
-      font-weight: bold;
-      background: #2563eb;
-      color: white;
-    }
+.btn:hover{
+  opacity:.9;
+}
 
-    .btn:hover {
-      background: #1d4ed8;
-    }
+.btn-danger{
+  background:#dc2626;
+}
 
-    .error {
-      background: #fee2e2;
-      color: #991b1b;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      font-size: 14px;
-    }
+.btn-success{
+  background:#16a34a;
+}
 
-    .success {
-      background: #dcfce7;
-      color: #166534;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      font-size: 14px;
-    }
+.btn-warning{
+  background:#d97706;
+}
 
-    /* DASHBOARD */
+.btn-gray{
+  background:#475569;
+}
 
-    .topbar {
-      background: #0f172a;
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
+.full{
+  width:100%;
+}
 
-    .brand {
-      font-size: 23px;
-      font-weight: bold;
-    }
+.message{
+  margin-top:15px;
+  padding:10px;
+  border-radius:8px;
+  display:none;
+  font-size:14px;
+}
 
-    .admin-area {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+/* DASHBOARD */
 
-    .logout-btn {
-      background: #dc2626;
-      color: white;
-      padding: 9px 14px;
-      border-radius: 7px;
-      font-weight: bold;
-    }
+#dashboard{
+  min-height:100vh;
+}
 
-    .container {
-      max-width: 1200px;
-      margin: auto;
-      padding: 20px;
-    }
+.topbar{
+  background:#0f172a;
+  color:white;
+  padding:15px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  position:sticky;
+  top:0;
+  z-index:20;
+}
 
-    .welcome {
-      margin-bottom: 20px;
-    }
+.topbar-title{
+  font-size:22px;
+  font-weight:bold;
+}
 
-    .welcome h2 {
-      margin-bottom: 5px;
-    }
+.logout{
+  background:#dc2626;
+  border:0;
+  color:white;
+  padding:9px 15px;
+  border-radius:8px;
+}
 
-    .welcome p {
-      color: #64748b;
-    }
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:20px;
+}
 
-    /* STATS */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:20px;
+}
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 15px;
-      margin-bottom: 25px;
-    }
+.card{
+  background:white;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 3px 12px rgba(0,0,0,.06);
+}
 
-    .stat-card {
-      background: white;
-      padding: 20px;
-      border-radius: 14px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-    }
+.card-title{
+  color:#64748b;
+  font-size:14px;
+}
 
-    .stat-title {
-      color: #64748b;
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
+.card-value{
+  font-size:26px;
+  font-weight:bold;
+  margin-top:8px;
+}
 
-    .stat-value {
-      font-size: 28px;
-      font-weight: bold;
-    }
+.section{
+  background:white;
+  padding:20px;
+  border-radius:14px;
+  margin-bottom:20px;
+  box-shadow:0 3px 12px rgba(0,0,0,.06);
+}
 
-    /* CARDS */
+.section h2{
+  margin-bottom:15px;
+}
 
-    .card {
-      background: white;
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-    }
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:15px;
+}
 
-    .card h3 {
-      margin-bottom: 18px;
-    }
+.table-wrap{
+  overflow-x:auto;
+}
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-    }
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:800px;
+}
 
-    .full {
-      grid-column: 1 / -1;
-    }
+th,td{
+  padding:11px;
+  border-bottom:1px solid #e2e8f0;
+  text-align:left;
+  font-size:14px;
+}
 
-    .create-btn {
-      width: auto;
-      padding: 12px 25px;
-    }
+th{
+  background:#f8fafc;
+}
 
-    /* TABLE */
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
 
-    .table-wrap {
-      overflow-x: auto;
-    }
+.active{
+  background:#dcfce7;
+  color:#166534;
+}
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 700px;
-    }
+.blocked{
+  background:#fee2e2;
+  color:#991b1b;
+}
 
-    th,
-    td {
-      padding: 12px;
-      border-bottom: 1px solid #e2e8f0;
-      text-align: left;
-      font-size: 14px;
-    }
+.pending{
+  background:#fef3c7;
+  color:#92400e;
+}
 
-    th {
-      background: #f8fafc;
-    }
+.approved{
+  background:#dcfce7;
+  color:#166534;
+}
 
-    .badge {
-      display: inline-block;
-      padding: 5px 9px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
-    }
+.rejected{
+  background:#fee2e2;
+  color:#991b1b;
+}
 
-    .active {
-      background: #dcfce7;
-      color: #166534;
-    }
+.frozen{
+  background:#e0e7ff;
+  color:#3730a3;
+}
 
-    .blocked {
-      background: #fee2e2;
-      color: #991b1b;
-    }
+.small-btn{
+  padding:6px 9px;
+  border:0;
+  border-radius:6px;
+  color:white;
+  font-size:12px;
+  margin:2px;
+}
 
-    .small-btn {
-      padding: 7px 10px;
-      border-radius: 6px;
-      background: #475569;
-      color: white;
-      font-size: 12px;
-    }
+.action-area{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
 
-    .refresh-btn {
-      background: #2563eb;
-      color: white;
-      padding: 9px 14px;
-      border-radius: 7px;
-      margin-bottom: 15px;
-    }
+.empty{
+  text-align:center;
+  color:#64748b;
+  padding:20px;
+}
 
-    .empty {
-      text-align: center;
-      padding: 25px;
-      color: #64748b;
-    }
+/* MOBILE */
 
-    /* MOBILE */
+@media(max-width:800px){
 
-    @media (max-width: 700px) {
+  .cards{
+    grid-template-columns:repeat(2,1fr);
+  }
 
-      .stats {
-        grid-template-columns: 1fr;
-      }
+  .grid{
+    grid-template-columns:1fr;
+  }
 
-      .form-grid {
-        grid-template-columns: 1fr;
-      }
+  .topbar{
+    padding:12px;
+  }
 
-      .full {
-        grid-column: auto;
-      }
+  .topbar-title{
+    font-size:18px;
+  }
 
-      .topbar {
-        align-items: flex-start;
-      }
+  .container{
+    padding:12px;
+  }
 
-      .admin-area {
-        width: 100%;
-        justify-content: space-between;
-      }
+  .section{
+    padding:15px;
+  }
 
-      .container {
-        padding: 12px;
-      }
+}
 
-      .card {
-        padding: 15px;
-      }
+@media(max-width:480px){
 
-      .login-box {
-        padding: 22px;
-      }
-    }
-  </style>
+  .cards{
+    grid-template-columns:1fr;
+  }
+
+  .login-box{
+    padding:22px;
+  }
+
+}
+</style>
 </head>
 
 <body>
 
-  <!-- LOGIN PAGE -->
+<!-- ================= LOGIN ================= -->
 
-  <section id="loginPage">
+<div id="loginPage">
 
-    <div class="login-box">
+  <div class="login-box">
 
-      <div class="logo">DhanFlow</div>
+    <div class="logo">DhanFlow</div>
 
-      <div class="subtitle">
-        Admin Dashboard
-      </div>
+    <div class="subtitle">
+      Secure Wallet Management
+    </div>
 
-      <div id="loginError" class="error hidden"></div>
+    <label>Email</label>
+    <input
+      id="email"
+      type="email"
+      placeholder="Enter admin email"
+    >
 
-      <div class="form-group">
-        <label for="loginEmail">
-          Admin Email
-        </label>
+    <label>Password</label>
+    <input
+      id="password"
+      type="password"
+      placeholder="Enter password"
+    >
 
-        <input
-          type="email"
-          id="loginEmail"
-          placeholder="Enter admin email"
-          autocomplete="email"
+    <button
+      id="loginButton"
+      class="btn full"
+      type="button"
+    >
+      Login
+    </button>
+
+    <div
+      id="loginMessage"
+      class="message"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<div id="dashboard" class="hidden">
+
+  <div class="topbar">
+
+    <div class="topbar-title">
+      DhanFlow Admin
+    </div>
+
+    <button
+      id="logoutButton"
+      class="logout"
+    >
+      Logout
+    </button>
+
+  </div>
+
+
+  <div class="container">
+
+    <!-- CARDS -->
+
+    <div class="cards">
+
+      <div class="card">
+        <div class="card-title">
+          Total Customers
+        </div>
+        <div
+          id="totalCustomers"
+          class="card-value"
         >
+          0
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="loginPassword">
-          Password
-        </label>
-
-        <input
-          type="password"
-          id="loginPassword"
-          placeholder="Enter password"
-          autocomplete="current-password"
+      <div class="card">
+        <div class="card-title">
+          Total Balance
+        </div>
+        <div
+          id="totalBalance"
+          class="card-value"
         >
+          ₹0.00
+        </div>
       </div>
 
-      <button
-        id="loginButton"
-        class="btn"
-        type="button"
-      >
-        Login
-      </button>
+      <div class="card">
+        <div class="card-title">
+          Pending Transfers
+        </div>
+        <div
+          id="pendingTransfers"
+          class="card-value"
+        >
+          0
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          Pending Withdrawals
+        </div>
+        <div
+          id="pendingWithdrawals"
+          class="card-value"
+        >
+          0
+        </div>
+      </div>
 
     </div>
 
-  </section>
 
+    <!-- CREATE CUSTOMER -->
 
-  <!-- DASHBOARD -->
+    <div class="section">
 
-  <section id="dashboardPage" class="hidden">
+      <h2>Create Customer</h2>
 
-    <header class="topbar">
+      <div class="grid">
 
-      <div class="brand">
-        DhanFlow
-      </div>
-
-      <div class="admin-area">
-
-        <span id="adminInfo">
-          Logged in
-        </span>
-
-        <button
-          id="logoutButton"
-          class="logout-btn"
-          type="button"
-        >
-          Logout
-        </button>
-
-      </div>
-
-    </header>
-
-
-    <main class="container">
-
-      <div class="welcome">
-
-        <h2>
-          Admin Dashboard
-        </h2>
-
-        <p>
-          Manage customers and wallet information.
-        </p>
-
-      </div>
-
-
-      <!-- STATS -->
-
-      <div class="stats">
-
-        <div class="stat-card">
-
-          <div class="stat-title">
-            Total Customers
-          </div>
-
-          <div
-            id="totalCustomers"
-            class="stat-value"
+        <div>
+          <label>User ID</label>
+          <input
+            id="newUserId"
+            placeholder="Example: USER001"
           >
-            0
-          </div>
-
         </div>
 
-
-        <div class="stat-card">
-
-          <div class="stat-title">
-            Active Customers
-          </div>
-
-          <div
-            id="activeCustomers"
-            class="stat-value"
+        <div>
+          <label>Username</label>
+          <input
+            id="newUsername"
+            placeholder="Example: rahim"
           >
-            0
-          </div>
-
         </div>
 
-
-        <div class="stat-card">
-
-          <div class="stat-title">
-            Total Balance
-          </div>
-
-          <div
-            id="totalBalance"
-            class="stat-value"
+        <div>
+          <label>Email</label>
+          <input
+            id="newEmail"
+            type="email"
+            placeholder="customer@email.com"
           >
-            ₹0.00
-          </div>
+        </div>
 
+        <div>
+          <label>Password</label>
+          <input
+            id="newPassword"
+            type="password"
+            placeholder="Minimum 6 characters"
+          >
+        </div>
+
+        <div>
+          <label>Initial Balance</label>
+          <input
+            id="newBalance"
+            type="number"
+            min="0"
+            step="0.01"
+            value="0"
+          >
         </div>
 
       </div>
 
+      <button
+        id="createCustomerButton"
+        class="btn btn-success"
+      >
+        Create Customer
+      </button>
 
-      <!-- CREATE CUSTOMER -->
+      <div
+        id="customerMessage"
+        class="message"
+      ></div>
 
-      <div class="card">
+    </div>
 
-        <h3>
-          Create New Customer
-        </h3>
 
-        <div
-          id="createMessage"
-          class="hidden"
-        ></div>
+    <!-- CUSTOMER LIST -->
 
-        <div class="form-grid">
+    <div class="section">
 
-          <div class="form-group">
+      <h2>Customers</h2>
 
-            <label for="customerUserId">
-              User ID
-            </label>
+      <div class="table-wrap">
 
-            <input
-              id="customerUserId"
-              type="text"
-              placeholder="Example: USER001"
-            >
+        <table>
 
-          </div>
+          <thead>
 
-
-          <div class="form-group">
-
-            <label for="customerUsername">
-              Username
-            </label>
-
-            <input
-              id="customerUsername"
-              type="text"
-              placeholder="Example: rahim"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="customerEmail">
-              Email
-            </label>
-
-            <input
-              id="customerEmail"
-              type="email"
-              placeholder="customer@email.com"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="customerPassword">
-              Password
-            </label>
-
-            <input
-              id="customerPassword"
-              type="password"
-              placeholder="Minimum 6 characters"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="customerBalance">
-              Initial Balance
-            </label>
-
-            <input
-              id="customerBalance"
-              type="number"
-              min="0"
-              step="0.01"
-              value="0"
-              placeholder="0"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label>
-              Account Type
-            </label>
-
-            <input
-              type="text"
-              value="Customer"
-              disabled
-            >
-
-          </div>
-
-
-          <div class="form-group full">
-
-            <button
-              id="createCustomerButton"
-              class="btn create-btn"
-              type="button"
-            >
-              Create Customer
-            </button>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- CUSTOMER LIST -->
-
-      <div class="card">
-
-        <h3>
-          Customer Management
-        </h3>
-
-        <button
-          id="refreshButton"
-          class="refresh-btn"
-          type="button"
-        >
-          Refresh Customers
-        </button>
-
-        <div class="table-wrap">
-
-          <table>
-
-            <thead>
-
-              <tr>
-
-                <th>
-                  User ID
-                </th>
-
-                <th>
-                  Username
-                </th>
-
-                <th>
-                  Balance
-                </th>
-
-                <th>
-                  Status
-                </th>
-
-                <th>
-                  Created
-                </th>
-
-                <th>
-                  Action
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody id="customerTableBody">
-
-              <tr>
-
-                <td
-                  colspan="6"
-                  class="empty"
-                >
-                  Loading...
-                </td>
-
-              </tr>
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-
-      <!-- FUTURE MODULES -->
-
-      <div class="card">
-
-        <h3>
-          Transaction Management
-        </h3>
-
-        <p>
-          Transfer approval, withdrawal approval,
-          deposit, adjustment, freeze and transaction
-          history will be added here.
-        </p>
-
-      </div>
-
-
-      <div class="card">
-
-        <h3>
-          Admin Action Log
-        </h3>
-
-        <p>
-          Admin activity and audit trail will be
-          added here.
-        </p>
-
-      </div>
-
-    </main>
-
-  </section>
-
-
-  <script>
-
-    /* ==============================
-       SUPABASE CONFIGURATION
-    ============================== */
-
-    const SUPABASE_URL =
-      "https://oxwjnravklpcdhfxibya.supabase.co";
-
-    const SUPABASE_KEY =
-      "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
-
-
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      );
-
-
-    /* ==============================
-       HELPER FUNCTIONS
-    ============================== */
-
-    function showError(elementId, message) {
-
-      const element =
-        document.getElementById(elementId);
-
-      if (!element) return;
-
-      element.textContent = message;
-
-      element.classList.remove("hidden");
-
-    }
-
-
-    function hideMessage(elementId) {
-
-      const element =
-        document.getElementById(elementId);
-
-      if (!element) return;
-
-      element.textContent = "";
-
-      element.classList.add("hidden");
-
-    }
-
-
-    function showCreateMessage(
-      message,
-      success = false
-    ) {
-
-      const element =
-        document.getElementById("createMessage");
-
-      if (!element) return;
-
-      element.textContent = message;
-
-      element.className =
-        success
-          ? "success"
-          : "error";
-
-    }
-
-
-    function escapeHtml(value) {
-
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-    }
-
-
-    function money(value) {
-
-      const number =
-        Number(value || 0);
-
-      return "₹" +
-        number.toLocaleString(
-          "en-IN",
-          {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          }
-        );
-
-    }
-
-
-    /* ==============================
-       LOGIN
-    ============================== */
-
-    async function login() {
-
-      hideMessage("loginError");
-
-      const email =
-        document
-          .getElementById("loginEmail")
-          .value
-          .trim();
-
-      const password =
-        document
-          .getElementById("loginPassword")
-          .value;
-
-
-      if (!email || !password) {
-
-        showError(
-          "loginError",
-          "Email এবং Password দুটোই দিন।"
-        );
-
-        return;
-      }
-
-
-      const loginButton =
-        document.getElementById(
-          "loginButton"
-        );
-
-      loginButton.disabled = true;
-
-      loginButton.textContent =
-        "Logging in...";
-
-
-      try {
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth
-            .signInWithPassword({
-              email: email,
-              password: password
-            });
-
-
-        if (error) {
-
-          throw new Error(
-            error.message
-          );
-
-        }
-
-
-        if (!data || !data.user) {
-
-          throw new Error(
-            "Login session পাওয়া যায়নি।"
-          );
-
-        }
-
-
-        const {
-          data: profile,
-          error: profileError
-        } =
-          await supabaseClient
-            .from("profiles")
-            .select(
-              "id,user_id,username,role,balance,status"
-            )
-            .eq(
-              "id",
-              data.user.id
-            )
-            .single();
-
-
-        if (profileError) {
-
-          throw new Error(
-            "Profile পাওয়া যাচ্ছে না: " +
-            profileError.message
-          );
-
-        }
-
-
-        if (
-          !profile ||
-          profile.role !== "admin"
-        ) {
-
-          await supabaseClient.auth
-            .signOut();
-
-          throw new Error(
-            "এই account-এর Admin access নেই।"
-          );
-
-        }
-
-
-        if (
-          profile.status !== "active"
-        ) {
-
-          await supabaseClient.auth
-            .signOut();
-
-          throw new Error(
-            "Admin account blocked।"
-          );
-
-        }
-
-
-        document
-          .getElementById("loginPage")
-          .classList
-          .add("hidden");
-
-
-        document
-          .getElementById("dashboardPage")
-          .classList
-          .remove("hidden");
-
-
-        document
-          .getElementById("adminInfo")
-          .textContent =
-          "Logged in as: " +
-          profile.username;
-
-
-        await loadDashboard();
-
-      }
-
-      catch (error) {
-
-        console.error(
-          "LOGIN ERROR:",
-          error
-        );
-
-        showError(
-          "loginError",
-          "Login failed: " +
-          (
-            error.message ||
-            "Unknown error"
-          )
-        );
-
-      }
-
-      finally {
-
-        loginButton.disabled =
-          false;
-
-        loginButton.textContent =
-          "Login";
-
-      }
-
-    }
-
-
-    /* ==============================
-       LOGOUT
-    ============================== */
-
-    async function logout() {
-
-      await supabaseClient.auth
-        .signOut();
-
-
-      document
-        .getElementById("dashboardPage")
-        .classList
-        .add("hidden");
-
-
-      document
-        .getElementById("loginPage")
-        .classList
-        .remove("hidden");
-
-
-      document
-        .getElementById("loginPassword")
-        .value = "";
-
-    }
-
-
-    /* ==============================
-       LOAD DASHBOARD
-    ============================== */
-
-    async function loadDashboard() {
-
-      await loadCustomers();
-
-      await loadStats();
-
-    }
-
-
-    /* ==============================
-       LOAD CUSTOMERS
-    ============================== */
-
-    async function loadCustomers() {
-
-      const tableBody =
-        document.getElementById(
-          "customerTableBody"
-        );
-
-
-      tableBody.innerHTML = `
-        <tr>
-          <td colspan="6" class="empty">
-            Loading customers...
-          </td>
-        </tr>
-      `;
-
-
-      try {
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient
-            .from("profiles")
-            .select(
-              "id,user_id,username,role,balance,status,created_at"
-            )
-            .eq(
-              "role",
-              "customer"
-            )
-            .order(
-              "created_at",
-              {
-                ascending: false
-              }
-            );
-
-
-        if (error) {
-
-          throw new Error(
-            error.message
-          );
-
-        }
-
-
-        if (!data || data.length === 0) {
-
-          tableBody.innerHTML = `
             <tr>
-              <td colspan="6" class="empty">
-                No customers found.
-              </td>
+              <th>User ID</th>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Balance</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
             </tr>
-          `;
 
-          return;
+          </thead>
+
+          <tbody id="customerTableBody">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <!-- TRANSACTIONS -->
+
+    <div class="section">
+
+      <h2>Transactions</h2>
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Transaction ID</th>
+              <th>Type</th>
+              <th>Sender</th>
+              <th>Receiver</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="transactionTableBody">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <!-- WITHDRAWALS -->
+
+    <div class="section">
+
+      <h2>Bank Withdrawals</h2>
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Withdrawal ID</th>
+              <th>User</th>
+              <th>Bank</th>
+              <th>Account Holder</th>
+              <th>Account No.</th>
+              <th>IFSC</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="withdrawalTableBody">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <!-- ADMIN ACTION LOG -->
+
+    <div class="section">
+
+      <h2>Admin Action Log</h2>
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Action ID</th>
+              <th>Action</th>
+              <th>Amount</th>
+              <th>Reason</th>
+              <th>Transaction</th>
+              <th>Date</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="actionTableBody">
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   SUPABASE CONFIG
+========================================= */
+
+const SUPABASE_URL =
+  "https://oxwjnravklpcdhfxibya.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* =========================================
+   HELPERS
+========================================= */
+
+function showMessage(
+  elementId,
+  message,
+  success = false
+){
+
+  const el =
+    document.getElementById(elementId);
+
+  el.style.display = "block";
+
+  el.textContent = message;
+
+  if(success){
+
+    el.style.background =
+      "#dcfce7";
+
+    el.style.color =
+      "#166534";
+
+  }else{
+
+    el.style.background =
+      "#fee2e2";
+
+    el.style.color =
+      "#991b1b";
+
+  }
+
+}
+
+
+function money(value){
+
+  return "₹" +
+    Number(value || 0)
+      .toLocaleString(
+        "en-IN",
+        {
+          minimumFractionDigits:2,
+          maximumFractionDigits:2
         }
+      );
+
+}
 
 
-        tableBody.innerHTML =
-          data.map(customer => {
+function makeId(prefix){
 
-            const statusClass =
-              customer.status === "active"
-                ? "active"
-                : "blocked";
+  return (
+    prefix +
+    Date.now() +
+    Math.random()
+      .toString(36)
+      .substring(2,7)
+  ).toUpperCase();
 
-
-            const statusText =
-              customer.status === "active"
-                ? "Active"
-                : "Blocked";
+}
 
 
-            const created =
-              customer.created_at
-                ? new Date(
-                    customer.created_at
-                  ).toLocaleString(
-                    "en-IN"
-                  )
-                : "-";
+/* =========================================
+   LOGIN
+========================================= */
+
+async function login(){
+
+  const email =
+    document
+      .getElementById("email")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("password")
+      .value;
+
+  if(!email || !password){
+
+    showMessage(
+      "loginMessage",
+      "Email and password are required."
+    );
+
+    return;
+
+  }
+
+  showMessage(
+    "loginMessage",
+    "Logging in...",
+    true
+  );
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth
+        .signInWithPassword({
+          email,
+          password
+        });
+
+    if(error){
+
+      showMessage(
+        "loginMessage",
+        error.message
+      );
+
+      return;
+
+    }
+
+    const user =
+      data.user;
+
+    if(!user){
+
+      showMessage(
+        "loginMessage",
+        "Login failed."
+      );
+
+      return;
+
+    }
+
+    const {
+      data:profile,
+      error:profileError
+    } =
+      await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id",user.id)
+        .single();
+
+    if(profileError){
+
+      await supabaseClient.auth.signOut();
+
+      showMessage(
+        "loginMessage",
+        profileError.message
+      );
+
+      return;
+
+    }
+
+    if(
+      profile.role !== "admin"
+    ){
+
+      await supabaseClient.auth.signOut();
+
+      showMessage(
+        "loginMessage",
+        "Admin access required."
+      );
+
+      return;
+
+    }
+
+    if(
+      profile.status !== "active"
+    ){
+
+      await supabaseClient.auth.signOut();
+
+      showMessage(
+        "loginMessage",
+        "Admin account is blocked."
+      );
+
+      return;
+
+    }
+
+    document
+      .getElementById("loginPage")
+      .classList.add("hidden");
+
+    document
+      .getElementById("dashboard")
+      .classList.remove("hidden");
+
+    await loadDashboard();
+
+  }catch(error){
+
+    console.error(error);
+
+    showMessage(
+      "loginMessage",
+      error.message ||
+      "Login error occurred."
+    );
+
+  }
+
+}
 
 
-            return `
+/* =========================================
+   LOGOUT
+========================================= */
 
-              <tr>
+async function logout(){
 
-                <td>
-                  ${escapeHtml(
-                    customer.user_id
-                  )}
-                </td>
+  await supabaseClient.auth.signOut();
 
-                <td>
-                  ${escapeHtml(
-                    customer.username
-                  )}
-                </td>
+  document
+    .getElementById("dashboard")
+    .classList.add("hidden");
 
-                <td>
-                  ${money(
-                    customer.balance
-                  )}
-                </td>
+  document
+    .getElementById("loginPage")
+    .classList.remove("hidden");
 
-                <td>
-                  <span class="badge ${statusClass}">
-                    ${statusText}
-                  </span>
-                </td>
+}
 
-                <td>
-                  ${escapeHtml(
-                    created
-                  )}
-                </td>
 
-                <td>
+/* =========================================
+   CREATE CUSTOMER
+========================================= */
 
-                  <button
-                    class="small-btn"
-                    type="button"
-                    data-action="coming-soon"
-                  >
-                    Manage
-                  </button>
+async function createCustomer(){
 
-                </td>
+  const user_id =
+    document
+      .getElementById("newUserId")
+      .value
+      .trim();
 
-              </tr>
+  const username =
+    document
+      .getElementById("newUsername")
+      .value
+      .trim();
 
-            `;
+  const email =
+    document
+      .getElementById("newEmail")
+      .value
+      .trim();
 
-          }).join("");
+  const password =
+    document
+      .getElementById("newPassword")
+      .value;
 
+  const initial_balance =
+    Number(
+      document
+        .getElementById("newBalance")
+        .value || 0
+    );
+
+
+  if(
+    !user_id ||
+    !username ||
+    !email ||
+    !password
+  ){
+
+    showMessage(
+      "customerMessage",
+      "Please fill all required fields."
+    );
+
+    return;
+
+  }
+
+
+  if(password.length < 6){
+
+    showMessage(
+      "customerMessage",
+      "Password must be at least 6 characters."
+    );
+
+    return;
+
+  }
+
+
+  showMessage(
+    "customerMessage",
+    "Creating customer...",
+    true
+  );
+
+
+  try{
+
+    const {
+      data:{
+        session
       }
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
 
-      catch (error) {
 
-        console.error(
-          "CUSTOMER LOAD ERROR:"
-                    error
-        );
+    if(!session){
 
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="6" class="empty">
-              Error loading customers:
-              ${escapeHtml(error.message)}
-            </td>
-          </tr>
-        `;
+      showMessage(
+        "customerMessage",
+        "Admin session expired. Please login again."
+      );
 
-      }
+      return;
 
     }
 
 
-    /* ==============================
-       LOAD STATS
-    ============================== */
+    const response =
+      await fetch(
+        SUPABASE_URL +
+        "/functions/v1/create-customer",
+        {
+          method:"POST",
 
-    async function loadStats() {
+          headers:{
+            "Content-Type":
+              "application/json",
 
-      try {
+            "Authorization":
+              "Bearer " +
+              session.access_token
+          },
 
-        const {
-          data,
-          error
-        } =
-          await supabaseClient
-            .from("profiles")
-            .select(
-              "balance,status,role"
-            )
-            .eq(
-              "role",
-              "customer"
-            );
-
-
-        if (error) {
-
-          throw new Error(
-            error.message
-          );
-
+          body:JSON.stringify({
+            user_id,
+            username,
+            email,
+            password,
+            initial_balance
+          })
         }
+      );
 
 
-        const customers =
-          data || [];
+    const result =
+      await response.json();
 
 
-        const total =
-          customers.length;
+    if(!response.ok){
 
+      showMessage(
+        "customerMessage",
+        result.error ||
+        "Customer creation failed."
+      );
 
-        const active =
-          customers.filter(
-            customer =>
-              customer.status === "active"
-          ).length;
-
-
-        const balance =
-          customers.reduce(
-            (sum, customer) =>
-              sum +
-              Number(
-                customer.balance || 0
-              ),
-            0
-          );
-
-
-        document
-          .getElementById(
-            "totalCustomers"
-          )
-          .textContent =
-          total;
-
-
-        document
-          .getElementById(
-            "activeCustomers"
-          )
-          .textContent =
-          active;
-
-
-        document
-          .getElementById(
-            "totalBalance"
-          )
-          .textContent =
-          money(balance);
-
-      }
-
-      catch (error) {
-
-        console.error(
-          "STATS ERROR:",
-          error
-        );
-
-      }
+      return;
 
     }
 
 
-    /* ==============================
-       CREATE CUSTOMER
-    ============================== */
-
-    async function createCustomer() {
-
-      hideMessage("createMessage");
-
-      const user_id =
-        document
-          .getElementById(
-            "customerUserId"
-          )
-          .value
-          .trim();
-
-
-      const username =
-        document
-          .getElementById(
-            "customerUsername"
-          )
-          .value
-          .trim();
-
-
-      const email =
-        document
-          .getElementById(
-            "customerEmail"
-          )
-          .value
-          .trim();
-
-
-      const password =
-        document
-          .getElementById(
-            "customerPassword"
-          )
-          .value;
-
-
-      const initial_balance =
-        Number(
-          document
-            .getElementById(
-              "customerBalance"
-            )
-            .value || 0
-        );
-
-
-      if (
-        !user_id ||
-        !username ||
-        !email ||
-        !password
-      ) {
-
-        showCreateMessage(
-          "User ID, Username, Email এবং Password দিন।"
-        );
-
-        return;
-
-      }
-
-
-      if (password.length < 6) {
-
-        showCreateMessage(
-          "Password কমপক্ষে 6 characters হতে হবে।"
-        );
-
-        return;
-
-      }
-
-
-      if (
-        !Number.isFinite(
-          initial_balance
-        ) ||
-        initial_balance < 0
-      ) {
-
-        showCreateMessage(
-          "Initial Balance সঠিকভাবে দিন।"
-        );
-
-        return;
-
-      }
-
-
-      const button =
-        document.getElementById(
-          "createCustomerButton"
-        );
-
-
-      button.disabled = true;
-
-      button.textContent =
-        "Creating...";
-
-
-      try {
-
-        const {
-          data: sessionData,
-          error: sessionError
-        } =
-          await supabaseClient.auth
-            .getSession();
-
-
-        if (
-          sessionError ||
-          !sessionData ||
-          !sessionData.session
-        ) {
-
-          throw new Error(
-            "Admin login session পাওয়া যায়নি।"
-          );
-
-        }
-
-
-        const accessToken =
-          sessionData.session
-            .access_token;
-
-
-        const response =
-          await fetch(
-            SUPABASE_URL +
-            "/functions/v1/create-customer",
-            {
-              method: "POST",
-
-              headers: {
-
-                "Content-Type":
-                  "application/json",
-
-                "Authorization":
-                  "Bearer " +
-                  accessToken,
-
-                "apikey":
-                  SUPABASE_KEY
-
-              },
-
-              body: JSON.stringify({
-
-                user_id:
-                  user_id,
-
-                username:
-                  username,
-
-                email:
-                  email,
-
-                password:
-                  password,
-
-                initial_balance:
-                  initial_balance
-
-              })
-
-            }
-          );
-
-
-        const result =
-          await response.json();
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            result.error ||
-            "Customer create failed"
-          );
-
-        }
-
-
-        showCreateMessage(
-          "Customer successfully created.",
-          true
-        );
-
-
-        document
-          .getElementById(
-            "customerUserId"
-          )
-          .value = "";
-
-
-        document
-          .getElementById(
-            "customerUsername"
-          )
-          .value = "";
-
-
-        document
-          .getElementById(
-            "customerEmail"
-          )
-          .value = "";
-
-
-        document
-          .getElementById(
-            "customerPassword"
-          )
-          .value = "";
-
-
-        document
-          .getElementById(
-            "customerBalance"
-          )
-          .value = "0";
-
-
-        await loadDashboard();
-
-      }
-
-      catch (error) {
-
-        console.error(
-          "CREATE CUSTOMER ERROR:",
-          error
-        );
-
-
-        showCreateMessage(
-          "Customer create failed: " +
-          (
-            error.message ||
-            "Unknown error"
-          )
-        );
-
-      }
-
-      finally {
-
-        button.disabled =
-          false;
-
-        button.textContent =
-          "Create Customer";
-
-      }
-
-    }
-
-
-    /* ==============================
-       SESSION CHECK
-    ============================== */
-
-    async function checkSession() {
-
-      try {
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth
-            .getSession();
-
-
-        if (error) {
-
-          console.error(
-            "SESSION ERROR:",
-            error
-          );
-
-          return;
-
-        }
-
-
-        if (
-          data &&
-          data.session
-        ) {
-
-          const {
-            data: profile,
-            error: profileError
-          } =
-            await supabaseClient
-              .from("profiles")
-              .select(
-                "id,user_id,username,role,balance,status"
-              )
-              .eq(
-                "id",
-                data.session.user.id
-              )
-              .single();
-
-
-          if (
-            profileError ||
-            !profile
-          ) {
-
-            await supabaseClient.auth
-              .signOut();
-
-            return;
-
-          }
-
-
-          if (
-            profile.role === "admin" &&
-            profile.status === "active"
-          ) {
-
-            document
-              .getElementById(
-                "loginPage"
-              )
-              .classList
-              .add("hidden");
-
-
-            document
-              .getElementById(
-                "dashboardPage"
-              )
-              .classList
-              .remove("hidden");
-
-
-            document
-              .getElementById(
-                "adminInfo"
-              )
-              .textContent =
-              "Logged in as: " +
-              profile.username;
-
-
-            await loadDashboard();
-
-          }
-
-        }
-
-      }
-
-      catch (error) {
-
-        console.error(
-          "SESSION ERROR:",
-          error
-        );
-
-      }
-
-    }
-
-
-    /* ==============================
-       BUTTON EVENTS
-    ============================== */
-
-    document
-      .getElementById(
-        "loginButton"
-      )
-      .addEventListener(
-        "click",
-        login
-      );
+    showMessage(
+      "customerMessage",
+      "Customer created successfully.",
+      true
+    );
 
 
     document
-      .getElementById(
-        "logoutButton"
-      )
-      .addEventListener(
-        "click",
-        logout
-      );
-
+      .getElementById("newUserId")
+      .value = "";
 
     document
-      .getElementById(
-        "createCustomerButton"
-      )
-      .addEventListener(
-        "click",
-        createCustomer
-      );
-
+      .getElementById("newUsername")
+      .value = "";
 
     document
-      .getElementById(
-        "refreshButton"
-      )
-      .addEventListener(
-        "click",
-        loadDashboard
+      .getElementById("newEmail")
+      .value = "";
+
+    document
+      .getElementById("newPassword")
+      .value = "";
+
+    document
+      .getElementById("newBalance")
+      .value = "0";
+
+
+    await loadDashboard();
+
+  }catch(error){
+
+    console.error(error);
+
+    showMessage(
+      "customerMessage",
+      error.message ||
+      "Customer creation error."
+    );
+
+  }
+
+}
+
+
+/* =========================================
+   LOAD DASHBOARD
+========================================= */
+
+async function loadDashboard(){
+
+  await loadCustomers();
+
+  await loadTransactions();
+
+  await loadWithdrawals();
+
+  await loadAdminActions();
+
+}
+
+
+/* =========================================
+   LOAD CUSTOMERS
+========================================= */
+
+async function loadCustomers(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
       );
 
 
+  if(error){
+
+    console.error(
+      "CUSTOMER LOAD ERROR:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  const customers =
+    data || [];
+
+
+  const tbody =
     document
       .getElementById(
         "customerTableBody"
-      )
-      .addEventListener(
-        "click",
-        function(event) {
-
-          const button =
-            event.target.closest(
-              "[data-action]"
-            );
-
-          if (!button) return;
-
-          alert(
-            "Customer management module will be added next."
-          );
-
-        }
       );
 
 
-    /* ==============================
-       START APPLICATION
-    ============================== */
+  tbody.innerHTML = "";
 
-    checkSession();
 
-  </script>
+  let totalBalance = 0;
 
-</body>
-</html>
+  let customerCount = 0;
+
+
+  customers.forEach(
+    user => {
+
+      if(user.role === "customer"){
+
+        customerCount++;
+
+        totalBalance +=
+          Number(user.balance || 0);
+
+      }
+
+
+      const tr =
+        document.createElement("tr");
+
+
+      const statusClass =
+        user.status === "active"
+          ? "active"
+          : "blocked";
+
+
+      tr.innerHTML = `
+
+        <td>${user.user_id}</td>
+
+        <td>${user.username}</td>
+
+        <td>${user.role}</td>
+
+        <td>${money(user.balance)}</td>
+
+        <td>
+          <span class="badge ${statusClass}">
+            ${user.status}
+          </span>
+        </td>
+
+        <td>
+          ${new Date(
+            user.created_at
+          ).toLocaleString("en-IN")}
+        </td>
+
+        <td>
+
+          ${
+            user.role === "customer"
+            ?
+            `
+            <button
+              class="small-btn ${
+                user.status === "active"
+                ? "btn-danger"
+                : "btn-success"
+              }"
+              onclick="
+                toggleUserStatus(
+                  '${user.id}',
+                  '${user.status}'
+                )
+              "
+            >
+              ${
+                user.status === "active"
+                ? "Block"
+                : "Unblock"
+              }
+            </button>
+            `
+            :
+            ""
+          }
+
+        </td>
+
+      `;
+
+
+      tbody.appendChild(tr);
+
+    }
+  );
+
+
+  document
+    .getElementById(
+      "totalCustomers"
+    )
+    .textContent =
+      customerCount;
+
+
+  document
+    .getElementById(
+      "totalBalance"
+    )
+    .textContent =
+      money(totalBalance);
+
+}
+
+
+/* =========================================
+   BLOCK / UNBLOCK
+========================================= */
+
+async function toggleUserStatus(
+  userId,
+  currentStatus
+){
+
+  const newStatus =
+    currentStatus === "active"
+      ? "blocked"
+      : "active";
+
+
+  const confirmAction =
+    confirm(
+      "Change user status to " +
+      newStatus +
+      "?"
+    );
+
+
+  if(!confirmAction){
+
+    return;
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .update({
+        status:newStatus
+      })
+      .eq("id",userId);
+
+
+  if(error){
+
+    alert(
+      "Error: " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  await loadCustomers();
+
+}
+
+
+/* =========================================
+   TRANSACTIONS
+========================================= */
+
+async function loadTransactions(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("transactions")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+      .limit(100);
+
+
+  if(error){
+
+    console.error(
+      "TRANSACTION ERROR:",
+      error
+    );
+
+    return;
+
+  }
+
+
+  const rows =
+    data || [];
+
+
+  const tbody =
+    document
+      .getElementById(
+        "transactionTableBody"
+      );
+
+
+  tbody.innerHTML = "";
+
+
+  let pending = 0;
+
+
+  rows.forEach(
+    tx => {
+
+      if(tx.status === "pending"){
+
+        pending++;
+
+      }
+
+
+      const tr =
+        document.createElement("tr");
+
+
+      tr.innerHTML = `
+
+        <td>${tx.transaction_id}</td>
+
+        <td>${tx.type}</td>
+
+        <td>${tx.sender_id || "-"}</td>
+
+        <td>${tx.receiver_id || "-"}</td>
+
+        <td>${money(tx.amount)}</td>
+
+        <td>
+          <span class="badge ${tx.status}
