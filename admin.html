@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DhanFlow Admin Panel</title>
+  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; }
@@ -19,13 +20,8 @@
     label { display: block; margin: 12px 0 6px; font-weight: bold; font-size: 14px; }
     input, textarea, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 9px; font-size: 15px; outline: none; margin-bottom: 10px;}
     input:focus, textarea:focus, select:focus { border-color: #2563eb; }
-    .btn { border: 0; border-radius: 9px; padding: 12px 18px; color: white; background: #2563eb; font-weight: bold; font-size: 15px; }
+    .btn { border: 0; border-radius: 9px; padding: 12px 18px; color: white; background: #2563eb; font-weight: bold; font-size: 15px; width: 100%; margin-top: 18px; }
     .btn:hover { opacity: 0.9; }
-    .full { width: 100%; margin-top: 18px; }
-    .success { background: #16a34a; }
-    .danger { background: #dc2626; }
-    .warning { background: #d97706; }
-    .gray { background: #475569; }
     .message { margin-top: 15px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; white-space: pre-wrap; }
 
     /* DASHBOARD */
@@ -33,35 +29,8 @@
     .topbarTitle { font-size: 22px; font-weight: bold; }
     .logoutBtn { border: 0; background: #dc2626; color: white; padding: 9px 15px; border-radius: 8px; font-weight: bold; }
     .container { width: 100%; max-width: 1200px; margin: auto; padding: 20px; }
-    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-    .card { background: white; padding: 20px; border-radius: 14px; box-shadow: 0 3px 12px rgba(0,0,0,0.06); }
-    .cardTitle { color: #64748b; font-size: 14px; }
-    .cardValue { font-size: 26px; font-weight: bold; margin-top: 8px; }
-    .section { background: white; padding: 20px; border-radius: 14px; margin-bottom: 20px; box-shadow: 0 3px 12px rgba(0,0,0,0.06); overflow: hidden;}
-    .section h2 { margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-    .tableWrap { overflow-x: auto; }
-    table { width: 100%; min-width: 750px; border-collapse: collapse; }
-    th, td { border-bottom: 1px solid #e2e8f0; padding: 11px; text-align: left; font-size: 14px; }
-    th { background: #f8fafc; font-weight: bold; color: #475569;}
-    .badge { display: inline-block; padding: 5px 9px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase;}
-    .badgeActive, .badgeApproved { background: #dcfce7; color: #166534; }
-    .badgeBlocked, .badgeRejected { background: #fee2e2; color: #991b1b; }
-    .badgePending { background: #fef3c7; color: #92400e; }
-    .badgeFrozen { background: #e0e7ff; color: #3730a3; }
-    .smallBtn { border: 0; border-radius: 6px; padding: 6px 9px; color: white; font-size: 12px; margin: 2px; cursor: pointer;}
-    
-    /* MODAL */
-    .modalOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
-    .modalBox { background: white; padding: 25px; border-radius: 14px; width: 90%; max-width: 400px; }
-    .modalBox h3 { margin-top: 0; }
-    .modalActions { display: flex; gap: 10px; margin-top: 20px; }
-
-    @media (max-width: 800px) { .cards { grid-template-columns: repeat(2, 1fr); } .grid { grid-template-columns: 1fr; } }
-    @media (max-width: 480px) { .cards { grid-template-columns: 1fr; } .container { padding: 12px; } .topbarTitle { font-size: 18px; } }
   </style>
 </head>
-
 <body>
 
 <!-- ================= LOGIN PAGE ================= -->
@@ -69,13 +38,15 @@
   <div class="loginBox">
     <div class="logo">DhanFlow Admin</div>
     <div class="loginSubtitle">Secure Management Panel</div>
+    
     <label>Email</label>
     <input id="email" type="email" placeholder="admin@dhanflow.com">
+    
     <label>Password</label>
     <input id="password" type="password" placeholder="••••••••">
     
-    <!-- সরাসরি onclick ফাংশন যুক্ত করা হয়েছে -->
-    <button type="button" class="btn full" onclick="login()">Login</button>
+    <!-- সরাসরি onclick ফাংশন -->
+    <button type="button" class="btn" onclick="adminLogin()">Login</button>
     
     <div id="loginMessage" class="message"></div>
   </div>
@@ -85,376 +56,79 @@
 <div id="dashboard" class="hidden">
   <div class="topbar">
     <div class="topbarTitle">DhanFlow Control Center</div>
-    <button type="button" class="logoutBtn" onclick="logout()">Logout</button>
+    <button type="button" class="logoutBtn" onclick="adminLogout()">Logout</button>
   </div>
-
   <div class="container">
-    <!-- SUMMARY CARDS -->
-    <div class="cards">
-      <div class="card"><div class="cardTitle">Total Customers</div><div id="totalCustomers" class="cardValue">0</div></div>
-      <div class="card"><div class="cardTitle">Total Balance (₹)</div><div id="totalBalance" class="cardValue">₹0.00</div></div>
-      <div class="card"><div class="cardTitle">Pending Transfers</div><div id="pendingTransfers" class="cardValue">0</div></div>
-      <div class="card"><div class="cardTitle">Pending Withdrawals</div><div id="pendingWithdrawals" class="cardValue">0</div></div>
-    </div>
-
-    <!-- CREATE CUSTOMER -->
-    <div class="section">
-      <h2>Create New Customer</h2>
-      <div class="grid">
-        <div><label>User ID</label><input id="newUserId" placeholder="USER001"></div>
-        <div><label>Username</label><input id="newUsername" placeholder="John Doe"></div>
-        <div><label>Email</label><input id="newEmail" type="email" placeholder="user@email.com"></div>
-        <div><label>Password</label><input id="newPassword" type="password" placeholder="Min 6 chars"></div>
-        <div><label>Initial Balance (₹)</label><input id="newBalance" type="number" min="0" value="0"></div>
-      </div>
-      <button type="button" class="btn success full" onclick="createCustomer()">Create Customer</button>
-      <div id="customerMessage" class="message"></div>
-    </div>
-
-    <!-- CUSTOMERS MANAGEMENT -->
-    <div class="section">
-      <h2>Customer Management</h2>
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th><th>Username</th><th>Balance</th><th>Status</th><th>Joined Date</th><th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="customerTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TRANSACTIONS MANAGEMENT -->
-    <div class="section">
-      <h2>User Transfers (Transactions)</h2>
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>TXN ID</th><th>Sender</th><th>Receiver</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="transactionTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- WITHDRAWALS MANAGEMENT -->
-    <div class="section">
-      <h2>Bank Withdrawal Requests</h2>
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>WD ID</th><th>User</th><th>Bank Details</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="withdrawalTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ADMIN LOGS -->
-    <div class="section">
-      <h2>Admin Action Log</h2>
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Date & Time</th><th>Admin</th><th>Action</th><th>Target User / ID</th><th>Note / Reason</th>
-            </tr>
-          </thead>
-          <tbody id="logTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ================= BALANCE ADJUSTMENT MODAL ================= -->
-<div id="balanceModal" class="modalOverlay hidden">
-  <div class="modalBox">
-    <h3>Adjust Balance</h3>
-    <p>User: <strong id="adjUserName"></strong></p>
-    <label>Action Type</label>
-    <select id="adjType">
-      <option value="add">Deposit (Add Funds)</option>
-      <option value="deduct">Deduct (Remove Funds)</option>
-    </select>
-    <label>Amount (₹)</label>
-    <input type="number" id="adjAmount" min="1" placeholder="Enter amount">
-    <label>Reason / Note</label>
-    <input type="text" id="adjReason" placeholder="e.g., Reward, Penalty">
-    <div class="modalActions">
-      <button type="button" class="btn success" style="flex:1" onclick="submitBalanceAdjustment()">Confirm</button>
-      <button type="button" class="btn gray" style="flex:1" onclick="closeModal('balanceModal')">Cancel</button>
-    </div>
+    <h2>Welcome to Admin Dashboard!</h2>
+    <p>Successfully logged in.</p>
   </div>
 </div>
 
 <script>
-/* ============================================
-   SUPABASE CONFIG
-============================================ */
-const SUPABASE_URL = "https://oxwjnravklpcdhfxibya.supabase.co";
-const SUPABASE_KEY = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // সুপাবেস কনফিগারেশন
+  const SUPABASE_URL = "https://oxwjnravklpcdhfxibya.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let currentAdminId = "";
-let selectedUserId = ""; 
-
-/* ============================================
-   UTILITY FUNCTIONS
-============================================ */
-function showMessage(elementId, msg, success = false) {
-  const el = document.getElementById(elementId);
-  if (!el) return;
-  el.style.display = "block";
-  el.textContent = msg;
-  el.style.background = success ? "#dcfce7" : "#fee2e2";
-  el.style.color = success ? "#166534" : "#991b1b";
-  setTimeout(() => el.style.display = "none", 5000);
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.add("hidden");
-}
-
-function openBalanceModal(id, username) {
-  selectedUserId = id;
-  document.getElementById("adjUserName").textContent = username;
-  document.getElementById("adjAmount").value = "";
-  document.getElementById("adjReason").value = "";
-  document.getElementById("balanceModal").classList.remove("hidden");
-}
-
-/* ============================================
-   LOGIN & LOGOUT (WITH ALERTS)
-============================================ */
-async function login() {
-  alert("১. Login Button Clicked successfully!");
-  
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  
-  if (!email || !password) {
-    alert("Error: ইমেইল বা পাসওয়ার্ড দেওয়া হয়নি!");
-    return showMessage("loginMessage", "Please enter email and password");
+  function showMsg(text, isSuccess = false) {
+    const msg = document.getElementById("loginMessage");
+    msg.style.display = "block";
+    msg.textContent = text;
+    msg.style.background = isSuccess ? "#dcfce7" : "#fee2e2";
+    msg.style.color = isSuccess ? "#166534" : "#991b1b";
   }
 
-  showMessage("loginMessage", "Logging in...", true);
-  
-  try {
-    alert("২. Sending auth request to Supabase...");
-    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-    
-    if (error) {
-      alert("৩. Auth Error: " + error.message);
-      throw error;
+  // লগইন ফাংশন
+  async function adminLogin() {
+    alert("লগইন বাটন কাজ করছে!"); // বাটন কাজ করছে কি না দেখার জন্য অ্যালার্ট
+
+    const emailField = document.getElementById("email").value.trim();
+    const passwordField = document.getElementById("password").value;
+
+    if (!emailField || !passwordField) {
+      showMsg("দয়া করে ইমেইল এবং পাসওয়ার্ড দিন।");
+      return;
     }
-    
-    alert("৪. Auth successful! Checking profile database...");
-    const profileRes = await supabaseClient.from("profiles").select("*").eq("id", data.user.id).single();
-    
-    if (profileRes.error) {
-      alert("৫. Profile Error: " + profileRes.error.message);
-      throw profileRes.error;
+
+    showMsg("লগইন হচ্ছে, অপেক্ষা করুন...", true);
+
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: emailField,
+        password: passwordField
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // প্রোফাইল ও রোল চেক
+      const { data: profile, error: profError } = await supabaseClient
+        .from("profiles")
+        .select("role")
+        .eq("id", data.user.id)
+        .single();
+
+      if (profError || !profile || profile.role !== "admin") {
+        await supabaseClient.auth.signOut();
+        throw new Error("আপনার এই প্যানেলে ঢোকার অ্যাডমিন পারমিশন নেই!");
+      }
+
+      alert("লগইন সফল হয়েছে!");
+      document.getElementById("loginPage").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
+
+    } catch (err) {
+      showMsg("এরর: " + err.message);
+      alert("লগইন ফেইলড: " + err.message);
     }
-    
-    const profile = profileRes.data;
-    if (profile.role !== "admin") {
-      alert("৬. Error: This is not an admin account!");
-      await supabaseClient.auth.signOut();
-      return showMessage("loginMessage", "Access denied: Not an admin");
-    }
-    
-    currentAdminId = profile.id;
-    alert("৭. Admin Access Granted! Loading Dashboard...");
-    
-    document.getElementById("loginPage").classList.add("hidden");
-    document.getElementById("dashboard").classList.remove("hidden");
-    loadDashboard();
-    
-  } catch (err) {
-    alert("Catch Error: " + err.message);
-    showMessage("loginMessage", err.message);
   }
-}
 
-async function logout() {
-  await supabaseClient.auth.signOut();
-  window.location.reload();
-}
+  function adminLogout() {
+    supabaseClient.auth.signOut();
+    location.reload();
+  }
+</script>
 
-/* ============================================
-   DASHBOARD DATA LOADER
-============================================ */
-async function loadDashboard() {
-  await Promise.all([
-    fetchCustomers(),
-    fetchTransactions(),
-    fetchWithdrawals(),
-    fetchAdminLogs()
-  ]);
-}
-
-/* ============================================
-   1. CUSTOMER MANAGEMENT
-============================================ */
-async function fetchCustomers() {
-  const { data, error } = await supabaseClient.from("profiles").select("*").order("created_at", { ascending: false });
-  if (error) return console.error(error);
-
-  const tbody = document.getElementById("customerTableBody");
-  tbody.innerHTML = "";
-  let count = 0, totalBal = 0;
-
-  data.forEach(user => {
-    if (user.role === "customer") { count++; totalBal += Number(user.balance || 0); }
-    
-    const statusClass = user.status === "active" ? "badgeActive" : "badgeBlocked";
-    const toggleBtn = user.status === "active" 
-      ? `<button type="button" class="smallBtn danger" onclick="toggleStatus('${user.id}', 'blocked')">Block</button>`
-      : `<button type="button" class="smallBtn success" onclick="toggleStatus('${user.id}', 'active')">Unblock</button>`;
-    
-    const balanceBtn = `<button type="button" class="smallBtn warning" onclick="openBalanceModal('${user.id}', '${user.username}')">Adjust Bal</button>`;
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${user.user_id} <br><small style="color:gray">${user.role}</small></td>
-        <td>${user.username} <br><small style="color:gray">${user.email}</small></td>
-        <td><b>₹${Number(user.balance).toFixed(2)}</b></td>
-        <td><span class="badge ${statusClass}">${user.status}</span></td>
-        <td>${new Date(user.created_at).toLocaleDateString()}</td>
-        <td>${user.role === 'customer' ? toggleBtn + balanceBtn : '-'}</td>
-      </tr>`;
-  });
-  document.getElementById("totalCustomers").textContent = count;
-  document.getElementById("totalBalance").textContent = "₹" + totalBal.toFixed(2);
-}
-
-async function toggleStatus(userId, newStatus) {
-  if(!confirm(`Are you sure you want to ${newStatus === 'blocked' ? 'Block' : 'Unblock'} this user?`)) return;
-  await supabaseClient.from("profiles").update({ status: newStatus }).eq("id", userId);
-  await logAction(`User ${newStatus}`, userId, null, `Changed status to ${newStatus}`, userId);
-  fetchCustomers();
-}
-
-/* ============================================
-   2. BALANCE ADJUSTMENT
-============================================ */
-async function submitBalanceAdjustment() {
-  const type = document.getElementById("adjType").value;
-  const amount = Number(document.getElementById("adjAmount").value);
-  const reason = document.getElementById("adjReason").value.trim() || "Admin Adjustment";
-
-  if (amount <= 0) return alert("Amount must be greater than 0");
-
-  const { data: user } = await supabaseClient.from("profiles").select("balance").eq("id", selectedUserId).single();
-  let newBalance = Number(user.balance);
-  
-  if (type === "add") newBalance += amount;
-  else newBalance -= amount;
-
-  if (newBalance < 0) return alert("Insufficient balance to deduct!");
-
-  await supabaseClient.from("profiles").update({ balance: newBalance }).eq("id", selectedUserId);
-  await logAction(`Balance ${type === 'add' ? 'Deposit' : 'Deduction'}`, selectedUserId, amount, reason, `ADJ-${Date.now()}`);
-  
-  closeModal("balanceModal");
-  alert("Balance adjusted successfully!");
-  fetchCustomers();
-  fetchAdminLogs();
-}
-
-/* ============================================
-   3. TRANSACTIONS
-============================================ */
-async function fetchTransactions() {
-  const { data, error } = await supabaseClient.from("transactions").select(`*, sender:profiles!sender_id(user_id, username), receiver:profiles!receiver_id(user_id, username)`).order("created_at", { ascending: false });
-  if (error) return console.error(error);
-
-  const tbody = document.getElementById("transactionTableBody");
-  tbody.innerHTML = "";
-  let pendingCount = 0;
-
-  data.forEach(txn => {
-    if (txn.status === "pending") pendingCount++;
-    const badgeClass = txn.status === "approved" ? "badgeApproved" : txn.status === "rejected" ? "badgeRejected" : txn.status === "frozen" ? "badgeFrozen" : "badgePending";
-    
-    let actions = "-";
-    if (txn.status === "pending") {
-      actions = `
-        <button type="button" class="smallBtn success" onclick="updateTxn('${txn.id}', 'approved')">Approve</button>
-        <button type="button" class="smallBtn danger" onclick="updateTxn('${txn.id}', 'rejected')">Reject</button>
-        <button type="button" class="smallBtn warning" onclick="updateTxn('${txn.id}', 'frozen')">Freeze</button>
-      `;
-    }
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${txn.transaction_id}</td>
-        <td>${txn.sender?.username} (${txn.sender?.user_id})</td>
-        <td>${txn.receiver?.username} (${txn.receiver?.user_id})</td>
-        <td>₹${Number(txn.amount).toFixed(2)}</td>
-        <td><span class="badge ${badgeClass}">${txn.status}</span></td>
-        <td>${new Date(txn.created_at).toLocaleDateString()}</td>
-        <td>${actions}</td>
-      </tr>`;
-  });
-  document.getElementById("pendingTransfers").textContent = pendingCount;
-}
-
-async function updateTxn(txnId, newStatus) {
-  if(!confirm(`Are you sure you want to ${newStatus.toUpperCase()} this transaction?`)) return;
-  await supabaseClient.from("transactions").update({ status: newStatus }).eq("id", txnId);
-  await logAction(`Transaction ${newStatus}`, null, null, `Admin marked TXN as ${newStatus}`, txnId);
-  fetchTransactions();
-  fetchAdminLogs();
-}
-
-/* ============================================
-   4. WITHDRAWALS
-============================================ */
-async function fetchWithdrawals() {
-  const { data, error } = await supabaseClient.from("withdrawals").select(`*, user:profiles(user_id, username)`).order("created_at", { ascending: false });
-  if (error) return console.error(error);
-
-  const tbody = document.getElementById("withdrawalTableBody");
-  tbody.innerHTML = "";
-  let pendingCount = 0;
-
-  data.forEach(wd => {
-    if (wd.status === "pending") pendingCount++;
-    const badgeClass = wd.status === "approved" ? "badgeApproved" : wd.status === "rejected" ? "badgeRejected" : wd.status === "frozen" ? "badgeFrozen" : "badgePending";
-    
-    let actions = "-";
-    if (wd.status === "pending") {
-      actions = `
-        <button type="button" class="smallBtn success" onclick="updateWd('${wd.id}', 'approved', '${wd.user_id}', ${wd.amount})">Approve</button>
-        <button type="button" class="smallBtn danger" onclick="updateWd('${wd.id}', 'rejected', null, null)">Reject</button>
-      `;
-    }
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${wd.withdrawal_id}</td>
-        <td>${wd.user?.username} (${wd.user?.user_id})</td>
-        <td><small>Bank: ${wd.bank_name}<br>A/C: ${wd.account_number}<br>IFSC: ${wd.ifsc}</small></td>
-        <td><b>₹${Number(wd.amount).toFixed(2)}</b></td>
-        <td><span class="badge ${badgeClass}">${wd.status}</span></td>
-        <td>${new Date(wd.created_at).toLocaleDateString()}</td>
-        <td>${actions}</td>
-      </tr>`;
-  });
-  document.getElementById("pendingWithdrawals").textContent = pendingCount;
-}
-
-async function updateWd(wdId, newStatus, userId, amount) {
-  if(!confirm(`Are you sure you want to ${newStatus.toUpperCase()} this withdrawal?`)) return;
-  
-  if (newStatus === 'approved') {
-    const { data: user } = await supabaseClient.from("profiles").select("balance").eq("id", userId).single();
-    if(user.balance < amount) return alert("User does not have e
+</body>
+</html>
