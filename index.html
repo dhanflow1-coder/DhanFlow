@@ -1,365 +1,352 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>DhanFlow</title>
+  <title>DhanFlow Admin</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Arial,sans-serif;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-body{
-  background:#f3f6fb;
-  color:#172033;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+    }
 
-button{
-  cursor:pointer;
-}
+    .hidden {
+      display: none !important;
+    }
 
-.hidden{
-  display:none!important;
-}
+    button {
+      cursor: pointer;
+    }
 
-/* LOGIN */
+    /* LOGIN */
 
-#loginPage{
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:20px;
-  background:linear-gradient(135deg,#0f172a,#2563eb);
-}
+    #loginPage {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #0f172a, #2563eb);
+    }
 
-.login-box{
-  width:100%;
-  max-width:400px;
-  background:white;
-  padding:30px;
-  border-radius:18px;
-  box-shadow:0 20px 50px rgba(0,0,0,.2);
-}
+    .loginBox {
+      width: 100%;
+      max-width: 400px;
+      background: white;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    }
 
-.logo{
-  text-align:center;
-  font-size:32px;
-  font-weight:bold;
-  color:#2563eb;
-  margin-bottom:8px;
-}
+    .logo {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      color: #2563eb;
+      margin-bottom: 5px;
+    }
 
-.subtitle{
-  text-align:center;
-  color:#64748b;
-  margin-bottom:25px;
-}
+    .loginSubtitle {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 25px;
+    }
 
-label{
-  display:block;
-  margin:12px 0 6px;
-  font-weight:bold;
-  font-size:14px;
-}
+    label {
+      display: block;
+      margin: 12px 0 6px;
+      font-weight: bold;
+      font-size: 14px;
+    }
 
-input,select,textarea{
-  width:100%;
-  padding:12px;
-  border:1px solid #cbd5e1;
-  border-radius:9px;
-  outline:none;
-  font-size:15px;
-}
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      font-size: 15px;
+      outline: none;
+    }
 
-input:focus,
-select:focus,
-textarea:focus{
-  border-color:#2563eb;
-}
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #2563eb;
+    }
 
-.btn{
-  border:0;
-  padding:12px 18px;
-  border-radius:9px;
-  background:#2563eb;
-  color:white;
-  font-weight:bold;
-  margin-top:15px;
-}
+    .btn {
+      border: 0;
+      border-radius: 9px;
+      padding: 12px 18px;
+      color: white;
+      background: #2563eb;
+      font-weight: bold;
+      font-size: 15px;
+    }
 
-.btn:hover{
-  opacity:.9;
-}
+    .btn:hover {
+      opacity: 0.9;
+    }
 
-.btn-danger{
-  background:#dc2626;
-}
+    .full {
+      width: 100%;
+      margin-top: 18px;
+    }
 
-.btn-success{
-  background:#16a34a;
-}
+    .success {
+      background: #16a34a;
+    }
 
-.btn-warning{
-  background:#d97706;
-}
+    .danger {
+      background: #dc2626;
+    }
 
-.btn-gray{
-  background:#475569;
-}
+    .warning {
+      background: #d97706;
+    }
 
-.full{
-  width:100%;
-}
+    .gray {
+      background: #475569;
+    }
 
-.message{
-  margin-top:15px;
-  padding:10px;
-  border-radius:8px;
-  display:none;
-  font-size:14px;
-}
+    .message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+      white-space: pre-wrap;
+    }
 
-/* DASHBOARD */
+    /* DASHBOARD */
 
-#dashboard{
-  min-height:100vh;
-}
+    #dashboard {
+      min-height: 100vh;
+    }
 
-.topbar{
-  background:#0f172a;
-  color:white;
-  padding:15px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:15px;
-  position:sticky;
-  top:0;
-  z-index:20;
-}
+    .topbar {
+      background: #0f172a;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
 
-.topbar-title{
-  font-size:22px;
-  font-weight:bold;
-}
+    .topbarTitle {
+      font-size: 22px;
+      font-weight: bold;
+    }
 
-.logout{
-  background:#dc2626;
-  border:0;
-  color:white;
-  padding:9px 15px;
-  border-radius:8px;
-}
+    .logoutBtn {
+      border: 0;
+      background: #dc2626;
+      color: white;
+      padding: 9px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
 
-.container{
-  max-width:1200px;
-  margin:auto;
-  padding:20px;
-}
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
 
-.cards{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:15px;
-  margin-bottom:20px;
-}
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
 
-.card{
-  background:white;
-  padding:20px;
-  border-radius:14px;
-  box-shadow:0 3px 12px rgba(0,0,0,.06);
-}
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    }
 
-.card-title{
-  color:#64748b;
-  font-size:14px;
-}
+    .cardTitle {
+      color: #64748b;
+      font-size: 14px;
+    }
 
-.card-value{
-  font-size:26px;
-  font-weight:bold;
-  margin-top:8px;
-}
+    .cardValue {
+      font-size: 26px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
 
-.section{
-  background:white;
-  padding:20px;
-  border-radius:14px;
-  margin-bottom:20px;
-  box-shadow:0 3px 12px rgba(0,0,0,.06);
-}
+    .section {
+      background: white;
+      padding: 20px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+    }
 
-.section h2{
-  margin-bottom:15px;
-}
+    .section h2 {
+      margin-top: 0;
+    }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:15px;
-}
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
 
-.table-wrap{
-  overflow-x:auto;
-}
+    .tableWrap {
+      overflow-x: auto;
+    }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:800px;
-}
+    table {
+      width: 100%;
+      min-width: 750px;
+      border-collapse: collapse;
+    }
 
-th,td{
-  padding:11px;
-  border-bottom:1px solid #e2e8f0;
-  text-align:left;
-  font-size:14px;
-}
+    th,
+    td {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 11px;
+      text-align: left;
+      font-size: 14px;
+    }
 
-th{
-  background:#f8fafc;
-}
+    th {
+      background: #f8fafc;
+    }
 
-.badge{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:20px;
-  font-size:12px;
-  font-weight:bold;
-}
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
 
-.active{
-  background:#dcfce7;
-  color:#166534;
-}
+    .badgeActive {
+      background: #dcfce7;
+      color: #166534;
+    }
 
-.blocked{
-  background:#fee2e2;
-  color:#991b1b;
-}
+    .badgeBlocked {
+      background: #fee2e2;
+      color: #991b1b;
+    }
 
-.pending{
-  background:#fef3c7;
-  color:#92400e;
-}
+    .badgePending {
+      background: #fef3c7;
+      color: #92400e;
+    }
 
-.approved{
-  background:#dcfce7;
-  color:#166534;
-}
+    .badgeApproved {
+      background: #dcfce7;
+      color: #166534;
+    }
 
-.rejected{
-  background:#fee2e2;
-  color:#991b1b;
-}
+    .badgeRejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
 
-.frozen{
-  background:#e0e7ff;
-  color:#3730a3;
-}
+    .badgeFrozen {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
 
-.small-btn{
-  padding:6px 9px;
-  border:0;
-  border-radius:6px;
-  color:white;
-  font-size:12px;
-  margin:2px;
-}
+    .smallBtn {
+      border: 0;
+      border-radius: 6px;
+      padding: 6px 9px;
+      color: white;
+      font-size: 12px;
+      margin: 2px;
+    }
 
-.action-area{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
+    @media (max-width: 800px) {
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
 
-.empty{
-  text-align:center;
-  color:#64748b;
-  padding:20px;
-}
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
 
-/* MOBILE */
+    @media (max-width: 480px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
 
-@media(max-width:800px){
+      .container {
+        padding: 12px;
+      }
 
-  .cards{
-    grid-template-columns:repeat(2,1fr);
-  }
+      .section {
+        padding: 15px;
+      }
 
-  .grid{
-    grid-template-columns:1fr;
-  }
-
-  .topbar{
-    padding:12px;
-  }
-
-  .topbar-title{
-    font-size:18px;
-  }
-
-  .container{
-    padding:12px;
-  }
-
-  .section{
-    padding:15px;
-  }
-
-}
-
-@media(max-width:480px){
-
-  .cards{
-    grid-template-columns:1fr;
-  }
-
-  .login-box{
-    padding:22px;
-  }
-
-}
-</style>
+      .topbarTitle {
+        font-size: 18px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<script>
-alert("DhanFlow নতুন ফাইল লোড হয়েছে");
-</script>
-<!-- ================= LOGIN ================= -->
+
+<!-- ================= LOGIN PAGE ================= -->
 
 <div id="loginPage">
 
-  <div class="login-box">
+  <div class="loginBox">
 
-    <div class="logo">DhanFlow</div>
+    <div class="logo">
+      DhanFlow
+    </div>
 
-    <div class="subtitle">
+    <div class="loginSubtitle">
       Secure Wallet Management
     </div>
 
-    <label>Email</label>
+    <label for="email">
+      Email
+    </label>
+
     <input
       id="email"
       type="email"
       placeholder="Enter admin email"
+      autocomplete="username"
     >
 
-    <label>Password</label>
+    <label for="password">
+      Password
+    </label>
+
     <input
       id="password"
       type="password"
       placeholder="Enter password"
+      autocomplete="current-password"
     >
 
     <button
@@ -369,11 +356,7 @@ alert("DhanFlow নতুন ফাইল লোড হয়েছে");
     >
       Login
     </button>
-<script>
-document.getElementById("loginButton").onclick = function () {
-  alert("LOGIN BUTTON কাজ করছে");
-};
-</script>
+
     <div
       id="loginMessage"
       class="message"
@@ -384,19 +367,20 @@ document.getElementById("loginButton").onclick = function () {
 </div>
 
 
-<!-- ================= DASHBOARD ================= -->
+<!-- ================= ADMIN DASHBOARD ================= -->
 
 <div id="dashboard" class="hidden">
 
   <div class="topbar">
 
-    <div class="topbar-title">
-      DhanFlow Admin
+    <div class="topbarTitle">
+      DhanFlow Admin Panel
     </div>
 
     <button
       id="logoutButton"
-      class="logout"
+      class="logoutBtn"
+      type="button"
     >
       Logout
     </button>
@@ -406,53 +390,60 @@ document.getElementById("loginButton").onclick = function () {
 
   <div class="container">
 
-    <!-- CARDS -->
+    <!-- SUMMARY -->
 
     <div class="cards">
 
       <div class="card">
-        <div class="card-title">
+        <div class="cardTitle">
           Total Customers
         </div>
+
         <div
           id="totalCustomers"
-          class="card-value"
+          class="cardValue"
         >
           0
         </div>
       </div>
 
+
       <div class="card">
-        <div class="card-title">
+        <div class="cardTitle">
           Total Balance
         </div>
+
         <div
           id="totalBalance"
-          class="card-value"
+          class="cardValue"
         >
           ₹0.00
         </div>
       </div>
 
+
       <div class="card">
-        <div class="card-title">
+        <div class="cardTitle">
           Pending Transfers
         </div>
+
         <div
           id="pendingTransfers"
-          class="card-value"
+          class="cardValue"
         >
           0
         </div>
       </div>
 
+
       <div class="card">
-        <div class="card-title">
+        <div class="cardTitle">
           Pending Withdrawals
         </div>
+
         <div
           id="pendingWithdrawals"
-          class="card-value"
+          class="cardValue"
         >
           0
         </div>
@@ -465,46 +456,76 @@ document.getElementById("loginButton").onclick = function () {
 
     <div class="section">
 
-      <h2>Create Customer</h2>
+      <h2>
+        Create Customer
+      </h2>
 
       <div class="grid">
 
         <div>
-          <label>User ID</label>
+
+          <label>
+            User ID
+          </label>
+
           <input
             id="newUserId"
-            placeholder="Example: USER001"
+            placeholder="USER001"
           >
+
         </div>
 
+
         <div>
-          <label>Username</label>
+
+          <label>
+            Username
+          </label>
+
           <input
             id="newUsername"
-            placeholder="Example: rahim"
+            placeholder="username"
           >
+
         </div>
 
+
         <div>
-          <label>Email</label>
+
+          <label>
+            Email
+          </label>
+
           <input
             id="newEmail"
             type="email"
             placeholder="customer@email.com"
           >
+
         </div>
 
+
         <div>
-          <label>Password</label>
+
+          <label>
+            Password
+          </label>
+
           <input
             id="newPassword"
             type="password"
             placeholder="Minimum 6 characters"
           >
+
         </div>
 
+
         <div>
-          <label>Initial Balance</label>
+
+          <label>
+            Initial Balance
+          </label>
+
           <input
             id="newBalance"
             type="number"
@@ -512,16 +533,20 @@ document.getElementById("loginButton").onclick = function () {
             step="0.01"
             value="0"
           >
+
         </div>
 
       </div>
 
+
       <button
         id="createCustomerButton"
-        class="btn btn-success"
+        class="btn success"
+        type="button"
       >
         Create Customer
       </button>
+
 
       <div
         id="customerMessage"
@@ -531,13 +556,15 @@ document.getElementById("loginButton").onclick = function () {
     </div>
 
 
-    <!-- CUSTOMER LIST -->
+    <!-- CUSTOMERS -->
 
     <div class="section">
 
-      <h2>Customers</h2>
+      <h2>
+        Customers
+      </h2>
 
-      <div class="table-wrap">
+      <div class="tableWrap">
 
         <table>
 
@@ -550,14 +577,14 @@ document.getElementById("loginButton").onclick = function () {
               <th>Balance</th>
               <th>Status</th>
               <th>Created</th>
-              <th>Actions</th>
+              <th>Action</th>
             </tr>
 
           </thead>
 
-          <tbody id="customerTableBody">
-
-          </tbody>
+          <tbody
+            id="customerTableBody"
+          ></tbody>
 
         </table>
 
@@ -570,9 +597,11 @@ document.getElementById("loginButton").onclick = function () {
 
     <div class="section">
 
-      <h2>Transactions</h2>
+      <h2>
+        Transactions
+      </h2>
 
-      <div class="table-wrap">
+      <div class="tableWrap">
 
         <table>
 
@@ -590,9 +619,9 @@ document.getElementById("loginButton").onclick = function () {
 
           </thead>
 
-          <tbody id="transactionTableBody">
-
-          </tbody>
+          <tbody
+            id="transactionTableBody"
+          ></tbody>
 
         </table>
 
@@ -605,9 +634,11 @@ document.getElementById("loginButton").onclick = function () {
 
     <div class="section">
 
-      <h2>Bank Withdrawals</h2>
+      <h2>
+        Bank Withdrawals
+      </h2>
 
-      <div class="table-wrap">
+      <div class="tableWrap">
 
         <table>
 
@@ -618,7 +649,7 @@ document.getElementById("loginButton").onclick = function () {
               <th>User</th>
               <th>Bank</th>
               <th>Account Holder</th>
-              <th>Account No.</th>
+              <th>Account Number</th>
               <th>IFSC</th>
               <th>Amount</th>
               <th>Status</th>
@@ -627,9 +658,9 @@ document.getElementById("loginButton").onclick = function () {
 
           </thead>
 
-          <tbody id="withdrawalTableBody">
-
-          </tbody>
+          <tbody
+            id="withdrawalTableBody"
+          ></tbody>
 
         </table>
 
@@ -638,13 +669,15 @@ document.getElementById("loginButton").onclick = function () {
     </div>
 
 
-    <!-- ADMIN ACTION LOG -->
+    <!-- ADMIN LOG -->
 
     <div class="section">
 
-      <h2>Admin Action Log</h2>
+      <h2>
+        Admin Action Log
+      </h2>
 
-      <div class="table-wrap">
+      <div class="tableWrap">
 
         <table>
 
@@ -655,15 +688,15 @@ document.getElementById("loginButton").onclick = function () {
               <th>Action</th>
               <th>Amount</th>
               <th>Reason</th>
-              <th>Transaction</th>
+              <th>Transaction ID</th>
               <th>Date</th>
             </tr>
 
           </thead>
 
-          <tbody id="actionTableBody">
-
-          </tbody>
+          <tbody
+            id="actionTableBody"
+          ></tbody>
 
         </table>
 
@@ -678,9 +711,9 @@ document.getElementById("loginButton").onclick = function () {
 
 <script>
 
-/* =========================================
-   SUPABASE CONFIG
-========================================= */
+/* ============================================
+   SUPABASE
+============================================ */
 
 const SUPABASE_URL =
   "https://oxwjnravklpcdhfxibya.supabase.co";
@@ -695,37 +728,44 @@ const supabaseClient =
   );
 
 
-/* =========================================
-   HELPERS
-========================================= */
+/* ============================================
+   MESSAGE
+============================================ */
 
 function showMessage(
   elementId,
   message,
   success = false
-){
+) {
 
-  const el =
-    document.getElementById(elementId);
+  const element =
+    document.getElementById(
+      elementId
+    );
 
-  el.style.display = "block";
+  if (!element) {
+    return;
+  }
 
-  el.textContent = message;
+  element.style.display = "block";
 
-  if(success){
+  element.textContent =
+    message;
 
-    el.style.background =
+  if (success) {
+
+    element.style.background =
       "#dcfce7";
 
-    el.style.color =
+    element.style.color =
       "#166534";
 
-  }else{
+  } else {
 
-    el.style.background =
+    element.style.background =
       "#fee2e2";
 
-    el.style.color =
+    element.style.color =
       "#991b1b";
 
   }
@@ -733,39 +773,31 @@ function showMessage(
 }
 
 
-function money(value){
+/* ============================================
+   MONEY
+============================================ */
 
-  return "₹" +
-    Number(value || 0)
-      .toLocaleString(
-        "en-IN",
-        {
-          minimumFractionDigits:2,
-          maximumFractionDigits:2
-        }
-      );
-
-}
-
-
-function makeId(prefix){
+function money(value) {
 
   return (
-    prefix +
-    Date.now() +
-    Math.random()
-      .toString(36)
-      .substring(2,7)
-  ).toUpperCase();
+    "₹" +
+    Number(value || 0).toLocaleString(
+      "en-IN",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    )
+  );
 
 }
 
 
-/* =========================================
+/* ============================================
    LOGIN
-========================================= */
+============================================ */
 
-async function login(){
+async function login() {
 
   const email =
     document
@@ -778,16 +810,29 @@ async function login(){
       .getElementById("password")
       .value;
 
-  if(!email || !password){
+  if (!email) {
 
     showMessage(
       "loginMessage",
-      "Email and password are required."
+      "Please enter your email."
     );
 
     return;
 
   }
+
+
+  if (!password) {
+
+    showMessage(
+      "loginMessage",
+      "Please enter your password."
+    );
+
+    return;
+
+  }
+
 
   showMessage(
     "loginMessage",
@@ -795,114 +840,143 @@ async function login(){
     true
   );
 
-  try{
 
-    const {
-      data,
-      error
-    } =
-      await supabaseClient.auth
-        .signInWithPassword({
-          email,
-          password
-        });
+  try {
 
-    if(error){
+    const result =
+      await supabaseClient.auth.signInWithPassword(
+        {
+          email: email,
+          password: password
+        }
+      );
+
+
+    if (result.error) {
+
+      console.error(
+        "SUPABASE LOGIN ERROR:",
+        result.error
+      );
 
       showMessage(
         "loginMessage",
-        error.message
+        "Login failed:\n" +
+        result.error.message
       );
 
       return;
 
     }
 
-    const user =
-      data.user;
 
-    if(!user){
+    if (!result.data.user) {
 
       showMessage(
         "loginMessage",
-        "Login failed."
+        "Login failed: user not found."
       );
 
       return;
 
     }
 
-    const {
-      data:profile,
-      error:profileError
-    } =
+
+    const profileResult =
       await supabaseClient
         .from("profiles")
-        .select("*")
-        .eq("id",user.id)
+        .select(
+          "id,user_id,username,role,balance,status"
+        )
+        .eq(
+          "id",
+          result.data.user.id
+        )
         .single();
 
-    if(profileError){
+
+    if (profileResult.error) {
+
+      console.error(
+        "PROFILE ERROR:",
+        profileResult.error
+      );
 
       await supabaseClient.auth.signOut();
 
       showMessage(
         "loginMessage",
-        profileError.message
+        "Profile error:\n" +
+        profileResult.error.message
       );
 
       return;
 
     }
 
-    if(
-      profile.role !== "admin"
-    ){
+
+    const profile =
+      profileResult.data;
+
+
+    if (profile.role !== "admin") {
 
       await supabaseClient.auth.signOut();
 
       showMessage(
         "loginMessage",
-        "Admin access required."
+        "This account is not an admin account."
       );
 
       return;
 
     }
 
-    if(
-      profile.status !== "active"
-    ){
+
+    if (profile.status !== "active") {
 
       await supabaseClient.auth.signOut();
 
       showMessage(
         "loginMessage",
-        "Admin account is blocked."
+        "This admin account is blocked."
       );
 
       return;
 
     }
+
 
     document
       .getElementById("loginPage")
-      .classList.add("hidden");
+      .classList
+      .add("hidden");
+
 
     document
       .getElementById("dashboard")
-      .classList.remove("hidden");
+      .classList
+      .remove("hidden");
+
 
     await loadDashboard();
 
-  }catch(error){
+  }
 
-    console.error(error);
+  catch (error) {
+
+    console.error(
+      "LOGIN ERROR:",
+      error
+    );
 
     showMessage(
       "loginMessage",
-      error.message ||
-      "Login error occurred."
+      "Unexpected error:\n" +
+      (
+        error.message ||
+        "Unknown error"
+      )
     );
 
   }
@@ -910,30 +984,45 @@ async function login(){
 }
 
 
-/* =========================================
+/* ============================================
    LOGOUT
-========================================= */
+============================================ */
 
-async function logout(){
+async function logout() {
 
   await supabaseClient.auth.signOut();
 
   document
     .getElementById("dashboard")
-    .classList.add("hidden");
+    .classList
+    .add("hidden");
+
 
   document
     .getElementById("loginPage")
-    .classList.remove("hidden");
+    .classList
+    .remove("hidden");
+
+
+  document
+    .getElementById("password")
+    .value = "";
+
+
+  showMessage(
+    "loginMessage",
+    "Logged out successfully.",
+    true
+  );
 
 }
 
 
-/* =========================================
+/* ============================================
    CREATE CUSTOMER
-========================================= */
+============================================ */
 
-async function createCustomer(){
+async function createCustomer() {
 
   const user_id =
     document
@@ -966,12 +1055,12 @@ async function createCustomer(){
     );
 
 
-  if(
+  if (
     !user_id ||
     !username ||
     !email ||
     !password
-  ){
+  ) {
 
     showMessage(
       "customerMessage",
@@ -983,11 +1072,26 @@ async function createCustomer(){
   }
 
 
-  if(password.length < 6){
+  if (password.length < 6) {
 
     showMessage(
       "customerMessage",
       "Password must be at least 6 characters."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !Number.isFinite(initial_balance) ||
+    initial_balance < 0
+  ) {
+
+    showMessage(
+      "customerMessage",
+      "Initial balance must be 0 or greater."
     );
 
     return;
@@ -1002,19 +1106,17 @@ async function createCustomer(){
   );
 
 
-  try{
+  try {
 
-    const {
-      data:{
-        session
-      }
-    } =
-      await supabaseClient
-        .auth
-        .getSession();
+    const sessionResult =
+      await supabaseClient.auth.getSession();
 
 
-    if(!session){
+    const session =
+      sessionResult.data.session;
+
+
+    if (!session) {
 
       showMessage(
         "customerMessage",
@@ -1031,9 +1133,9 @@ async function createCustomer(){
         SUPABASE_URL +
         "/functions/v1/create-customer",
         {
-          method:"POST",
+          method: "POST",
 
-          headers:{
+          headers: {
             "Content-Type":
               "application/json",
 
@@ -1042,7 +1144,7 @@ async function createCustomer(){
               session.access_token
           },
 
-          body:JSON.stringify({
+          body: JSON.stringify({
             user_id,
             username,
             email,
@@ -1057,7 +1159,7 @@ async function createCustomer(){
       await response.json();
 
 
-    if(!response.ok){
+    if (!response.ok) {
 
       showMessage(
         "customerMessage",
@@ -1077,37 +1179,42 @@ async function createCustomer(){
     );
 
 
-    document
-      .getElementById("newUserId")
-      .value = "";
+    document.getElementById(
+      "newUserId"
+    ).value = "";
 
-    document
-      .getElementById("newUsername")
-      .value = "";
+    document.getElementById(
+      "newUsername"
+    ).value = "";
 
-    document
-      .getElementById("newEmail")
-      .value = "";
+    document.getElementById(
+      "newEmail"
+    ).value = "";
 
-    document
-      .getElementById("newPassword")
-      .value = "";
+    document.getElementById(
+      "newPassword"
+    ).value = "";
 
-    document
-      .getElementById("newBalance")
-      .value = "0";
+    document.getElementById(
+      "newBalance"
+    ).value = "0";
 
 
-    await loadDashboard();
+    await loadCustomers();
 
-  }catch(error){
+  }
 
-    console.error(error);
+  catch (error) {
+
+    console.error(
+      "CREATE CUSTOMER ERROR:",
+      error
+    );
 
     showMessage(
       "customerMessage",
       error.message ||
-      "Customer creation error."
+      "Customer creation failed."
     );
 
   }
@@ -1115,11 +1222,11 @@ async function createCustomer(){
 }
 
 
-/* =========================================
+/* ============================================
    LOAD DASHBOARD
-========================================= */
+============================================ */
 
-async function loadDashboard(){
+async function loadDashboard() {
 
   await loadCustomers();
 
@@ -1132,32 +1239,29 @@ async function loadDashboard(){
 }
 
 
-/* =========================================
+/* ============================================
    LOAD CUSTOMERS
-========================================= */
+============================================ */
 
-async function loadCustomers(){
+async function loadCustomers() {
 
-  const {
-    data,
-    error
-  } =
+  const result =
     await supabaseClient
       .from("profiles")
       .select("*")
       .order(
         "created_at",
         {
-          ascending:false
+          ascending: false
         }
       );
 
 
-  if(error){
+  if (result.error) {
 
     console.error(
       "CUSTOMER LOAD ERROR:",
-      error
+      result.error
     );
 
     return;
@@ -1165,263 +1269,69 @@ async function loadCustomers(){
   }
 
 
-  const customers =
-    data || [];
+  const users =
+    result.data || [];
 
 
   const tbody =
-    document
-      .getElementById(
-        "customerTableBody"
-      );
+    document.getElementById(
+      "customerTableBody"
+    );
 
 
   tbody.innerHTML = "";
 
 
-  let totalBalance = 0;
-
   let customerCount = 0;
 
+  let totalBalance = 0;
 
-  customers.forEach(
-    user => {
 
-      if(user.role === "customer"){
+  users.forEach(
+    function(user) {
+
+      if (user.role === "customer") {
 
         customerCount++;
 
         totalBalance +=
-          Number(user.balance || 0);
+          Number(
+            user.balance || 0
+          );
 
       }
 
 
-      const tr =
+      const row =
         document.createElement("tr");
 
 
       const statusClass =
         user.status === "active"
-          ? "active"
-          : "blocked";
-
-
-      tr.innerHTML = `
-
-        <td>${user.user_id}</td>
-
-        <td>${user.username}</td>
-
-        <td>${user.role}</td>
-
-        <td>${money(user.balance)}</td>
-
-        <td>
-          <span class="badge ${statusClass}">
-            ${user.status}
-          </span>
-        </td>
-
-        <td>
-          ${new Date(
-            user.created_at
-          ).toLocaleString("en-IN")}
-        </td>
-
-        <td>
-
-          ${
-            user.role === "customer"
-            ?
-            `
-            <button
-              class="small-btn ${
-                user.status === "active"
-                ? "btn-danger"
-                : "btn-success"
-              }"
-              onclick="
-                toggleUserStatus(
-                  '${user.id}',
-                  '${user.status}'
-                )
-              "
-            >
-              ${
-                user.status === "active"
-                ? "Block"
-                : "Unblock"
-              }
-            </button>
-            `
-            :
-            ""
-          }
-
-        </td>
-
-      `;
-
-
-      tbody.appendChild(tr);
-
-    }
-  );
-
-
-  document
-    .getElementById(
-      "totalCustomers"
-    )
-    .textContent =
-      customerCount;
-
-
-  document
-    .getElementById(
-      "totalBalance"
-    )
-    .textContent =
-      money(totalBalance);
-
-}
-
-
-/* =========================================
-   BLOCK / UNBLOCK
-========================================= */
-
-async function toggleUserStatus(
-  userId,
-  currentStatus
-){
-
-  const newStatus =
-    currentStatus === "active"
-      ? "blocked"
-      : "active";
-
-
-  const confirmAction =
-    confirm(
-      "Change user status to " +
-      newStatus +
-      "?"
-    );
-
-
-  if(!confirmAction){
-
-    return;
-
-  }
-
-
-  const {
-    error
-  } =
-    await supabaseClient
-      .from("profiles")
-      .update({
-        status:newStatus
-      })
-      .eq("id",userId);
-
-
-  if(error){
-
-    alert(
-      "Error: " +
-      error.message
-    );
-
-    return;
-
-  }
-
-
-  await loadCustomers();
-
-}
-
-
-/* =========================================
-   TRANSACTIONS
-========================================= */
-
-async function loadTransactions(){
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("transactions")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      )
-      .limit(100);
-
-
-  if(error){
-
-    console.error(
-      "TRANSACTION ERROR:",
-      error
-    );
-
-    return;
-
-  }
-
-
-  const rows =
-    data || [];
-
-
-  const tbody =
-    document
-      .getElementById(
-        "transactionTableBody"
-      );
-
-
-  tbody.innerHTML = "";
-
-
-  let pending = 0;
-
-
-  rows.forEach(
-    tx => {
-
-      if(tx.status === "pending"){
-
-        pending++;
-
-      }
-
-
-      const tr =
-        document.createElement("tr");
-
-
-      tr.innerHTML = `
-
-        <td>${tx.transaction_id}</td>
-
-        <td>${tx.type}</td>
-
-        <td>${tx.sender_id || "-"}</td>
-
-        <td>${tx.receiver_id || "-"}</td>
-
-        <td>${money(tx.amount)}</td>
-
-        <td>
-          <span class="badge ${tx.status}
+          ? "badgeActive"
+          : "badgeBlocked";
+
+
+      let action = "";
+
+
+      if (user.role === "customer") {
+
+        action =
+          `
+          <button
+            class="smallBtn ${
+              user.status === "active"
+                ? "danger"
+                : "success"
+            }"
+            onclick="
+              toggleUserStatus(
+                '${user.id}',
+                '${user.status}'
+              )
+            "
+          >
+            ${
+              user.status === "active"
+    
