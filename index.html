@@ -73,7 +73,7 @@
     <input id="email" type="email" placeholder="admin@dhanflow.com">
     <label>Password</label>
     <input id="password" type="password" placeholder="••••••••">
-    <button id="loginButton" class="btn full" onclick="login()">Login</button>
+    <button id="loginButton" class="btn full">Login</button>
     <div id="loginMessage" class="message"></div>
   </div>
 </div>
@@ -237,7 +237,7 @@ async function login() {
   const password = document.getElementById("password").value;
   
   if (!email || !password) {
-    alert("Error: ইমেইল বা পাসওয়ার্ড দেওয়া হয়নি!");
+    alert("Error: ইমেইল বা পাসওয়ার্ড দেওয়া হয়নি!");
     return showMessage("loginMessage", "Please enter email and password");
   }
 
@@ -458,4 +458,5 @@ async function updateWd(wdId, newStatus, userId, amount) {
     await supabaseClient.from("profiles").update({ balance: user.balance - amount }).eq("id", userId);
   }
 
-  await supabaseClient.from("withdrawals").update({ status: newStatus }).eq("id"
+  await supabaseClient.from("withdrawals").update({ status: newStatus }).eq("id", wdId);
+  await
