@@ -45,7 +45,7 @@ main{padding:16px;padding-bottom:96px}
 .status{display:inline-block;padding:5px 8px;background:#eef2ff;border-radius:20px;font-size:10px;font-weight:bold;text-transform:uppercase}
 .status.approved{background:#dcfce7;color:#166534}.status.rejected{background:#fee2e2;color:#991b1b}.status.frozen{background:#fef3c7;color:#92400e}.status.pending{background:#dbeafe;color:#1d4ed8}
 .amount-in{color:var(--green)}.amount-out{color:#111827}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:5}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:5}
 .nav-btn{border:none;background:transparent;padding:8px;color:var(--muted);font-size:12px;font-weight:bold}.nav-btn.active{color:var(--ink)}
 .view{display:none}.view.active{display:block}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;display:flex;align-items:flex-end}
@@ -86,6 +86,7 @@ main{padding:16px;padding-bottom:96px}
       <div class="header-row">
         <div class="header-logo">DhanFlow</div>
         <div class="header-right">
+          <button class="icon-btn" onclick="openInbox()" title="Inbox">📥<span id="inboxBadge" style="position:absolute;transform:translate(9px,-9px);background:#ef4444;color:#fff;border-radius:10px;padding:1px 5px;font-size:9px;display:none">0</span></button>
           <button class="icon-btn" onclick="refreshAll()" title="Refresh">↻</button>
           <div class="user-badge">USER</div>
         </div>
@@ -94,6 +95,9 @@ main{padding:16px;padding-bottom:96px}
 
     <main>
       <div id="homeView" class="view active">
+        <div class="section" style="margin-top:0">
+          <button class="action" style="width:100%;display:flex;justify-content:space-between;align-items:center" onclick="openInbox()"><div>📥 Inbox<span>Notifications, status updates & admin messages</span></div><b id="inboxCountText" style="color:#ef4444">0 unread</b></button>
+        </div>
         <div class="balance-card">
           <div class="balance-label">Available Balance</div>
           <div id="balance" class="balance">₹0.00</div>
@@ -118,6 +122,13 @@ main{padding:16px;padding-bottom:96px}
         <div class="section">
           <div class="section-head"><div class="section-title">Recent Transactions</div><button class="link-btn" onclick="showView('historyView')">View all</button></div>
           <div id="recentTransactions" class="card"><div class="empty">Loading...</div></div>
+        </div>
+      </div>
+
+      <div id="inboxView" class="view">
+        <div class="section">
+          <div class="section-head"><div class="section-title">Inbox</div><button class="link-btn" onclick="markAllRead()">Mark all read</button></div>
+          <div id="inboxList" class="card"><div class="empty">Loading...</div></div>
         </div>
       </div>
 
@@ -150,6 +161,7 @@ main{padding:16px;padding-bottom:96px}
 
     <div class="bottom-nav">
       <button class="nav-btn active" data-view="homeView">🏠<br>Home</button>
+      <button class="nav-btn" data-view="inboxView">📥<br>Inbox</button>
       <button class="nav-btn" data-view="historyView">📜<br>History</button>
       <button class="nav-btn" data-view="profileView">👤<br>Profile</button>
     </div>
@@ -167,7 +179,7 @@ main{padding:16px;padding-bottom:96px}
 const SUPABASE_URL="https://oxwjnravklpcdhfxibya.supabase.co";
 const SUPABASE_KEY="sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
 const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let currentUser=null,currentProfile=null,installPrompt=null;
+let currentUser=null,currentProfile=null,installPrompt=null,notificationRows=[];
 
 function money(v){return "₹"+Number(v||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}
 function escapeHTML(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
@@ -218,7 +230,7 @@ async function loadUser(){
   if(data.role!=="customer"){await supabaseClient.auth.signOut();alert("This application is only for users.");showLogin();return}
   if(data.status!=="active"){await supabaseClient.auth.signOut();alert("Your account is blocked.");showLogin();return}
   document.getElementById("loginPage").classList.add("hidden");document.getElementById("userApp").classList.remove("hidden");
-  updateProfile();await loadTransactions();maybeShowInstall();
+  updateProfile();await loadTransactions();await loadNotifications();maybeShowInstall();
 }
 function showLogin(){document.getElementById("userApp").classList.add("hidden");document.getElementById("loginPage").classList.remove("hidden")}
 function updateProfile(){
@@ -236,7 +248,33 @@ async function refreshProfile(){
   const {data,error}=await supabaseClient.from("profiles").select("*").eq("id",currentUser.id).single();
   if(!error&&data){currentProfile=data;updateProfile()}
 }
-async function refreshAll(){if(!currentUser)return;await refreshProfile();await loadTransactions()}
+async function refreshAll(){if(!currentUser)return;await refreshProfile();await loadTransactions();await loadNotifications()}
+async function loadNotifications(){
+  if(!currentUser)return;
+  const {data,error}=await supabaseClient.from("notifications").select("*").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(100);
+  if(error){console.error(error);return}
+  notificationRows=data||[];
+  renderNotifications();
+}
+function renderNotifications(){
+  const box=document.getElementById("inboxList");
+  const unread=notificationRows.filter(n=>!n.is_read).length;
+  document.getElementById("inboxCountText").textContent=unread+" unread";
+  const badge=document.getElementById("inboxBadge");badge.textContent=unread>99?"99+":String(unread);badge.style.display=unread?"block":"none";
+  box.innerHTML=notificationRows.length?notificationRows.map(n=>`<button style="display:block;width:100%;border:0;background:${n.is_read?"transparent":"#f8fafc"};text-align:left" onclick="openNotification(${n.id})"><div class="row"><div style="min-width:0"><b>${n.is_read?"":"🔵 "}${escapeHTML(n.title)}</b><div class="small" style="margin-top:6px">${escapeHTML(n.message)}</div><div class="small">${dateTime(n.created_at)}</div></div></div></button>`).join(""):`<div class="empty">No notifications yet.</div>`;
+}
+function openInbox(){showView("inboxView");loadNotifications()}
+async function openNotification(id){
+  const n=notificationRows.find(x=>x.id===id);
+  if(!n)return;
+  if(!n.is_read){await supabaseClient.from("notifications").update({is_read:true}).eq("id",id).eq("user_id",currentUser.id);n.is_read=true;renderNotifications()}
+  openModal("Notification",`<div class="detail"><span>Title</span><b>${escapeHTML(n.title)}</b></div><div class="notice" style="margin-top:12px"><b>Message:</b><br>${escapeHTML(n.message)}</div><div class="notice"><b>Date:</b> ${escapeHTML(dateTime(n.created_at))}</div>`);
+}
+async function markAllRead(){
+  if(!currentUser)return;
+  await supabaseClient.from("notifications").update({is_read:true}).eq("user_id",currentUser.id).eq("is_read",false);
+  await loadNotifications();
+}
 async function loadTransactions(){
   const {data:transactions,error:txError}=await supabaseClient.from("transactions").select("*").or(`sender_id.eq.${currentProfile.id},receiver_id.eq.${currentProfile.id}`).order("created_at",{ascending:false});
   const {data:withdrawals,error:wdError}=await supabaseClient.from("withdrawals").select("*").eq("user_id",currentProfile.id).order("created_at",{ascending:false});
