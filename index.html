@@ -3,11 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>DhanFlow Admin</title>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
     * {
       box-sizing: border-box;
@@ -29,7 +26,6 @@
     }
 
     /* LOGIN */
-
     #loginPage {
       min-height: 100vh;
       display: flex;
@@ -131,7 +127,6 @@
     }
 
     /* DASHBOARD */
-
     #dashboard {
       min-height: 100vh;
     }
@@ -222,8 +217,7 @@
       border-collapse: collapse;
     }
 
-    th,
-    td {
+    th, td {
       border-bottom: 1px solid #e2e8f0;
       padding: 11px;
       text-align: left;
@@ -252,26 +246,6 @@
       color: #991b1b;
     }
 
-    .badgePending {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .badgeApproved {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .badgeRejected {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .badgeFrozen {
-      background: #e0e7ff;
-      color: #3730a3;
-    }
-
     .smallBtn {
       border: 0;
       border-radius: 6px;
@@ -285,7 +259,6 @@
       .cards {
         grid-template-columns: repeat(2, 1fr);
       }
-
       .grid {
         grid-template-columns: 1fr;
       }
@@ -295,15 +268,12 @@
       .cards {
         grid-template-columns: 1fr;
       }
-
       .container {
         padding: 12px;
       }
-
       .section {
         padding: 15px;
       }
-
       .topbarTitle {
         font-size: 18px;
       }
@@ -314,262 +284,87 @@
 <body>
 
 <!-- ================= LOGIN PAGE ================= -->
-
 <div id="loginPage">
-
   <div class="loginBox">
+    <div class="logo">DhanFlow</div>
+    <div class="loginSubtitle">Secure Wallet Management</div>
 
-    <div class="logo">
-      DhanFlow
-    </div>
+    <label for="email">Email</label>
+    <input id="email" type="email" placeholder="Enter admin email" autocomplete="username">
 
-    <div class="loginSubtitle">
-      Secure Wallet Management
-    </div>
+    <label for="password">Password</label>
+    <input id="password" type="password" placeholder="Enter password" autocomplete="current-password">
 
-    <label for="email">
-      Email
-    </label>
+    <button id="loginButton" class="btn full" type="button">Login</button>
 
-    <input
-      id="email"
-      type="email"
-      placeholder="Enter admin email"
-      autocomplete="username"
-    >
-
-    <label for="password">
-      Password
-    </label>
-
-    <input
-      id="password"
-      type="password"
-      placeholder="Enter password"
-      autocomplete="current-password"
-    >
-
-    <button
-      id="loginButton"
-      class="btn full"
-      type="button"
-    >
-      Login
-    </button>
-
-    <div
-      id="loginMessage"
-      class="message"
-    ></div>
-
+    <div id="loginMessage" class="message"></div>
   </div>
-
 </div>
 
-
 <!-- ================= ADMIN DASHBOARD ================= -->
-
 <div id="dashboard" class="hidden">
-
   <div class="topbar">
-
-    <div class="topbarTitle">
-      DhanFlow Admin Panel
-    </div>
-
-    <button
-      id="logoutButton"
-      class="logoutBtn"
-      type="button"
-    >
-      Logout
-    </button>
-
+    <div class="topbarTitle">DhanFlow Admin Panel</div>
+    <button id="logoutButton" class="logoutBtn" type="button">Logout</button>
   </div>
 
-
   <div class="container">
-
     <!-- SUMMARY -->
-
     <div class="cards">
-
       <div class="card">
-        <div class="cardTitle">
-          Total Customers
-        </div>
-
-        <div
-          id="totalCustomers"
-          class="cardValue"
-        >
-          0
-        </div>
+        <div class="cardTitle">Total Customers</div>
+        <div id="totalCustomers" class="cardValue">0</div>
       </div>
-
-
       <div class="card">
-        <div class="cardTitle">
-          Total Balance
-        </div>
-
-        <div
-          id="totalBalance"
-          class="cardValue"
-        >
-          ₹0.00
-        </div>
+        <div class="cardTitle">Total Balance</div>
+        <div id="totalBalance" class="cardValue">₹0.00</div>
       </div>
-
-
       <div class="card">
-        <div class="cardTitle">
-          Pending Transfers
-        </div>
-
-        <div
-          id="pendingTransfers"
-          class="cardValue"
-        >
-          0
-        </div>
+        <div class="cardTitle">Pending Transfers</div>
+        <div id="pendingTransfers" class="cardValue">0</div>
       </div>
-
-
       <div class="card">
-        <div class="cardTitle">
-          Pending Withdrawals
-        </div>
-
-        <div
-          id="pendingWithdrawals"
-          class="cardValue"
-        >
-          0
-        </div>
+        <div class="cardTitle">Pending Withdrawals</div>
+        <div id="pendingWithdrawals" class="cardValue">0</div>
       </div>
-
     </div>
-
 
     <!-- CREATE CUSTOMER -->
-
     <div class="section">
-
-      <h2>
-        Create Customer
-      </h2>
-
+      <h2>Create Customer</h2>
       <div class="grid">
-
         <div>
-
-          <label>
-            User ID
-          </label>
-
-          <input
-            id="newUserId"
-            placeholder="USER001"
-          >
-
+          <label>User ID</label>
+          <input id="newUserId" placeholder="USER001">
         </div>
-
-
         <div>
-
-          <label>
-            Username
-          </label>
-
-          <input
-            id="newUsername"
-            placeholder="username"
-          >
-
+          <label>Username</label>
+          <input id="newUsername" placeholder="username">
         </div>
-
-
         <div>
-
-          <label>
-            Email
-          </label>
-
-          <input
-            id="newEmail"
-            type="email"
-            placeholder="customer@email.com"
-          >
-
+          <label>Email</label>
+          <input id="newEmail" type="email" placeholder="customer@email.com">
         </div>
-
-
         <div>
-
-          <label>
-            Password
-          </label>
-
-          <input
-            id="newPassword"
-            type="password"
-            placeholder="Minimum 6 characters"
-          >
-
+          <label>Password</label>
+          <input id="newPassword" type="password" placeholder="Minimum 6 characters">
         </div>
-
-
         <div>
-
-          <label>
-            Initial Balance
-          </label>
-
-          <input
-            id="newBalance"
-            type="number"
-            min="0"
-            step="0.01"
-            value="0"
-          >
-
+          <label>Initial Balance</label>
+          <input id="newBalance" type="number" min="0" step="0.01" value="0">
         </div>
-
       </div>
 
-
-      <button
-        id="createCustomerButton"
-        class="btn success"
-        type="button"
-      >
-        Create Customer
-      </button>
-
-
-      <div
-        id="customerMessage"
-        class="message"
-      ></div>
-
+      <button id="createCustomerButton" class="btn success full" type="button">Create Customer</button>
+      <div id="customerMessage" class="message"></div>
     </div>
 
-
-    <!-- CUSTOMERS -->
-
+    <!-- CUSTOMERS TABLE -->
     <div class="section">
-
-      <h2>
-        Customers
-      </h2>
-
+      <h2>Customers</h2>
       <div class="tableWrap">
-
         <table>
-
           <thead>
-
             <tr>
               <th>User ID</th>
               <th>Username</th>
@@ -579,759 +374,189 @@
               <th>Created</th>
               <th>Action</th>
             </tr>
-
           </thead>
-
-          <tbody
-            id="customerTableBody"
-          ></tbody>
-
+          <tbody id="customerTableBody"></tbody>
         </table>
-
       </div>
-
     </div>
-
-
-    <!-- TRANSACTIONS -->
-
-    <div class="section">
-
-      <h2>
-        Transactions
-      </h2>
-
-      <div class="tableWrap">
-
-        <table>
-
-          <thead>
-
-            <tr>
-              <th>Transaction ID</th>
-              <th>Type</th>
-              <th>Sender</th>
-              <th>Receiver</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-
-          </thead>
-
-          <tbody
-            id="transactionTableBody"
-          ></tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-
-    <!-- WITHDRAWALS -->
-
-    <div class="section">
-
-      <h2>
-        Bank Withdrawals
-      </h2>
-
-      <div class="tableWrap">
-
-        <table>
-
-          <thead>
-
-            <tr>
-              <th>Withdrawal ID</th>
-              <th>User</th>
-              <th>Bank</th>
-              <th>Account Holder</th>
-              <th>Account Number</th>
-              <th>IFSC</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-
-          </thead>
-
-          <tbody
-            id="withdrawalTableBody"
-          ></tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-
-    <!-- ADMIN LOG -->
-
-    <div class="section">
-
-      <h2>
-        Admin Action Log
-      </h2>
-
-      <div class="tableWrap">
-
-        <table>
-
-          <thead>
-
-            <tr>
-              <th>Action ID</th>
-              <th>Action</th>
-              <th>Amount</th>
-              <th>Reason</th>
-              <th>Transaction ID</th>
-              <th>Date</th>
-            </tr>
-
-          </thead>
-
-          <tbody
-            id="actionTableBody"
-          ></tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
   </div>
-
 </div>
 
-
 <script>
+/* ============================================
+   SUPABASE CONFIG
+============================================ */
+const SUPABASE_URL = "https://oxwjnravklpcdhfxibya.supabase.co";
+const SUPABASE_KEY = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /* ============================================
-   SUPABASE
+   HELPER MESSAGES
 ============================================ */
-
-const SUPABASE_URL =
-  "https://oxwjnravklpcdhfxibya.supabase.co";
-
-const SUPABASE_KEY =
-  "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-
-
-/* ============================================
-   MESSAGE
-============================================ */
-
-function showMessage(
-  elementId,
-  message,
-  success = false
-) {
-
-  const element =
-    document.getElementById(
-      elementId
-    );
-
-  if (!element) {
-    return;
-  }
+function showMessage(elementId, message, success = false) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
 
   element.style.display = "block";
-
-  element.textContent =
-    message;
+  element.textContent = message;
 
   if (success) {
-
-    element.style.background =
-      "#dcfce7";
-
-    element.style.color =
-      "#166534";
-
+    element.style.background = "#dcfce7";
+    element.style.color = "#166534";
   } else {
-
-    element.style.background =
-      "#fee2e2";
-
-    element.style.color =
-      "#991b1b";
-
+    element.style.background = "#fee2e2";
+    element.style.color = "#991b1b";
   }
-
 }
 
-
 /* ============================================
-   MONEY
+   LOGIN FUNCTION
 ============================================ */
-
-function money(value) {
-
-  return (
-    "₹" +
-    Number(value || 0).toLocaleString(
-      "en-IN",
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }
-    )
-  );
-
-}
-
-
-/* ============================================
-   LOGIN
-============================================ */
-
 async function login() {
-
-  const email =
-    document
-      .getElementById("email")
-      .value
-      .trim();
-
-  const password =
-    document
-      .getElementById("password")
-      .value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
   if (!email) {
-
-    showMessage(
-      "loginMessage",
-      "Please enter your email."
-    );
-
+    showMessage("loginMessage", "Please enter your email.");
     return;
-
   }
-
 
   if (!password) {
-
-    showMessage(
-      "loginMessage",
-      "Please enter your password."
-    );
-
+    showMessage("loginMessage", "Please enter your password.");
     return;
-
   }
 
-
-  showMessage(
-    "loginMessage",
-    "Logging in...",
-    true
-  );
-
+  showMessage("loginMessage", "Logging in...", true);
 
   try {
-
-    const result =
-      await supabaseClient.auth.signInWithPassword(
-        {
-          email: email,
-          password: password
-        }
-      );
-
+    const result = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
 
     if (result.error) {
-
-      console.error(
-        "SUPABASE LOGIN ERROR:",
-        result.error
-      );
-
-      showMessage(
-        "loginMessage",
-        "Login failed:\n" +
-        result.error.message
-      );
-
+      console.error("SUPABASE LOGIN ERROR:", result.error);
+      showMessage("loginMessage", "Login failed:\n" + result.error.message);
       return;
-
     }
-
 
     if (!result.data.user) {
-
-      showMessage(
-        "loginMessage",
-        "Login failed: user not found."
-      );
-
+      showMessage("loginMessage", "Login failed: user not found.");
       return;
-
     }
 
-
-    const profileResult =
-      await supabaseClient
-        .from("profiles")
-        .select(
-          "id,user_id,username,role,balance,status"
-        )
-        .eq(
-          "id",
-          result.data.user.id
-        )
-        .single();
-
+    const profileResult = await supabaseClient
+      .from("profiles")
+      .select("id,user_id,username,role,balance,status")
+      .eq("id", result.data.user.id)
+      .single();
 
     if (profileResult.error) {
-
-      console.error(
-        "PROFILE ERROR:",
-        profileResult.error
-      );
-
+      console.error("PROFILE ERROR:", profileResult.error);
       await supabaseClient.auth.signOut();
-
-      showMessage(
-        "loginMessage",
-        "Profile error:\n" +
-        profileResult.error.message
-      );
-
+      showMessage("loginMessage", "Profile error:\n" + profileResult.error.message);
       return;
-
     }
 
-
-    const profile =
-      profileResult.data;
-
+    const profile = profileResult.data;
 
     if (profile.role !== "admin") {
-
       await supabaseClient.auth.signOut();
-
-      showMessage(
-        "loginMessage",
-        "This account is not an admin account."
-      );
-
+      showMessage("loginMessage", "This account is not an admin account.");
       return;
-
     }
-
 
     if (profile.status !== "active") {
-
       await supabaseClient.auth.signOut();
-
-      showMessage(
-        "loginMessage",
-        "This admin account is blocked."
-      );
-
+      showMessage("loginMessage", "This admin account is blocked.");
       return;
-
     }
 
-
-    document
-      .getElementById("loginPage")
-      .classList
-      .add("hidden");
-
-
-    document
-      .getElementById("dashboard")
-      .classList
-      .remove("hidden");
-
+    document.getElementById("loginPage").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
 
     await loadDashboard();
-
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
+    showMessage("loginMessage", "Unexpected error:\n" + (error.message || "Unknown error"));
   }
-
-  catch (error) {
-
-    console.error(
-      "LOGIN ERROR:",
-      error
-    );
-
-    showMessage(
-      "loginMessage",
-      "Unexpected error:\n" +
-      (
-        error.message ||
-        "Unknown error"
-      )
-    );
-
-  }
-
 }
 
-
 /* ============================================
-   LOGOUT
+   LOGOUT FUNCTION
 ============================================ */
-
 async function logout() {
-
   await supabaseClient.auth.signOut();
-
-  document
-    .getElementById("dashboard")
-    .classList
-    .add("hidden");
-
-
-  document
-    .getElementById("loginPage")
-    .classList
-    .remove("hidden");
-
-
-  document
-    .getElementById("password")
-    .value = "";
-
-
-  showMessage(
-    "loginMessage",
-    "Logged out successfully.",
-    true
-  );
-
+  document.getElementById("dashboard").classList.add("hidden");
+  document.getElementById("loginPage").classList.remove("hidden");
+  document.getElementById("password").value = "";
+  showMessage("loginMessage", "Logged out successfully.", true);
 }
 
-
 /* ============================================
-   CREATE CUSTOMER
+   LOAD DASHBOARD DATA
 ============================================ */
-
-async function createCustomer() {
-
-  const user_id =
-    document
-      .getElementById("newUserId")
-      .value
-      .trim();
-
-  const username =
-    document
-      .getElementById("newUsername")
-      .value
-      .trim();
-
-  const email =
-    document
-      .getElementById("newEmail")
-      .value
-      .trim();
-
-  const password =
-    document
-      .getElementById("newPassword")
-      .value;
-
-  const initial_balance =
-    Number(
-      document
-        .getElementById("newBalance")
-        .value || 0
-    );
-
-
-  if (
-    !user_id ||
-    !username ||
-    !email ||
-    !password
-  ) {
-
-    showMessage(
-      "customerMessage",
-      "Please fill all required fields."
-    );
-
-    return;
-
-  }
-
-
-  if (password.length < 6) {
-
-    showMessage(
-      "customerMessage",
-      "Password must be at least 6 characters."
-    );
-
-    return;
-
-  }
-
-
-  if (
-    !Number.isFinite(initial_balance) ||
-    initial_balance < 0
-  ) {
-
-    showMessage(
-      "customerMessage",
-      "Initial balance must be 0 or greater."
-    );
-
-    return;
-
-  }
-
-
-  showMessage(
-    "customerMessage",
-    "Creating customer...",
-    true
-  );
-
-
-  try {
-
-    const sessionResult =
-      await supabaseClient.auth.getSession();
-
-
-    const session =
-      sessionResult.data.session;
-
-
-    if (!session) {
-
-      showMessage(
-        "customerMessage",
-        "Admin session expired. Please login again."
-      );
-
-      return;
-
-    }
-
-
-    const response =
-      await fetch(
-        SUPABASE_URL +
-        "/functions/v1/create-customer",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-
-            "Authorization":
-              "Bearer " +
-              session.access_token
-          },
-
-          body: JSON.stringify({
-            user_id,
-            username,
-            email,
-            password,
-            initial_balance
-          })
-        }
-      );
-
-
-    const result =
-      await response.json();
-
-
-    if (!response.ok) {
-
-      showMessage(
-        "customerMessage",
-        result.error ||
-        "Customer creation failed."
-      );
-
-      return;
-
-    }
-
-
-    showMessage(
-      "customerMessage",
-      "Customer created successfully.",
-      true
-    );
-
-
-    document.getElementById(
-      "newUserId"
-    ).value = "";
-
-    document.getElementById(
-      "newUsername"
-    ).value = "";
-
-    document.getElementById(
-      "newEmail"
-    ).value = "";
-
-    document.getElementById(
-      "newPassword"
-    ).value = "";
-
-    document.getElementById(
-      "newBalance"
-    ).value = "0";
-
-
-    await loadCustomers();
-
-  }
-
-  catch (error) {
-
-    console.error(
-      "CREATE CUSTOMER ERROR:",
-      error
-    );
-
-    showMessage(
-      "customerMessage",
-      error.message ||
-      "Customer creation failed."
-    );
-
-  }
-
-}
-
-
-/* ============================================
-   LOAD DASHBOARD
-============================================ */
-
 async function loadDashboard() {
-
   await loadCustomers();
-
-  await loadTransactions();
-
-  await loadWithdrawals();
-
-  await loadAdminActions();
-
 }
-
 
 /* ============================================
    LOAD CUSTOMERS
 ============================================ */
-
 async function loadCustomers() {
-
-  const result =
-    await supabaseClient
-      .from("profiles")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
+  const result = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   if (result.error) {
-
-    console.error(
-      "CUSTOMER LOAD ERROR:",
-      result.error
-    );
-
+    console.error("CUSTOMER LOAD ERROR:", result.error);
     return;
-
   }
 
-
-  const users =
-    result.data || [];
-
-
-  const tbody =
-    document.getElementById(
-      "customerTableBody"
-    );
-
-
+  const users = result.data || [];
+  const tbody = document.getElementById("customerTableBody");
   tbody.innerHTML = "";
 
-
   let customerCount = 0;
-
   let totalBalance = 0;
 
+  users.forEach(function(user) {
+    if (user.role === "customer") {
+      customerCount++;
+      totalBalance += Number(user.balance || 0);
+    }
 
-  users.forEach(
-    function(user) {
+    const row = document.createElement("tr");
+    const statusClass = user.status === "active" ? "badgeActive" : "badgeBlocked";
 
-      if (user.role === "customer") {
+    row.innerHTML = `
+      <td>${user.user_id || "-"}</td>
+      <td>${user.username || "-"}</td>
+      <td>${user.role || "-"}</td>
+      <td>₹${Number(user.balance || 0).toFixed(2)}</td>
+      <td><span class="badge ${statusClass}">${user.status || "-"}</span></td>
+      <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : "-"}</td>
+      <td>-</td>
+    `;
+    tbody.appendChild(row);
+  });
 
-        customerCount++;
+  document.getElementById("totalCustomers").textContent = customerCount;
+  document.getElementById("totalBalance").textContent = "₹" + totalBalance.toFixed(2);
+}
 
-        totalBalance +=
-          Number(
-            user.balance || 0
-          );
+/* ============================================
+   EVENT LISTENERS (বাটনগুলোর কানেকশন)
+============================================ */
+document.getElementById("loginButton").addEventListener("click", login);
 
-      }
+const logoutBtn = document.getElementById("logoutButton");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", logout);
+}
+</script>
 
-
-      const row =
-        document.createElement("tr");
-
-
-      const statusClass =
-        user.status === "active"
-          ? "badgeActive"
-          : "badgeBlocked";
-
-
-      let action = "";
-
-
-      if (user.role === "customer") {
-
-        action =
-          `
-          <button
-            class="smallBtn ${
-              user.status === "active"
-                ? "danger"
-                : "success"
-            }"
-            onclick="
-              toggleUserStatus(
-                '${user.id}',
-                '${user.status}'
-              )
-            "
-          >
-            ${
-              user.status === "active"
-    
+</body>
+</html>
