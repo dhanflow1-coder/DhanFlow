@@ -266,7 +266,7 @@ function showTransactionDetail(t){
     <div class="detail"><span>Status</span>${statusHTML(t.status)}</div>
     <div class="detail"><span>Direction</span><b>${outgoing?"Sent":"Received"}</b></div>
     <div class="detail"><span>Date</span><b>${escapeHTML(dateTime(t.created_at))}</b></div>
-  </div>${t.admin_note?`<div class="notice"><b>Admin note:</b> ${escapeHTML(t.admin_note)}</div>`:""}<button class="secondary" style="margin-top:14px" onclick="copyText('${escapeHTML(t.transaction_id)}')">Copy Transaction ID</button>`);
+  </div>${t.admin_note?`<div class="notice"><b>${(t.status==="rejected"||t.status==="frozen")?"Reason / Admin Note":"Admin Note"}:</b> ${escapeHTML(t.admin_note)}</div>`:(t.status==="rejected"||t.status==="frozen")?`<div class="notice"><b>Reason:</b> No reason was provided by admin.</div>`:""}<button class="secondary" style="margin-top:14px" onclick="copyText('${escapeHTML(t.transaction_id)}')">Copy Transaction ID</button>`);
 }
 function showWithdrawalDetail(w){
   openModal("Withdrawal Details",`<div class="detail-grid">
@@ -278,7 +278,7 @@ function showWithdrawalDetail(w){
     <div class="detail"><span>Account Holder</span><b>${escapeHTML(w.account_holder)}</b></div>
     <div class="detail"><span>Account Number</span><b>${escapeHTML(w.account_number)}</b></div>
     <div class="detail"><span>IFSC</span><b>${escapeHTML(w.ifsc)}</b></div>
-  </div>${w.admin_note?`<div class="notice"><b>Admin note:</b> ${escapeHTML(w.admin_note)}</div>`:""}<button class="secondary" style="margin-top:14px" onclick="copyText('${escapeHTML(w.withdrawal_id)}')">Copy Withdrawal ID</button>`);
+  </div>${w.admin_note?`<div class="notice"><b>${(w.status==="rejected"||w.status==="frozen")?"Reason / Admin Note":"Admin Note"}:</b> ${escapeHTML(w.admin_note)}</div>`:(w.status==="rejected"||w.status==="frozen")?`<div class="notice"><b>Reason:</b> No reason was provided by admin.</div>`:""}<button class="secondary" style="margin-top:14px" onclick="copyText('${escapeHTML(w.withdrawal_id)}')">Copy Withdrawal ID</button>`);
 }
 function openTransfer(){
   openModal("Send Money",`<label>Receiver User ID</label><input id="receiver" placeholder="e.g. Mala112"><div class="form-help">Enter the recipient's DhanFlow User ID.</div>
