@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="description" content="DhanFlow secure user wallet">
+<link rel="manifest" href="./manifest.json">
+<title>DhanFlow User</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0b1220;--muted:#64748b;--bg:#f4f7fb;--card:#fff;--line:#e5e7eb;--green:#059669;--red:#dc2626;--amber:#d97706;--blue:#2563eb}
+html{background:var(--bg)}
+body{font-family:Arial,sans-serif;background:var(--bg);color:#111827}
+button,input{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.app{max-width:520px;min-height:100vh;margin:auto;background:var(--bg)}
+#loginPage{min-height:100vh;padding:24px 18px;display:flex;align-items:center;justify-content:center}
+.login-card{width:100%;background:#fff;padding:25px;border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,.08)}
+.logo{font-size:30px;font-weight:900;color:var(--ink);margin-bottom:6px}.subtitle{color:var(--muted);font-size:14px;margin-bottom:22px}
+label{display:block;font-size:13px;font-weight:bold;margin:14px 0 7px}
+.input-wrap{position:relative}.input-wrap input{padding-right:48px}
+input{width:100%;padding:14px;border:1px solid #dbe2ea;border-radius:12px;outline:none;background:#fff}
+input:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(11,18,32,.06)}
+.eye{position:absolute;right:6px;top:5px;width:38px;height:38px;border:0;background:transparent;border-radius:10px}
+.primary{width:100%;border:none;background:var(--ink);color:#fff;padding:14px;border-radius:12px;margin-top:18px;font-weight:bold}
+.primary:disabled{opacity:.55;cursor:not-allowed}.secondary{width:100%;border:1px solid var(--line);background:#fff;padding:13px;border-radius:12px;font-weight:bold}
+.message{margin-top:12px;font-size:13px;line-height:1.4}.error{color:var(--red)}.success{color:var(--green)}
+.login-note{margin-top:14px;text-align:center;color:var(--muted);font-size:11px;line-height:1.5}
+.header{background:var(--ink);color:#fff;padding:17px 18px calc(17px + env(safe-area-inset-top));border-radius:0 0 24px 24px}
+.header-row{display:flex;align-items:center;justify-content:space-between}.header-logo{font-size:22px;font-weight:900}
+.header-right{display:flex;align-items:center;gap:8px}.user-badge{background:#1e293b;color:#cbd5e1;padding:7px 10px;border-radius:20px;font-size:11px}
+.icon-btn{border:0;background:#1e293b;color:#fff;width:34px;height:34px;border-radius:50%}
+main{padding:16px;padding-bottom:96px}
+.balance-card{background:linear-gradient(145deg,#111827,#0b1220);color:#fff;padding:22px;border-radius:21px;margin-bottom:14px;box-shadow:0 12px 28px rgba(11,18,32,.18)}
+.balance-label{font-size:13px;color:#cbd5e1}.balance{font-size:34px;font-weight:900;margin-top:8px}.user-info{color:#cbd5e1;font-size:12px;margin-top:8px}
+.balance-tools{display:flex;gap:8px;margin-top:16px}.mini-btn{border:1px solid #334155;background:#172033;color:#fff;padding:8px 11px;border-radius:10px;font-size:11px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.action{background:#fff;border:1px solid var(--line);border-radius:17px;padding:17px;text-align:left;font-weight:bold;color:#111827;box-shadow:0 3px 12px rgba(0,0,0,.03)}
+.action:active{transform:scale(.99)}.action span{display:block;color:var(--muted);font-size:12px;margin-top:6px;font-weight:normal}
+.section{margin-top:22px}.section-title{font-size:17px;font-weight:bold;margin-bottom:10px}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.link-btn{border:0;background:transparent;color:var(--blue);font-size:12px;font-weight:bold}
+.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:15px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #eef2f7}.row:last-child{border-bottom:none}
+.small{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.35}.empty{text-align:center;color:var(--muted);font-size:13px;padding:20px 5px}
+.status{display:inline-block;padding:5px 8px;background:#eef2ff;border-radius:20px;font-size:10px;font-weight:bold;text-transform:uppercase}
+.status.approved{background:#dcfce7;color:#166534}.status.rejected{background:#fee2e2;color:#991b1b}.status.frozen{background:#fef3c7;color:#92400e}.status.pending{background:#dbeafe;color:#1d4ed8}
+.amount-in{color:var(--green)}.amount-out{color:#111827}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,1fr);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:5}
+.nav-btn{border:none;background:transparent;padding:8px;color:var(--muted);font-size:12px;font-weight:bold}.nav-btn.active{color:var(--ink)}
+.view{display:none}.view.active{display:block}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;display:flex;align-items:flex-end}
+.modal-box{width:min(520px,100%);background:#fff;border-radius:22px 22px 0 0;padding:20px;max-height:92vh;overflow:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.close{width:35px;height:35px;border:none;background:#f1f5f9;border-radius:50%;font-size:20px}
+.modal-box h3{font-size:18px}.form-help{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.4}
+.modal-msg{margin-top:10px;font-size:13px}.modal-actions{display:flex;gap:10px;margin-top:14px}.modal-actions button{flex:1}
+.logout{width:100%;margin-top:15px;padding:13px;border:none;border-radius:12px;background:#fee2e2;color:#991b1b;font-weight:bold}
+.install-card{margin-top:14px;background:#eef2ff;border:1px solid #dbeafe;padding:13px;border-radius:15px}.install-card b{font-size:13px}.install-card p{font-size:11px;color:#475569;margin:5px 0 9px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.detail{background:#f8fafc;border-radius:12px;padding:11px}.detail span{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}.detail b{font-size:12px;word-break:break-word}
+.copy{border:0;background:#eef2ff;color:#1d4ed8;padding:5px 8px;border-radius:8px;font-size:10px;font-weight:bold}
+.notice{font-size:11px;color:var(--muted);line-height:1.5;margin-top:12px}
+@media(max-width:380px){.balance{font-size:30px}.actions{grid-template-columns:1fr}.detail-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div id="loginPage">
+    <div class="login-card">
+      <div class="logo">DhanFlow</div>
+      <div class="subtitle">Secure User Wallet</div>
+      <label>Email</label>
+      <input id="email" type="email" autocomplete="username" placeholder="Enter your email">
+      <label>Password</label>
+      <div class="input-wrap">
+        <input id="password" type="password" autocomplete="current-password" placeholder="Enter your password">
+        <button class="eye" type="button" onclick="togglePassword('password',this)">👁</button>
+      </div>
+      <button id="loginBtn" class="primary">Login</button>
+      <button id="forgotBtn" class="secondary" style="margin-top:10px">Forgot Password?</button>
+      <div id="loginMessage" class="message"></div>
+      <div class="login-note">For DhanFlow customers only. Admin accounts use the Admin App.</div>
+    </div>
+  </div>
+
+  <div id="userApp" class="hidden">
+    <header class="header">
+      <div class="header-row">
+        <div class="header-logo">DhanFlow</div>
+        <div class="header-right">
+          <button class="icon-btn" onclick="refreshAll()" title="Refresh">↻</button>
+          <div class="user-badge">USER</div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div id="homeView" class="view active">
+        <div class="balance-card">
+          <div class="balance-label">Available Balance</div>
+          <div id="balance" class="balance">₹0.00</div>
+          <div id="userInfo" class="user-info">Loading...</div>
+          <div class="balance-tools">
+            <button class="mini-btn" onclick="refreshAll()">↻ Refresh</button>
+            <button class="mini-btn" onclick="copyText(currentProfile?.user_id)">Copy User ID</button>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="action" onclick="openTransfer()">💸 Send Money<span>Transfer to another user</span></button>
+          <button class="action" onclick="openWithdrawal()">🏦 Withdraw<span>Request bank withdrawal</span></button>
+        </div>
+
+        <div id="installCard" class="install-card hidden">
+          <b>Install DhanFlow</b>
+          <p>Add DhanFlow to your phone home screen for a faster app-like experience.</p>
+          <button id="installBtn" class="secondary">Install App</button>
+        </div>
+
+        <div class="section">
+          <div class="section-head"><div class="section-title">Recent Transactions</div><button class="link-btn" onclick="showView('historyView')">View all</button></div>
+          <div id="recentTransactions" class="card"><div class="empty">Loading...</div></div>
+        </div>
+      </div>
+
+      <div id="historyView" class="view">
+        <div class="section">
+          <div class="section-head"><div class="section-title">Transaction History</div><button class="link-btn" onclick="refreshAll()">Refresh</button></div>
+          <div id="transactionHistory" class="card"><div class="empty">Loading...</div></div>
+        </div>
+        <div class="section">
+          <div class="section-title">Withdrawal History</div>
+          <div id="withdrawalHistory" class="card"><div class="empty">Loading...</div></div>
+        </div>
+      </div>
+
+      <div id="profileView" class="view">
+        <div class="section">
+          <div class="section-title">My Profile</div>
+          <div id="profileCard" class="card">Loading...</div>
+        </div>
+        <div class="section">
+          <div class="section-title">Security</div>
+          <div class="card">
+            <button class="secondary" onclick="openPasswordChange()">🔐 Change Password</button>
+            <div class="notice">Use a strong password and never share it with anyone.</div>
+          </div>
+        </div>
+        <button id="logoutBtn" class="logout">Logout</button>
+      </div>
+    </main>
+
+    <div class="bottom-nav">
+      <button class="nav-btn active" data-view="homeView">🏠<br>Home</button>
+      <button class="nav-btn" data-view="historyView">📜<br>History</button>
+      <button class="nav-btn" data-view="profileView">👤<br>Profile</button>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-head"><h3 id="modalTitle">DhanFlow</h3><button class="close" onclick="closeModal()">×</button></div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL="https://oxwjnravklpcdhfxibya.supabase.co";
+const SUPABASE_KEY="sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let currentUser=null,currentProfile=null,installPrompt=null;
+
+function money(v){return "₹"+Number(v||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function escapeHTML(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function dateTime(v){return v?new Date(v).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"}):""}
+function statusHTML(s){return `<span class="status ${escapeHTML(String(s||"").toLowerCase())}">${escapeHTML(s)}</span>`}
+function togglePassword(id,btn){const el=document.getElementById(id);el.type=el.type==="password"?"text":"password";btn.textContent=el.type==="password"?"👁":"🙈"}
+function showLoginMessage(msg,type){const b=document.getElementById("loginMessage");b.className="message "+type;b.textContent=msg}
+function copyText(v){if(!v)return; navigator.clipboard?.writeText(String(v)).then(()=>alert("Copied")).catch(()=>alert(String(v)))}
+
+document.getElementById("loginBtn").addEventListener("click",login);
+document.getElementById("forgotBtn").addEventListener("click",forgotPassword);
+document.getElementById("password").addEventListener("keydown",e=>{if(e.key==="Enter")login()});
+document.getElementById("logoutBtn").addEventListener("click",logout);
+document.querySelectorAll(".nav-btn").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+
+function showView(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function openModal(title,html){document.getElementById("modalTitle").textContent=title;document.getElementById("modalContent").innerHTML=html;document.getElementById("modal").classList.remove("hidden")}
+function closeModal(){document.getElementById("modal").classList.add("hidden")}
+function modalMessage(msg,type="error"){const b=document.getElementById("modalMessage");if(b){b.className="modal-msg "+type;b.textContent=msg}}
+
+async function login(){
+  const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;
+  if(!email||!password){showLoginMessage("Please enter email and password.","error");return}
+  const btn=document.getElementById("loginBtn");btn.disabled=true;btn.textContent="Logging in...";
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  btn.disabled=false;btn.textContent="Login";
+  if(error){showLoginMessage(error.message,"error");return}
+  currentUser=data.user;await loadUser();
+}
+async function forgotPassword(){
+  const email=document.getElementById("email").value.trim();
+  if(!email){showLoginMessage("Enter your email first.","error");return}
+  const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname});
+  if(error)showLoginMessage(error.message,"error");else showLoginMessage("Password reset email sent. Check your inbox.","success");
+}
+async function loadUser(){
+  const {data:{user}}=await supabaseClient.auth.getUser();
+  if(!user){showLogin();return}
+  currentUser=user;
+  const {data,error}=await supabaseClient.from("profiles").select("*").eq("id",user.id).single();
+  if(error){alert("Profile load failed: "+error.message);return}
+  currentProfile=data;
+  if(data.role!=="customer"){await supabaseClient.auth.signOut();alert("This application is only for users.");showLogin();return}
+  if(data.status!=="active"){await supabaseClient.auth.signOut();alert("Your account is blocked.");showLogin();return}
+  document.getElementById("loginPage").classList.add("hidden");document.getElementById("userApp").classList.remove("hidden");
+  updateProfile();await loadTransactions();maybeShowInstall();
+}
+function showLogin(){document.getElementById("userApp").classList.add("hidden");document.getElementById("loginPage").classList.remove("hidden")}
+function updateProfile(){
+  document.getElementById("balance").textContent=money(currentProfile.balance);
+  document.getElementById("userInfo").textContent=currentProfile.username+" • "+currentProfile.user_id;
+  document.getElementById("profileCard").innerHTML=`
+    <div class="row"><span>User ID</span><span><b>${escapeHTML(currentProfile.user_id)}</b> <button class="copy" onclick="copyText('${escapeHTML(currentProfile.user_id)}')">Copy</button></span></div>
+    <div class="row"><span>Username</span><b>${escapeHTML(currentProfile.username)}</b></div>
+    <div class="row"><span>Email</span><b style="word-break:break-word;text-align:right">${escapeHTML(currentUser.email)}</b></div>
+    <div class="row"><span>Balance</span><b>${money(currentProfile.balance)}</b></div>
+    <div class="row"><span>Status</span>${statusHTML(currentProfile.status)}</div>`;
+}
+async function refreshProfile(){
+  if(!currentUser)return;
+  const {data,error}=await supabaseClient.from("profiles").select("*").eq("id",currentUser.id).single();
+  if(!error&&data){currentProfile=data;updateProfile()}
+}
+async function refreshAll(){if(!currentUser)return;await refreshProfile();await loadTransactions()}
+async function loadTransactions(){
+  const {data:transactions,error:txError}=await supabaseClient.from("transactions").select("*").or(`sender_id.eq.${currentProfile.id},receiver_id.eq.${currentProfile.id}`).order("created_at",{ascending:false});
+  const {data:withdrawals,error:wdError}=await supabaseClient.from("withdrawals").select("*").eq("user_id",currentProfile.id).order("created_at",{ascending:false});
+  if(txError)console.error(txError);if(wdError)console.error(wdError);
+  renderRecent(transactions||[]);renderTransactions(transactions||[]);renderWithdrawals(withdrawals||[]);
+}
+function renderRecent(rows){const box=document.getElementById("recentTransactions");box.innerHTML=rows.length?rows.slice(0,5).map(transactionHTML).join(""):`<div class="empty">No transactions yet.</div>`}
+function transactionHTML(t){
+  const outgoing=t.sender_id===currentProfile.id;
+  return `<button style="display:block;width:100%;border:0;background:transparent;text-align:left" onclick='showTransactionDetail(${JSON.stringify(t)})'>
+    <div class="row"><div><b>${outgoing?"Sent":"Received"} • ${escapeHTML(t.type)}</b><div class="small">${escapeHTML(t.transaction_id)}</div><div class="small">${dateTime(t.created_at)}</div></div>
+    <div style="text-align:right"><b class="${outgoing?"amount-out":"amount-in"}">${outgoing?"−":"+"}${money(t.amount)}</b><div>${statusHTML(t.status)}</div></div></div></button>`
+}
+function renderTransactions(rows){const box=document.getElementById("transactionHistory");box.innerHTML=rows.length?rows.map(transactionHTML).join(""):`<div class="empty">No transactions yet.</div>`}
+function renderWithdrawals(rows){
+  const box=document.getElementById("withdrawalHistory");
+  box.innerHTML=rows.length?rows.map(w=>`<button style="display:block;width:100%;border:0;background:transparent;text-align:left" onclick='showWithdrawalDetail(${JSON.stringify(w)})'>
+    <div class="row"><div><b>Bank Withdrawal</b><div class="small">${escapeHTML(w.withdrawal_id)}</div><div class="small">${dateTime(w.created_at)}</div></div>
+    <div style="text-align:right"><b>−${money(w.amount)}</b><div>${statusHTML(w.status)}</div></div></div></button>`).join(""):`<div class="empty">No withdrawal requests yet.</div>`
+}
+function showTransactionDetail(t){
+  const outgoing=t.sender_id===currentProfile.id;
+  openModal("Transaction Details",`<div class="detail-grid">
+    <div class="detail"><span>Transaction ID</span><b>${escapeHTML(t.transaction_id)}</b></div>
+    <div class="detail"><span>Type</span><b>${escapeHTML(t.type)}</b></div>
+    <div class="detail"><span>Amount</span><b>${outgoing?"−":"+"}${money(t.amount)}</b></div>
+    <div class="detail"><span>Status</span>${statusHTML(t.status)}</div>
+    <div class="detail"><span>Direction</span><b>${outgoing?"Sent":"Received"}</b></div>
+    <div class="detail"><span>Date</span><b>${escapeHTML(dateTime(t.created_at))}</b></div>
+  </div>${t.admin_note?`<div class="notice"><b>Admin note:</b> ${escapeHTML(t.admin_note)}</div>`:""}<button class="secondary" style="margin-top:14px" onclick="copyText('${escapeHTML(t.transaction_id)}')">Copy Transaction ID</button>`);
+}
+function showWithdrawalDetail(w){
+  openModal("Withdrawal Details",`<div class="detail-grid">
+    <div class="detail"><span>Withdrawal ID</span><b>${escapeHTML(w.withdrawal_id)}</b></div>
+    <div class="detail"><span>Amount</span><b>${money(w.amount)}</b></div>
+    <div class="detail"><span>Status</span>${statusHTML(w.status)}</div>
+    <div class="detail"><span>Date</span><b>${escapeHTML(dateTime(w.created_at))}</b></div>
+    <div class="detail"><span>Bank</span><b>${escapeHTML(w.bank_name)}</b></div>
+    <div class="detail"><span>Account Holder</span><b>${escapeHTML(w.account_holder)}</b></div>
+    <div class="detail"><span>Account Number</span><b>${escapeHTML(w.account_number)}</b></div>
+    <div class="detail"><span>IFSC</span><b>${escapeHTML(w.ifsc)}</b></div>
+  </div>${w.admin_note?`<div class="notice"><b>Admin note:</b> ${escapeHTML(w.admin_note)}</div>`:""}<button class="secondary" style="margin-top:14px" onclick="copyText('${escapeHTML(w.withdrawal_id)}')">Copy Withdrawal ID</button>`);
+}
+function openTransfer(){
+  openModal("Send Money",`<label>Receiver User ID</label><input id="receiver" placeholder="e.g. Mala112"><div class="form-help">Enter the recipient's DhanFlow User ID.</div>
+  <label>Amount</label><input id="transferAmount" type="number" min="0.01" step="0.01" placeholder="0.00">
+  <div id="modalMessage" class="modal-msg"></div><div class="modal-actions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" style="margin-top:0" onclick="sendTransfer()">Send</button></div>`);
+}
+async function sendTransfer(){
+  const receiver=document.getElementById("receiver").value.trim(),amount=Number(document.getElementById("transferAmount").value);
+  if(!receiver||!amount||amount<=0){modalMessage("Enter a valid receiver and amount.");return}
+  if(amount>Number(currentProfile.balance)){modalMessage("Insufficient balance.");return}
+  const {error}=await supabaseClient.rpc("create_transfer_request",{p_receiver_user_id:receiver,p_amount:amount});
+  if(error){modalMessage(error.message);return}
+  modalMessage("Transfer request submitted as PENDING.","success");await refreshAll();setTimeout(closeModal,900);
+}
+function openWithdrawal(){
+  openModal("Bank Withdrawal",`<label>Bank Name</label><input id="bankName" placeholder="Bank name">
+  <label>Account Holder</label><input id="accountHolder" placeholder="Account holder name">
+  <label>Account Number</label><input id="accountNumber" inputmode="numeric" placeholder="Account number">
+  <label>IFSC</label><input id="ifsc" maxlength="11" placeholder="ABCD0123456" style="text-transform:uppercase">
+  <label>Amount</label><input id="withdrawAmount" type="number" min="0.01" step="0.01" placeholder="0.00">
+  <div class="form-help">This creates an internal withdrawal request. It does not transfer money to a bank automatically.</div>
+  <div id="modalMessage" class="modal-msg"></div><div class="modal-actions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" style="margin-top:0" onclick="sendWithdrawal()">Submit</button></div>`);
+}
+async function sendWithdrawal(){
+  const bankName=document.getElementById("bankName").value.trim(),accountHolder=document.getElementById("accountHolder").value.trim(),accountNumber=document.getElementById("accountNumber").value.trim(),ifsc=document.getElementById("ifsc").value.trim().toUpperCase(),amount=Number(document.getElementById("withdrawAmount").value);
+  if(!bankName||!accountHolder||!accountNumber||!ifsc||!amount||amount<=0){modalMessage("Please fill all fields correctly.");return}
+  if(!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)){modalMessage("Enter a valid IFSC format.");return}
+  if(amount>Number(currentProfile.balance)){modalMessage("Insufficient balance.");return}
+  const {error}=await supabaseClient.rpc("create_withdrawal_request",{p_bank_name:bankName,p_account_holder:accountHolder,p_account_number:accountNumber,p_ifsc:ifsc,p_amount:amount});
+  if(error){modalMessage(error.message);return}
+  modalMessage("Withdrawal request submitted as PENDING.","success");await refreshAll();setTimeout(closeModal,900);
+}
+function openPasswordChange(){
+  openModal("Change Password",`<label>New Password</label><div class="input-wrap"><input id="newPassword" type="password" minlength="8" placeholder="At least 8 characters"><button class="eye" type="button" onclick="togglePassword('newPassword',this)">👁</button></div>
+  <label>Confirm Password</label><div class="input-wrap"><input id="confirmPassword" type="password" minlength="8" placeholder="Repeat password"><button class="eye" type="button" onclick="togglePassword('confirmPassword',this)">👁</button></div>
+  <div id="modalMessage" class="modal-msg"></div><div class="modal-actions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" style="margin-top:0" onclick="changePassword()">Update</button></div>`);
+}
+async function changePassword(){
+  const p=document.getElementById("newPassword").value,c=document.getElementById("confirmPassword").value;
+  if(p.length<8){modalMessage("Password must be at least 8 characters.");return}
+  if(p!==c){modalMessage("Passwords do not match.");return}
+  const {error}=await supabaseClient.auth.updateUser({password:p});
+  if(error){modalMessage(error.message);return}
+  modalMessage("Password updated successfully.","success");setTimeout(closeModal,900);
+}
+async function logout(){await supabaseClient.auth.signOut();currentUser=null;currentProfile=null;showLogin();document.getElementById("email").value="";document.getElementById("password").value=""}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPrompt=e;document.getElementById("installCard").classList.remove("hidden")});
+document.getElementById("installBtn").addEventListener("click",async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;document.getElementById("installCard").classList.add("hidden")});
+window.addEventListener("appinstalled",()=>document.getElementById("installCard").classList.add("hidden"));
+function maybeShowInstall(){if(installPrompt)document.getElementById("installCard").classList.remove("hidden")}
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(console.error))}
+supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==="PASSWORD_RECOVERY"){setTimeout(()=>openPasswordChange(),300)}});
+(async()=>{const {data:{session}}=await supabaseClient.auth.getSession();if(session)loadUser()})();
+</script>
+</body>
+</html>
