@@ -9,131 +9,300 @@
 
 <style>
 *{box-sizing:border-box}
+
 body{
   margin:0;
   font-family:Arial,sans-serif;
-  background:#08101f;
+  background:#050a14;
   color:#fff;
 }
+
 .container{
   width:94%;
-  max-width:850px;
-  margin:25px auto;
+  max-width:900px;
+  margin:25px auto 60px;
 }
+
 .card{
-  background:#121d33;
-  border:1px solid #263754;
-  border-radius:14px;
-  padding:18px;
+  background:#101a2e;
+  border:1px solid #263653;
+  border-radius:15px;
+  padding:20px;
   margin-bottom:18px;
 }
-h1,h2,h3{margin-top:0}
-input,select,textarea{
+
+h1,h2,h3{
+  margin-top:0;
+}
+
+h1{font-size:28px}
+h2{font-size:21px}
+
+input{
   width:100%;
-  padding:13px;
+  padding:14px;
   margin:7px 0;
-  border-radius:9px;
-  border:1px solid #344765;
-  background:#081426;
+  border-radius:8px;
+  border:1px solid #30415f;
+  background:#07101f;
   color:#fff;
   font-size:15px;
 }
+
 button{
   border:0;
   border-radius:8px;
   padding:12px 18px;
+  color:#fff;
   font-weight:bold;
   cursor:pointer;
+  margin-top:8px;
 }
-.primary{background:#2878f0;color:#fff}
-.green{background:#16a34a;color:#fff}
-.red{background:#e53935;color:#fff}
-.logout{float:right;background:#e53935;color:#fff}
-.hidden{display:none}
-.message{
-  padding:10px;
-  margin-top:10px;
-  background:#1d2a42;
-  border-radius:8px;
-}
+
+.primary{background:#2563eb}
+.success{background:#16a34a}
+.warning{background:#ea8a00}
+.danger{background:#dc2626}
+.secondary{background:#334155}
+
+.full{width:100%}
+
 .balance{
-  font-size:34px;
+  font-size:32px;
   font-weight:bold;
-  color:#4ade80;
+  color:#38e27b;
 }
+
+.message{
+  padding:12px;
+  border-radius:8px;
+  background:#17243b;
+  margin-top:10px;
+}
+
 table{
   width:100%;
   border-collapse:collapse;
-  margin-top:10px;
-}
-th,td{
-  padding:10px 7px;
-  border-bottom:1px solid #293952;
-  text-align:left;
   font-size:13px;
 }
-th{background:#1a2943}
+
+th,td{
+  padding:11px 8px;
+  border-bottom:1px solid #263653;
+  text-align:left;
+}
+
+th{
+  background:#18263f;
+}
+
 .status{
   font-weight:bold;
+}
+
+.login{
+  max-width:430px;
+  margin:70px auto;
+}
+
+.hidden{
+  display:none;
+}
+
+.small{
+  color:#aebbd0;
+  font-size:13px;
+}
+
+@media(max-width:600px){
+  .container{
+    width:95%;
+  }
+
+  .card{
+    padding:16px;
+  }
+
+  table{
+    min-width:650px;
+  }
+
+  .table-wrap{
+    overflow-x:auto;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
 <!-- LOGIN -->
-<div id="loginBox" class="card">
-  <h1>DhanFlow Customer</h1>
-  <p>Customer Login</p>
+<div id="loginPage" class="container login">
 
-  <input id="email" type="email" placeholder="Customer Email">
-  <input id="password" type="password" placeholder="Password">
+  <div class="card">
+    <h1>DhanFlow</h1>
+    <p class="small">Customer Login</p>
 
-  <button class="primary" onclick="login()">Login</button>
+    <input id="loginEmail"
+           type="email"
+           placeholder="Email">
 
-  <div id="loginMessage" class="message hidden"></div>
+    <input id="loginPassword"
+           type="password"
+           placeholder="Password">
+
+    <button class="primary full" onclick="login()">
+      Login
+    </button>
+
+    <div id="loginMessage"></div>
+  </div>
+
 </div>
 
 
 <!-- CUSTOMER APP -->
-<div id="app" class="hidden">
+<div id="customerApp" class="container hidden">
 
+  <!-- HEADER -->
   <div class="card">
-    <button class="logout" onclick="logout()">Logout</button>
+
     <h1>DhanFlow</h1>
-    <p id="welcome">Customer</p>
+
+    <p>
+      Welcome, <b id="username"></b>
+    </p>
+
+    <button class="danger" onclick="logout()">
+      Logout
+    </button>
+
   </div>
+
 
   <!-- BALANCE -->
   <div class="card">
-    <h3>Available Balance</h3>
-    <div class="balance" id="balance">₹0.00</div>
-  </div>
 
-  <!-- PROFILE -->
-  <div class="card">
-    <h2>My Profile</h2>
+    <h2>Available Balance</h2>
 
-    <p>User ID: <b id="userId">-</b></p>
-    <p>Username: <b id="username">-</b></p>
-    <p>Status: <b id="status">-</b></p>
+    <div class="balance" id="balance">
+      ₹0.00
+    </div>
 
-    <button class="primary" onclick="loadDashboard()">
+    <button class="primary" onclick="loadCustomerData()">
       Refresh
     </button>
 
-    <div id="dashMessage" class="message hidden"></div>
+  </div>
+
+
+  <!-- PROFILE -->
+  <div class="card">
+
+    <h2>My Profile</h2>
+
+    <p>User ID:
+      <b id="userId"></b>
+    </p>
+
+    <p>Username:
+      <b id="profileUsername"></b>
+    </p>
+
+    <p>Status:
+      <b id="userStatus"></b>
+    </p>
+
+  </div>
+
+
+  <!-- TRANSFER -->
+  <div class="card">
+
+    <h2>Transfer Money</h2>
+
+    <p class="small">
+      Transfer money to another DhanFlow user.
+    </p>
+
+    <input
+      id="receiverUserId"
+      placeholder="Receiver User ID e.g. USER002">
+
+    <input
+      id="transferAmount"
+      type="number"
+      min="1"
+      step="0.01"
+      placeholder="Amount">
+
+    <button
+      class="success full"
+      onclick="submitTransfer()">
+
+      Send Transfer Request
+
+    </button>
+
+    <div id="transferMessage"></div>
+
+  </div>
+
+
+  <!-- BANK WITHDRAWAL -->
+  <div class="card">
+
+    <h2>Bank Withdrawal</h2>
+
+    <p class="small">
+      Submit a withdrawal request. Admin approval is required.
+    </p>
+
+    <input
+      id="bankName"
+      placeholder="Bank Name">
+
+    <input
+      id="accountHolder"
+      placeholder="Account Holder Name">
+
+    <input
+      id="accountNumber"
+      placeholder="Account Number">
+
+    <input
+      id="ifsc"
+      placeholder="IFSC Code">
+
+    <input
+      id="withdrawAmount"
+      type="number"
+      min="1"
+      step="0.01"
+      placeholder="Amount">
+
+    <button
+      class="warning full"
+      onclick="submitWithdrawal()">
+
+      Submit Withdrawal
+
+    </button>
+
+    <div id="withdrawMessage"></div>
+
   </div>
 
 
   <!-- TRANSACTION HISTORY -->
   <div class="card">
+
     <h2>Transaction History</h2>
 
-    <div style="overflow-x:auto;">
+    <div class="table-wrap">
+
       <table>
+
         <thead>
           <tr>
             <th>Transaction ID</th>
@@ -144,13 +313,43 @@ th{background:#1a2943}
           </tr>
         </thead>
 
-        <tbody id="transactions">
+        <tbody id="transactionTable">
         </tbody>
+
       </table>
+
     </div>
+
   </div>
 
-</div>
+
+  <!-- WITHDRAWAL HISTORY -->
+  <div class="card">
+
+    <h2>Bank Withdrawal History</h2>
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Withdrawal ID</th>
+            <th>Amount</th>
+            <th>Bank</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody id="withdrawalTable">
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
 
 </div>
 
@@ -172,247 +371,546 @@ window.supabase.createClient(
 let currentProfile = null;
 
 
-function showMessage(id,text){
-  const el=document.getElementById(id);
-  el.textContent=text;
-  el.classList.remove("hidden");
-}
+/* MESSAGE */
+function showMessage(id,text,good=false){
 
+  const box=document.getElementById(id);
 
-function hideMessage(id){
-  document.getElementById(id).classList.add("hidden");
+  box.innerHTML=
+    '<div class="message">'+text+'</div>';
+
 }
 
 
 /* LOGIN */
-
 async function login(){
 
-  hideMessage("loginMessage");
-
   const email=
-    document.getElementById("email").value.trim();
+    document.getElementById("loginEmail").value.trim();
 
   const password=
-    document.getElementById("password").value;
+    document.getElementById("loginPassword").value;
 
   if(!email || !password){
+
     showMessage(
       "loginMessage",
       "Email এবং Password দিন।"
     );
+
     return;
   }
 
-  const {data,error} =
+  showMessage(
+    "loginMessage",
+    "Logging in..."
+  );
+
+  const {data,error}=
     await supabaseClient.auth.signInWithPassword({
       email:email,
       password:password
     });
 
   if(error){
+
     showMessage(
       "loginMessage",
       "Login failed: "+error.message
     );
+
     return;
   }
 
-  if(!data.user){
-    showMessage(
-      "loginMessage",
-      "User পাওয়া যায়নি।"
-    );
-    return;
-  }
+  await loadCustomerData();
 
-  await loadProfile(data.user.id);
 }
 
 
-/* LOAD PROFILE */
+/* LOAD CUSTOMER DATA */
+async function loadCustomerData(){
 
-async function loadProfile(userId){
+  const {
+    data:{user}
+  }=await supabaseClient.auth.getUser();
 
-  const {data,error} =
+  if(!user){
+
+    document
+      .getElementById("loginPage")
+      .classList.remove("hidden");
+
+    document
+      .getElementById("customerApp")
+      .classList.add("hidden");
+
+    return;
+  }
+
+
+  /* PROFILE */
+  const {data:profile,error:profileError}=
     await supabaseClient
       .from("profiles")
       .select("*")
-      .eq("id",userId)
+      .eq("id",user.id)
       .single();
 
-  if(error){
+  if(profileError){
 
-    showMessage(
-      "loginMessage",
-      "Profile load failed: "+error.message
+    alert(
+      "Profile load failed: "+
+      profileError.message
     );
 
-    await supabaseClient.auth.signOut();
     return;
   }
 
-  if(data.role !== "customer"){
 
-    showMessage(
-      "loginMessage",
-      "এই Login Customer account-এর জন্য নয়।"
-    );
+  if(profile.role!=="customer"){
+
+    alert("Customer account required.");
 
     await supabaseClient.auth.signOut();
+
     return;
   }
 
-  if(data.status !== "active"){
 
-    showMessage(
-      "loginMessage",
-      "আপনার account বর্তমানে blocked।"
-    );
+  if(profile.status!=="active"){
+
+    alert("Your account is blocked.");
 
     await supabaseClient.auth.signOut();
+
     return;
   }
 
-  currentProfile=data;
 
-  document.getElementById("loginBox")
+  currentProfile=profile;
+
+
+  document
+    .getElementById("loginPage")
     .classList.add("hidden");
 
-  document.getElementById("app")
+  document
+    .getElementById("customerApp")
     .classList.remove("hidden");
 
-  document.getElementById("userId")
-    .textContent=data.user_id;
 
   document.getElementById("username")
-    .textContent=data.username;
+    .textContent=profile.username;
 
-  document.getElementById("status")
-    .textContent=data.status;
+  document.getElementById("profileUsername")
+    .textContent=profile.username;
 
-  document.getElementById("welcome")
-    .textContent=
-      "Welcome, "+data.username;
+  document.getElementById("userId")
+    .textContent=profile.user_id;
 
-  document.getElementById("balance")
-    .textContent=
-      "₹"+Number(data.balance).toFixed(2);
-
-  await loadTransactions();
-}
-
-
-/* DASHBOARD REFRESH */
-
-async function loadDashboard(){
-
-  if(!currentProfile){
-    return;
-  }
-
-  const {data,error} =
-    await supabaseClient
-      .from("profiles")
-      .select("*")
-      .eq("id",currentProfile.id)
-      .single();
-
-  if(error){
-
-    showMessage(
-      "dashMessage",
-      "Dashboard update failed: "+error.message
-    );
-
-    return;
-  }
-
-  currentProfile=data;
+  document.getElementById("userStatus")
+    .textContent=profile.status;
 
   document.getElementById("balance")
     .textContent=
-      "₹"+Number(data.balance).toFixed(2);
+      "₹"+Number(profile.balance).toFixed(2);
 
-  document.getElementById("status")
-    .textContent=data.status;
-
-  showMessage(
-    "dashMessage",
-    "Dashboard updated."
-  );
 
   await loadTransactions();
+  await loadWithdrawals();
+
 }
 
 
 /* TRANSACTIONS */
-
 async function loadTransactions(){
 
-  const tbody=
-    document.getElementById("transactions");
+  const {
+    data:{user}
+  }=await supabaseClient.auth.getUser();
 
-  tbody.innerHTML="";
+  if(!user)return;
 
-  const {data,error} =
+
+  const {data,error}=
     await supabaseClient
       .from("transactions")
       .select("*")
       .or(
-        "sender_id.eq."+currentProfile.id+
-        ",receiver_id.eq."+currentProfile.id
+        "sender_id.eq."+user.id+
+        ",receiver_id.eq."+user.id
       )
-      .order("created_at",{ascending:false});
+      .order(
+        "created_at",
+        {ascending:false}
+      );
+
 
   if(error){
 
-    tbody.innerHTML=
-      `<tr>
-        <td colspan="5">
-          Unable to load transactions
-        </td>
-      </tr>`;
+    console.log(error);
 
     return;
   }
+
+
+  const table=
+    document.getElementById(
+      "transactionTable"
+    );
+
+  table.innerHTML="";
+
 
   if(!data || data.length===0){
 
-    tbody.innerHTML=
-      `<tr>
-        <td colspan="5">
-          No transactions yet
-        </td>
-      </tr>`;
+    table.innerHTML=
+      "<tr><td colspan='5'>No transactions yet.</td></tr>";
 
     return;
   }
 
+
   data.forEach(tx=>{
 
-    const tr=document.createElement("tr");
+    const row=
+      document.createElement("tr");
 
-    tr.innerHTML=`
+    row.innerHTML=`
+
       <td>${escapeHtml(tx.transaction_id)}</td>
+
       <td>₹${Number(tx.amount).toFixed(2)}</td>
+
       <td>${escapeHtml(tx.type)}</td>
+
       <td class="status">
         ${escapeHtml(tx.status)}
       </td>
+
       <td>
         ${new Date(tx.created_at).toLocaleString()}
       </td>
+
     `;
 
-    tbody.appendChild(tr);
+    table.appendChild(row);
 
   });
+
 }
 
 
-/* SECURITY */
+/* WITHDRAWALS */
+async function loadWithdrawals(){
 
+  const {
+    data:{user}
+  }=await supabaseClient.auth.getUser();
+
+  if(!user)return;
+
+
+  const {data,error}=
+    await supabaseClient
+      .from("withdrawals")
+      .select("*")
+      .eq("user_id",user.id)
+      .order(
+        "created_at",
+        {ascending:false}
+      );
+
+
+  if(error){
+
+    console.log(error);
+
+    return;
+  }
+
+
+  const table=
+    document.getElementById(
+      "withdrawalTable"
+    );
+
+  table.innerHTML="";
+
+
+  if(!data || data.length===0){
+
+    table.innerHTML=
+      "<tr><td colspan='5'>No withdrawal requests yet.</td></tr>";
+
+    return;
+  }
+
+
+  data.forEach(w=>{
+
+    const row=
+      document.createElement("tr");
+
+    row.innerHTML=`
+
+      <td>${escapeHtml(w.withdrawal_id)}</td>
+
+      <td>₹${Number(w.amount).toFixed(2)}</td>
+
+      <td>${escapeHtml(w.bank_name)}</td>
+
+      <td class="status">
+        ${escapeHtml(w.status)}
+      </td>
+
+      <td>
+        ${new Date(w.created_at).toLocaleString()}
+      </td>
+
+    `;
+
+    table.appendChild(row);
+
+  });
+
+}
+
+
+/* TRANSFER */
+async function submitTransfer(){
+
+  const receiver=
+    document
+      .getElementById("receiverUserId")
+      .value
+      .trim();
+
+  const amount=
+    Number(
+      document
+        .getElementById("transferAmount")
+        .value
+    );
+
+
+  if(!receiver){
+
+    showMessage(
+      "transferMessage",
+      "Receiver User ID দিন।"
+    );
+
+    return;
+  }
+
+
+  if(!amount || amount<=0){
+
+    showMessage(
+      "transferMessage",
+      "সঠিক Amount দিন।"
+    );
+
+    return;
+  }
+
+
+  if(currentProfile &&
+     amount>Number(currentProfile.balance)){
+
+    showMessage(
+      "transferMessage",
+      "আপনার balance-এর চেয়ে বেশি amount পাঠানো যাবে না।"
+    );
+
+    return;
+  }
+
+
+  showMessage(
+    "transferMessage",
+    "Transfer request তৈরি হচ্ছে..."
+  );
+
+
+  const {data,error}=
+    await supabaseClient.rpc(
+      "create_transfer_request",
+      {
+        p_receiver_user_id:receiver,
+        p_amount:amount
+      }
+    );
+
+
+  if(error){
+
+    showMessage(
+      "transferMessage",
+      "Transfer failed: "+
+      error.message
+    );
+
+    return;
+  }
+
+
+  showMessage(
+    "transferMessage",
+    "Transfer request সফলভাবে তৈরি হয়েছে। Status: PENDING"
+  );
+
+
+  document
+    .getElementById("receiverUserId")
+    .value="";
+
+  document
+    .getElementById("transferAmount")
+    .value="";
+
+
+  await loadCustomerData();
+
+}
+
+
+/* WITHDRAWAL */
+async function submitWithdrawal(){
+
+  const bankName=
+    document
+      .getElementById("bankName")
+      .value
+      .trim();
+
+  const accountHolder=
+    document
+      .getElementById("accountHolder")
+      .value
+      .trim();
+
+  const accountNumber=
+    document
+      .getElementById("accountNumber")
+      .value
+      .trim();
+
+  const ifsc=
+    document
+      .getElementById("ifsc")
+      .value
+      .trim()
+      .toUpperCase();
+
+  const amount=
+    Number(
+      document
+        .getElementById("withdrawAmount")
+        .value
+    );
+
+
+  if(
+    !bankName ||
+    !accountHolder ||
+    !accountNumber ||
+    !ifsc
+  ){
+
+    showMessage(
+      "withdrawMessage",
+      "সব Bank Details পূরণ করুন।"
+    );
+
+    return;
+  }
+
+
+  if(!amount || amount<=0){
+
+    showMessage(
+      "withdrawMessage",
+      "সঠিক Amount দিন।"
+    );
+
+    return;
+  }
+
+
+  if(currentProfile &&
+     amount>Number(currentProfile.balance)){
+
+    showMessage(
+      "withdrawMessage",
+      "আপনার balance-এর চেয়ে বেশি withdrawal করা যাবে না।"
+    );
+
+    return;
+  }
+
+
+  showMessage(
+    "withdrawMessage",
+    "Withdrawal request তৈরি হচ্ছে..."
+  );
+
+
+  const {data,error}=
+    await supabaseClient.rpc(
+      "create_withdrawal_request",
+      {
+        p_bank_name:bankName,
+        p_account_holder:accountHolder,
+        p_account_number:accountNumber,
+        p_ifsc:ifsc,
+        p_amount:amount
+      }
+    );
+
+
+  if(error){
+
+    showMessage(
+      "withdrawMessage",
+      "Withdrawal failed: "+
+      error.message
+    );
+
+    return;
+  }
+
+
+  showMessage(
+    "withdrawMessage",
+    "Withdrawal request সফলভাবে তৈরি হয়েছে। Status: PENDING"
+  );
+
+
+  document.getElementById("bankName").value="";
+  document.getElementById("accountHolder").value="";
+  document.getElementById("accountNumber").value="";
+  document.getElementById("ifsc").value="";
+  document.getElementById("withdrawAmount").value="";
+
+
+  await loadCustomerData();
+
+}
+
+
+/* LOGOUT */
+async function logout(){
+
+  await supabaseClient.auth.signOut();
+
+  location.reload();
+
+}
+
+
+/* SECURITY HELPER */
 function escapeHtml(value){
 
   return String(value ?? "")
@@ -421,45 +919,24 @@ function escapeHtml(value){
     .replace(/>/g,"&gt;")
     .replace(/"/g,"&quot;")
     .replace(/'/g,"&#039;");
+
 }
 
 
-/* LOGOUT */
+/* AUTO LOGIN */
+(async function(){
 
-async function logout(){
+  const {
+    data:{session}
+  }=await supabaseClient.auth.getSession();
 
-  await supabaseClient.auth.signOut();
+  if(session){
 
-  currentProfile=null;
-
-  document.getElementById("app")
-    .classList.add("hidden");
-
-  document.getElementById("loginBox")
-    .classList.remove("hidden");
-
-  document.getElementById("email").value="";
-  document.getElementById("password").value="";
-}
-
-
-/* EXISTING SESSION */
-
-async function checkSession(){
-
-  const {data} =
-    await supabaseClient.auth.getSession();
-
-  if(data.session && data.session.user){
-
-    await loadProfile(
-      data.session.user.id
-    );
+    await loadCustomerData();
 
   }
-}
 
-checkSession();
+})();
 
 </script>
 
