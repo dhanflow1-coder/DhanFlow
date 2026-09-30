@@ -3,130 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DhanFlow Admin Panel</title>
-  <!-- Supabase CDN -->
+  <title>DhanFlow Admin Login</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, sans-serif; background: #f1f5f9; color: #0f172a; }
-    .hidden { display: none !important; }
-    button { cursor: pointer; }
-    
-    /* LOGIN PAGE */
-    #loginPage { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, #0f172a, #2563eb); }
-    .loginBox { width: 100%; max-width: 400px; background: white; padding: 30px; border-radius: 18px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
-    .logo { text-align: center; font-size: 32px; font-weight: bold; color: #2563eb; margin-bottom: 5px; }
-    .loginSubtitle { text-align: center; color: #64748b; margin-bottom: 25px; }
-    label { display: block; margin: 12px 0 6px; font-weight: bold; font-size: 14px; }
-    input, textarea, select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 9px; font-size: 15px; outline: none; margin-bottom: 10px;}
-    input:focus, textarea:focus, select:focus { border-color: #2563eb; }
-    .btn { border: 0; border-radius: 9px; padding: 12px 18px; color: white; background: #2563eb; font-weight: bold; font-size: 15px; width: 100%; margin-top: 18px; }
-    .btn:hover { opacity: 0.9; }
-    .message { margin-top: 15px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; white-space: pre-wrap; }
-
-    /* DASHBOARD */
-    .topbar { background: #0f172a; color: white; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
-    .topbarTitle { font-size: 22px; font-weight: bold; }
-    .logoutBtn { border: 0; background: #dc2626; color: white; padding: 9px 15px; border-radius: 8px; font-weight: bold; }
-    .container { width: 100%; max-width: 1200px; margin: auto; padding: 20px; }
+    body { margin: 0; font-family: Arial, sans-serif; background: #0f172a; display: flex; align-items: center; justify-content: center; height: 100vh; color: white; }
+    .box { background: white; padding: 30px; border-radius: 12px; width: 350px; color: #0f172a; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    h2 { text-align: center; color: #2563eb; margin-top: 0; }
+    label { display: block; margin: 10px 0 5px; font-weight: bold; font-size: 14px; }
+    input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box; margin-bottom: 15px; }
+    button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
   </style>
 </head>
 <body>
 
-<!-- ================= LOGIN PAGE ================= -->
-<div id="loginPage">
-  <div class="loginBox">
-    <div class="logo">DhanFlow Admin</div>
-    <div class="loginSubtitle">Secure Management Panel</div>
-    
-    <label>Email</label>
-    <input id="email" type="email" placeholder="admin@dhanflow.com">
-    
-    <label>Password</label>
-    <input id="password" type="password" placeholder="••••••••">
-    
-    <!-- সরাসরি onclick ফাংশন -->
-    <button type="button" class="btn" onclick="adminLogin()">Login</button>
-    
-    <div id="loginMessage" class="message"></div>
-  </div>
-</div>
-
-<!-- ================= ADMIN DASHBOARD ================= -->
-<div id="dashboard" class="hidden">
-  <div class="topbar">
-    <div class="topbarTitle">DhanFlow Control Center</div>
-    <button type="button" class="logoutBtn" onclick="adminLogout()">Logout</button>
-  </div>
-  <div class="container">
-    <h2>Welcome to Admin Dashboard!</h2>
-    <p>Successfully logged in.</p>
-  </div>
+<div class="box">
+  <h2>DhanFlow Admin</h2>
+  <label>Email</label>
+  <input type="email" id="email" placeholder="admin@dhanflow.com">
+  
+  <label>Password</label>
+  <input type="password" id="password" placeholder="••••••••">
+  
+  <button onclick="handleLogin()">Login</button>
 </div>
 
 <script>
-  // সুপাবেস কনফিগারেশন
-  const SUPABASE_URL = "https://oxwjnravklpcdhfxibya.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const supabaseUrl = "https://oxwjnravklpcdhfxibya.supabase.co";
+  const supabaseKey = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
+  const sb = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-  function showMsg(text, isSuccess = false) {
-    const msg = document.getElementById("loginMessage");
-    msg.style.display = "block";
-    msg.textContent = text;
-    msg.style.background = isSuccess ? "#dcfce7" : "#fee2e2";
-    msg.style.color = isSuccess ? "#166534" : "#991b1b";
-  }
+  async function handleLogin() {
+    alert("লগইন বাটন কাজ করছে!");
 
-  // লগইন ফাংশন
-  async function adminLogin() {
-    alert("লগইন বাটন কাজ করছে!"); // বাটন কাজ করছে কি না দেখার জন্য অ্যালার্ট
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-    const emailField = document.getElementById("email").value.trim();
-    const passwordField = document.getElementById("password").value;
-
-    if (!emailField || !passwordField) {
-      showMsg("দয়া করে ইমেইল এবং পাসওয়ার্ড দিন।");
+    if (!email || !password) {
+      alert("দয়া করে ইমেইল এবং পাসওয়ার্ড দিন!");
       return;
     }
 
-    showMsg("লগইন হচ্ছে, অপেক্ষা করুন...", true);
-
     try {
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email: emailField,
-        password: passwordField
-      });
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) throw error;
 
-      if (error) {
-        throw error;
-      }
-
-      // প্রোফাইল ও রোল চেক
-      const { data: profile, error: profError } = await supabaseClient
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .single();
-
-      if (profError || !profile || profile.role !== "admin") {
-        await supabaseClient.auth.signOut();
-        throw new Error("আপনার এই প্যানেলে ঢোকার অ্যাডমিন পারমিশন নেই!");
-      }
-
-      alert("লগইন সফল হয়েছে!");
-      document.getElementById("loginPage").classList.add("hidden");
-      document.getElementById("dashboard").classList.remove("hidden");
-
+      alert("লগইন সফল হয়েছে! আইডি: " + data.user.id);
     } catch (err) {
-      showMsg("এরর: " + err.message);
       alert("লগইন ফেইলড: " + err.message);
     }
-  }
-
-  function adminLogout() {
-    supabaseClient.auth.signOut();
-    location.reload();
   }
 </script>
 
