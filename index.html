@@ -411,40 +411,34 @@ function showMessage(elementId, message, success = false) {
 }
 
 /* ============================================
-   LOGIN FUNCTION
+   LOGIN FUNCTION (WITH ALERTS FOR TESTING)
 ============================================ */
 async function login() {
+  alert("Login function called!");
+
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
 
-  if (!email) {
-    showMessage("loginMessage", "Please enter your email.");
+  if (!email || !password) {
+    alert("Please enter email and password");
     return;
   }
-
-  if (!password) {
-    showMessage("loginMessage", "Please enter your password.");
-    return;
-  }
-
-  showMessage("loginMessage", "Logging in...", true);
 
   try {
+    alert("Sending request to Supabase...");
+    
     const result = await supabaseClient.auth.signInWithPassword({
       email: email,
       password: password
     });
 
     if (result.error) {
+      alert("Error: " + result.error.message);
       console.error("SUPABASE LOGIN ERROR:", result.error);
-      showMessage("loginMessage", "Login failed:\n" + result.error.message);
       return;
     }
 
-    if (!result.data.user) {
-      showMessage("loginMessage", "Login failed: user not found.");
-      return;
-    }
+    alert("Login successful! Checking profile...");
 
     const profileResult = await supabaseClient
       .from("profiles")
@@ -453,33 +447,34 @@ async function login() {
       .single();
 
     if (profileResult.error) {
-      console.error("PROFILE ERROR:", profileResult.error);
+      alert("Profile Error: " + profileResult.error.message);
       await supabaseClient.auth.signOut();
-      showMessage("loginMessage", "Profile error:\n" + profileResult.error.message);
       return;
     }
 
     const profile = profileResult.data;
 
     if (profile.role !== "admin") {
+      alert("Access denied: Not an admin account");
       await supabaseClient.auth.signOut();
-      showMessage("loginMessage", "This account is not an admin account.");
       return;
     }
 
     if (profile.status !== "active") {
+      alert("Account is blocked");
       await supabaseClient.auth.signOut();
-      showMessage("loginMessage", "This admin account is blocked.");
       return;
     }
 
+    alert("Opening dashboard...");
     document.getElementById("loginPage").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
 
     await loadDashboard();
+
   } catch (error) {
+    alert("Catch Error: " + error.message);
     console.error("LOGIN ERROR:", error);
-    showMessage("loginMessage", "Unexpected error:\n" + (error.message || "Unknown error"));
   }
 }
 
@@ -548,7 +543,7 @@ async function loadCustomers() {
 }
 
 /* ============================================
-   EVENT LISTENERS (বাটনগুলোর কানেকশন)
+   EVENT LISTENERS
 ============================================ */
 document.getElementById("loginButton").addEventListener("click", login);
 
