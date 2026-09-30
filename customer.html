@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DhanFlow Customer</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#08101f;
+  color:#fff;
+}
+.container{
+  width:94%;
+  max-width:850px;
+  margin:25px auto;
+}
+.card{
+  background:#121d33;
+  border:1px solid #263754;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:18px;
+}
+h1,h2,h3{margin-top:0}
+input,select,textarea{
+  width:100%;
+  padding:13px;
+  margin:7px 0;
+  border-radius:9px;
+  border:1px solid #344765;
+  background:#081426;
+  color:#fff;
+  font-size:15px;
+}
+button{
+  border:0;
+  border-radius:8px;
+  padding:12px 18px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.primary{background:#2878f0;color:#fff}
+.green{background:#16a34a;color:#fff}
+.red{background:#e53935;color:#fff}
+.logout{float:right;background:#e53935;color:#fff}
+.hidden{display:none}
+.message{
+  padding:10px;
+  margin-top:10px;
+  background:#1d2a42;
+  border-radius:8px;
+}
+.balance{
+  font-size:34px;
+  font-weight:bold;
+  color:#4ade80;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th,td{
+  padding:10px 7px;
+  border-bottom:1px solid #293952;
+  text-align:left;
+  font-size:13px;
+}
+th{background:#1a2943}
+.status{
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- LOGIN -->
+<div id="loginBox" class="card">
+  <h1>DhanFlow Customer</h1>
+  <p>Customer Login</p>
+
+  <input id="email" type="email" placeholder="Customer Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <button class="primary" onclick="login()">Login</button>
+
+  <div id="loginMessage" class="message hidden"></div>
+</div>
+
+
+<!-- CUSTOMER APP -->
+<div id="app" class="hidden">
+
+  <div class="card">
+    <button class="logout" onclick="logout()">Logout</button>
+    <h1>DhanFlow</h1>
+    <p id="welcome">Customer</p>
+  </div>
+
+  <!-- BALANCE -->
+  <div class="card">
+    <h3>Available Balance</h3>
+    <div class="balance" id="balance">₹0.00</div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="card">
+    <h2>My Profile</h2>
+
+    <p>User ID: <b id="userId">-</b></p>
+    <p>Username: <b id="username">-</b></p>
+    <p>Status: <b id="status">-</b></p>
+
+    <button class="primary" onclick="loadDashboard()">
+      Refresh
+    </button>
+
+    <div id="dashMessage" class="message hidden"></div>
+  </div>
+
+
+  <!-- TRANSACTION HISTORY -->
+  <div class="card">
+    <h2>Transaction History</h2>
+
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Transaction ID</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody id="transactions">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+"https://oxwjnravklpcdhfxibya.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
+
+const supabaseClient =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+let currentProfile = null;
+
+
+function showMessage(id,text){
+  const el=document.getElementById(id);
+  el.textContent=text;
+  el.classList.remove("hidden");
+}
+
+
+function hideMessage(id){
+  document.getElementById(id).classList.add("hidden");
+}
+
+
+/* LOGIN */
+
+async function login(){
+
+  hideMessage("loginMessage");
+
+  const email=
+    document.getElementById("email").value.trim();
+
+  const password=
+    document.getElementById("password").value;
+
+  if(!email || !password){
+    showMessage(
+      "loginMessage",
+      "Email এবং Password দিন।"
+    );
+    return;
+  }
+
+  const {data,error} =
+    await supabaseClient.auth.signInWithPassword({
+      email:email,
+      password:password
+    });
+
+  if(error){
+    showMessage(
+      "loginMessage",
+      "Login failed: "+error.message
+    );
+    return;
+  }
+
+  if(!data.user){
+    showMessage(
+      "loginMessage",
+      "User পাওয়া যায়নি।"
+    );
+    return;
+  }
+
+  await loadProfile(data.user.id);
+}
+
+
+/* LOAD PROFILE */
+
+async function loadProfile(userId){
+
+  const {data,error} =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id",userId)
+      .single();
+
+  if(error){
+
+    showMessage(
+      "loginMessage",
+      "Profile load failed: "+error.message
+    );
+
+    await supabaseClient.auth.signOut();
+    return;
+  }
+
+  if(data.role !== "customer"){
+
+    showMessage(
+      "loginMessage",
+      "এই Login Customer account-এর জন্য নয়।"
+    );
+
+    await supabaseClient.auth.signOut();
+    return;
+  }
+
+  if(data.status !== "active"){
+
+    showMessage(
+      "loginMessage",
+      "আপনার account বর্তমানে blocked।"
+    );
+
+    await supabaseClient.auth.signOut();
+    return;
+  }
+
+  currentProfile=data;
+
+  document.getElementById("loginBox")
+    .classList.add("hidden");
+
+  document.getElementById("app")
+    .classList.remove("hidden");
+
+  document.getElementById("userId")
+    .textContent=data.user_id;
+
+  document.getElementById("username")
+    .textContent=data.username;
+
+  document.getElementById("status")
+    .textContent=data.status;
+
+  document.getElementById("welcome")
+    .textContent=
+      "Welcome, "+data.username;
+
+  document.getElementById("balance")
+    .textContent=
+      "₹"+Number(data.balance).toFixed(2);
+
+  await loadTransactions();
+}
+
+
+/* DASHBOARD REFRESH */
+
+async function loadDashboard(){
+
+  if(!currentProfile){
+    return;
+  }
+
+  const {data,error} =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq("id",currentProfile.id)
+      .single();
+
+  if(error){
+
+    showMessage(
+      "dashMessage",
+      "Dashboard update failed: "+error.message
+    );
+
+    return;
+  }
+
+  currentProfile=data;
+
+  document.getElementById("balance")
+    .textContent=
+      "₹"+Number(data.balance).toFixed(2);
+
+  document.getElementById("status")
+    .textContent=data.status;
+
+  showMessage(
+    "dashMessage",
+    "Dashboard updated."
+  );
+
+  await loadTransactions();
+}
+
+
+/* TRANSACTIONS */
+
+async function loadTransactions(){
+
+  const tbody=
+    document.getElementById("transactions");
+
+  tbody.innerHTML="";
+
+  const {data,error} =
+    await supabaseClient
+      .from("transactions")
+      .select("*")
+      .or(
+        "sender_id.eq."+currentProfile.id+
+        ",receiver_id.eq."+currentProfile.id
+      )
+      .order("created_at",{ascending:false});
+
+  if(error){
+
+    tbody.innerHTML=
+      `<tr>
+        <td colspan="5">
+          Unable to load transactions
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+  if(!data || data.length===0){
+
+    tbody.innerHTML=
+      `<tr>
+        <td colspan="5">
+          No transactions yet
+        </td>
+      </tr>`;
+
+    return;
+  }
+
+  data.forEach(tx=>{
+
+    const tr=document.createElement("tr");
+
+    tr.innerHTML=`
+      <td>${escapeHtml(tx.transaction_id)}</td>
+      <td>₹${Number(tx.amount).toFixed(2)}</td>
+      <td>${escapeHtml(tx.type)}</td>
+      <td class="status">
+        ${escapeHtml(tx.status)}
+      </td>
+      <td>
+        ${new Date(tx.created_at).toLocaleString()}
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+
+  });
+}
+
+
+/* SECURITY */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+
+/* LOGOUT */
+
+async function logout(){
+
+  await supabaseClient.auth.signOut();
+
+  currentProfile=null;
+
+  document.getElementById("app")
+    .classList.add("hidden");
+
+  document.getElementById("loginBox")
+    .classList.remove("hidden");
+
+  document.getElementById("email").value="";
+  document.getElementById("password").value="";
+}
+
+
+/* EXISTING SESSION */
+
+async function checkSession(){
+
+  const {data} =
+    await supabaseClient.auth.getSession();
+
+  if(data.session && data.session.user){
+
+    await loadProfile(
+      data.session.user.id
+    );
+
+  }
+}
+
+checkSession();
+
+</script>
+
+</body>
+</html>
