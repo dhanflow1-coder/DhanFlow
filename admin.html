@@ -1,30 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
 <title>DhanFlow Admin Panel</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
 
 body{
   margin:0;
-  font-family:Arial, sans-serif;
+  font-family:Arial,sans-serif;
   background:#0b1220;
   color:#fff;
 }
 
 .container{
   width:100%;
-  max-width:1100px;
+  max-width:1150px;
   margin:auto;
-  padding:20px;
+  padding:18px;
 }
 
 .card{
@@ -39,7 +46,9 @@ h1,h2,h3{
   margin-top:0;
 }
 
-input,select,textarea{
+input,
+select,
+textarea{
   width:100%;
   padding:13px;
   margin:7px 0 12px;
@@ -50,13 +59,23 @@ input,select,textarea{
   font-size:15px;
 }
 
+textarea{
+  min-height:130px;
+  resize:vertical;
+}
+
 button{
   border:0;
   border-radius:9px;
-  padding:12px 18px;
+  padding:11px 16px;
   cursor:pointer;
-  font-size:15px;
+  font-size:14px;
   font-weight:bold;
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
 }
 
 .primary{
@@ -97,6 +116,7 @@ button{
   padding:12px;
   border-radius:8px;
   background:#1e293b;
+  line-height:1.5;
 }
 
 .login-box{
@@ -137,13 +157,15 @@ button{
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:700px;
+  min-width:850px;
 }
 
-th,td{
+th,
+td{
   padding:11px;
   border-bottom:1px solid #29364c;
   text-align:left;
+  vertical-align:top;
 }
 
 th{
@@ -165,33 +187,138 @@ th{
   margin-top:30px;
 }
 
+/* MODAL */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:15px;
+  z-index:9999;
+}
+
+.modal-box{
+  width:100%;
+  max-width:520px;
+  background:#121c2e;
+  border:1px solid #33445f;
+  border-radius:16px;
+  padding:22px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.close-btn{
+  background:#334155;
+  color:white;
+  font-size:18px;
+  padding:8px 12px;
+}
+
+.recipient-box{
+  background:#172338;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:15px;
+}
+
+.message-history{
+  max-height:300px;
+  overflow-y:auto;
+  margin-top:15px;
+}
+
+.message-item{
+  background:#172338;
+  border:1px solid #2b3b55;
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:10px;
+}
+
+.message-item strong{
+  display:block;
+  margin-bottom:5px;
+}
+
+.unread{
+  border-left:4px solid #2563eb;
+}
+
+.read{
+  opacity:.8;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:20px;
+  font-size:11px;
+  background:#334155;
+}
+
 @media(max-width:700px){
-  .stats{
-    grid-template-columns:repeat(2,1fr);
-  }
 
   .container{
-    padding:12px;
+    padding:10px;
   }
 
   .card{
     padding:15px;
   }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+  }
+
+  .stat{
+    padding:14px;
+  }
+
+  .stat strong{
+    font-size:22px;
+  }
+
+  button{
+    padding:10px 12px;
+  }
+
 }
+
 </style>
+
 </head>
+
 
 <body>
 
-<!-- LOGIN -->
+
+<!-- =========================
+     LOGIN
+========================= -->
+
 <div id="loginPage" class="container">
 
   <div class="card login-box">
 
     <h1>DhanFlow</h1>
-    <p class="small">Admin Login</p>
+
+    <p class="small">
+      Admin Login
+    </p>
 
     <label>Email</label>
+
     <input
       id="loginEmail"
       type="email"
@@ -200,6 +327,7 @@ th{
     >
 
     <label>Password</label>
+
     <input
       id="loginPassword"
       type="password"
@@ -216,23 +344,40 @@ th{
       Login
     </button>
 
-    <div id="loginMessage" class="message hidden"></div>
+    <div
+      id="loginMessage"
+      class="message hidden"
+    ></div>
 
   </div>
 
 </div>
 
 
-<!-- ADMIN APP -->
-<div id="adminApp" class="container hidden">
+<!-- =========================
+     ADMIN APP
+========================= -->
+
+<div
+  id="adminApp"
+  class="container hidden"
+>
+
+  <!-- TOP BAR -->
 
   <div class="card">
 
     <div class="topbar">
 
       <div>
+
         <h1>DhanFlow Admin</h1>
-        <div id="adminInfo" class="small"></div>
+
+        <div
+          id="adminInfo"
+          class="small"
+        ></div>
+
       </div>
 
       <button
@@ -249,32 +394,65 @@ th{
 
 
   <!-- STATS -->
+
   <div class="stats">
 
     <div class="stat">
-      <div class="small">Customers</div>
-      <strong id="statCustomers">0</strong>
+
+      <div class="small">
+        Customers
+      </div>
+
+      <strong id="statCustomers">
+        0
+      </strong>
+
     </div>
 
-    <div class="stat">
-      <div class="small">Total Balance</div>
-      <strong id="statBalance">₹0.00</strong>
-    </div>
 
     <div class="stat">
-      <div class="small">Transactions</div>
-      <strong id="statTransactions">0</strong>
+
+      <div class="small">
+        Total Balance
+      </div>
+
+      <strong id="statBalance">
+        ₹0.00
+      </strong>
+
     </div>
 
+
     <div class="stat">
-      <div class="small">Withdrawals</div>
-      <strong id="statWithdrawals">0</strong>
+
+      <div class="small">
+        Transactions
+      </div>
+
+      <strong id="statTransactions">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="stat">
+
+      <div class="small">
+        Withdrawals
+      </div>
+
+      <strong id="statWithdrawals">
+        0
+      </strong>
+
     </div>
 
   </div>
 
 
   <!-- REFRESH -->
+
   <div class="card">
 
     <button
@@ -282,18 +460,24 @@ th{
       type="button"
       onclick="loadDashboard()"
     >
-      Refresh Dashboard
+      🔄 Refresh Dashboard
     </button>
 
-    <div id="appMessage" class="message hidden"></div>
+    <div
+      id="appMessage"
+      class="message hidden"
+    ></div>
 
   </div>
 
 
   <!-- CREATE CUSTOMER -->
+
   <div class="card">
 
-    <h2>Create Customer</h2>
+    <h2>
+      Create Customer
+    </h2>
 
     <input
       id="newUserId"
@@ -337,9 +521,12 @@ th{
 
 
   <!-- BALANCE ADJUSTMENT -->
+
   <div class="card">
 
-    <h2>Balance Adjustment</h2>
+    <h2>
+      Balance Adjustment
+    </h2>
 
     <input
       id="adjustUserId"
@@ -370,28 +557,42 @@ th{
 
 
   <!-- CUSTOMERS -->
+
   <div class="card">
 
-    <h2>Customers</h2>
+    <h2>
+      Customers
+    </h2>
 
     <div class="table-wrap">
 
       <table>
 
         <thead>
+
           <tr>
+
             <th>User ID</th>
+
             <th>Username</th>
+
             <th>Role</th>
+
             <th>Balance</th>
+
             <th>Status</th>
+
             <th>Created</th>
+
             <th>Action</th>
+
           </tr>
+
         </thead>
 
-        <tbody id="customersBody">
-        </tbody>
+        <tbody
+          id="customersBody"
+        ></tbody>
 
       </table>
 
@@ -401,27 +602,40 @@ th{
 
 
   <!-- TRANSACTIONS -->
+
   <div class="card">
 
-    <h2>Transactions</h2>
+    <h2>
+      Transactions
+    </h2>
 
     <div class="table-wrap">
 
       <table>
 
         <thead>
+
           <tr>
+
             <th>Transaction ID</th>
+
             <th>Amount</th>
+
             <th>Type</th>
+
             <th>Status</th>
+
             <th>Date</th>
+
             <th>Action</th>
+
           </tr>
+
         </thead>
 
-        <tbody id="transactionsBody">
-        </tbody>
+        <tbody
+          id="transactionsBody"
+        ></tbody>
 
       </table>
 
@@ -431,29 +645,44 @@ th{
 
 
   <!-- WITHDRAWALS -->
+
   <div class="card">
 
-    <h2>Bank Withdrawals</h2>
+    <h2>
+      Bank Withdrawals
+    </h2>
 
     <div class="table-wrap">
 
       <table>
 
         <thead>
+
           <tr>
+
             <th>Withdrawal ID</th>
+
             <th>Amount</th>
+
             <th>Bank</th>
+
             <th>Account Holder</th>
+
             <th>IFSC</th>
+
             <th>Status</th>
+
             <th>Date</th>
+
             <th>Action</th>
+
           </tr>
+
         </thead>
 
-        <tbody id="withdrawalsBody">
-        </tbody>
+        <tbody
+          id="withdrawalsBody"
+        ></tbody>
 
       </table>
 
@@ -463,26 +692,38 @@ th{
 
 
   <!-- ADMIN LOG -->
+
   <div class="card">
 
-    <h2>Admin Action Log</h2>
+    <h2>
+      Admin Action Log
+    </h2>
 
     <div class="table-wrap">
 
       <table>
 
         <thead>
+
           <tr>
+
             <th>Action ID</th>
+
             <th>Action</th>
+
             <th>Amount</th>
+
             <th>Reason</th>
+
             <th>Date</th>
+
           </tr>
+
         </thead>
 
-        <tbody id="actionsBody">
-        </tbody>
+        <tbody
+          id="actionsBody"
+        ></tbody>
 
       </table>
 
@@ -493,11 +734,97 @@ th{
 </div>
 
 
+<!-- =========================
+     MESSAGE MODAL
+========================= -->
+
+<div
+  id="messageModal"
+  class="modal hidden"
+>
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <h2>
+        💬 Send Personal Message
+      </h2>
+
+      <button
+        class="close-btn"
+        type="button"
+        onclick="closeMessageModal()"
+      >
+        ✕
+      </button>
+
+    </div>
+
+
+    <div
+      id="recipientBox"
+      class="recipient-box"
+    >
+      Loading user...
+    </div>
+
+
+    <label>
+      Subject
+    </label>
+
+    <input
+      id="messageSubject"
+      type="text"
+      maxlength="150"
+      placeholder="Message subject"
+    >
+
+
+    <label>
+      Message
+    </label>
+
+    <textarea
+      id="messageText"
+      maxlength="5000"
+      placeholder="Write your personal message..."
+    ></textarea>
+
+
+    <button
+      id="sendMessageButton"
+      class="primary full"
+      type="button"
+      onclick="sendPersonalMessage()"
+    >
+      📤 Send Message
+    </button>
+
+
+    <div
+      id="messageSendStatus"
+      class="message hidden"
+    ></div>
+
+
+    <div
+      id="messageHistory"
+      class="message-history"
+    ></div>
+
+  </div>
+
+</div>
+
+
+
 <script>
 
-/* =========================
+/* =====================================================
    SUPABASE CONFIG
-========================= */
+===================================================== */
 
 const SUPABASE_URL =
 "https://oxwjnravklpcdhfxibya.supabase.co";
@@ -508,9 +835,27 @@ const SUPABASE_KEY =
 let supabaseClient = null;
 
 
-/* =========================
-   INITIALIZE
-========================= */
+/* =====================================================
+   MESSAGE HELPER
+===================================================== */
+
+function showMessage(id,text){
+
+  const el =
+    document.getElementById(id);
+
+  if(!el) return;
+
+  el.textContent = text;
+
+  el.classList.remove("hidden");
+
+}
+
+
+/* =====================================================
+   SUPABASE INITIALIZE
+===================================================== */
 
 function initSupabase(){
 
@@ -524,6 +869,7 @@ function initSupabase(){
     return false;
   }
 
+
   if(!supabaseClient){
 
     supabaseClient =
@@ -531,42 +877,36 @@ function initSupabase(){
         SUPABASE_URL,
         SUPABASE_KEY
       );
+
   }
 
+
   return true;
+
 }
 
 
-/* =========================
-   MESSAGE
-========================= */
-
-function showMessage(id,text){
-
-  const el = document.getElementById(id);
-
-  if(!el) return;
-
-  el.textContent = text;
-  el.classList.remove("hidden");
-}
-
-
-/* =========================
+/* =====================================================
    LOGIN
-========================= */
+===================================================== */
 
 async function login(){
 
-  console.log("LOGIN FUNCTION STARTED");
-
   if(!initSupabase()) return;
 
+
   const email =
-    document.getElementById("loginEmail").value.trim();
+    document
+      .getElementById("loginEmail")
+      .value
+      .trim();
+
 
   const password =
-    document.getElementById("loginPassword").value;
+    document
+      .getElementById("loginPassword")
+      .value;
+
 
   if(!email){
 
@@ -576,7 +916,9 @@ async function login(){
     );
 
     return;
+
   }
+
 
   if(!password){
 
@@ -586,14 +928,21 @@ async function login(){
     );
 
     return;
+
   }
 
 
   const button =
-    document.getElementById("loginButton");
+    document.getElementById(
+      "loginButton"
+    );
+
 
   button.disabled = true;
-  button.textContent = "Logging in...";
+
+  button.textContent =
+    "Logging in...";
+
 
   showMessage(
     "loginMessage",
@@ -604,15 +953,21 @@ async function login(){
   try{
 
     const result =
-      await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
+      await supabaseClient
+      .auth
+      .signInWithPassword({
+
+        email:email,
+
+        password:password
+
       });
 
 
     if(result.error){
 
       throw result.error;
+
     }
 
 
@@ -625,13 +980,16 @@ async function login(){
       throw new Error(
         "User পাওয়া যায়নি।"
       );
+
     }
 
 
     const profileResult =
       await supabaseClient
       .from("profiles")
-      .select("id,user_id,username,role,balance,status")
+      .select(
+        "id,user_id,username,role,balance,status"
+      )
       .eq("id",user.id)
       .single();
 
@@ -642,6 +1000,7 @@ async function login(){
         "Admin profile পাওয়া যায়নি: " +
         profileResult.error.message
       );
+
     }
 
 
@@ -651,46 +1010,55 @@ async function login(){
 
     if(profile.role !== "admin"){
 
-      await supabaseClient.auth.signOut();
+      await supabaseClient
+        .auth
+        .signOut();
 
       throw new Error(
         "এই account-এর admin permission নেই।"
       );
+
     }
 
 
     if(profile.status !== "active"){
 
-      await supabaseClient.auth.signOut();
+      await supabaseClient
+        .auth
+        .signOut();
 
       throw new Error(
         "Admin account blocked/inactive।"
       );
+
     }
 
 
-    document.getElementById(
-      "loginPage"
-    ).classList.add("hidden");
+    document
+      .getElementById("loginPage")
+      .classList
+      .add("hidden");
 
 
-    document.getElementById(
-      "adminApp"
-    ).classList.remove("hidden");
+    document
+      .getElementById("adminApp")
+      .classList
+      .remove("hidden");
 
 
-    document.getElementById(
-      "adminInfo"
-    ).textContent =
-      "Logged in as: " +
-      profile.username +
-      " | " +
-      profile.user_id;
+    document
+      .getElementById("adminInfo")
+      .textContent =
+        "Logged in as: " +
+        profile.username +
+        " | " +
+        profile.user_id;
 
 
-    document.getElementById(
-      "loginMessage"
-    ).classList.add("hidden");
+    document
+      .getElementById("loginMessage")
+      .classList
+      .add("hidden");
 
 
     await loadDashboard();
@@ -698,54 +1066,74 @@ async function login(){
   }
   catch(error){
 
-    console.error("LOGIN ERROR:",error);
+    console.error(
+      "LOGIN ERROR:",
+      error
+    );
+
 
     showMessage(
       "loginMessage",
       "Login failed: " +
-      (error.message || "Unknown error")
+      (error.message ||
+      "Unknown error")
     );
 
   }
   finally{
 
     button.disabled = false;
-    button.textContent = "Login";
+
+    button.textContent =
+      "Login";
+
   }
 
 }
 
 
-/* =========================
+/* =====================================================
    LOGOUT
-========================= */
+===================================================== */
 
 async function logout(){
 
-  if(!initSupabase()) return;
+  if(!initSupabase())
+    return;
 
-  await supabaseClient.auth.signOut();
+
+  await supabaseClient
+    .auth
+    .signOut();
+
 
   location.reload();
+
 }
 
 
-/* =========================
+/* =====================================================
    ADMIN API
-========================= */
+===================================================== */
 
-async function adminApi(action,data={}){
+async function adminApi(
+  action,
+  data={}
+){
 
   if(!initSupabase()){
 
     throw new Error(
       "Supabase initialize হয়নি।"
     );
+
   }
 
 
   const sessionResult =
-    await supabaseClient.auth.getSession();
+    await supabaseClient
+    .auth
+    .getSession();
 
 
   const session =
@@ -757,28 +1145,41 @@ async function adminApi(action,data={}){
     throw new Error(
       "Admin session পাওয়া যায়নি। আবার Login করুন।"
     );
+
   }
 
 
   const response =
     await fetch(
+
       SUPABASE_URL +
       "/functions/v1/admin-api",
+
       {
+
         method:"POST",
 
         headers:{
-          "Content-Type":"application/json",
+
+          "Content-Type":
+            "application/json",
+
           "Authorization":
             "Bearer " +
             session.access_token
+
         },
 
         body:JSON.stringify({
+
           action:action,
+
           data:data
+
         })
+
       }
+
     );
 
 
@@ -788,10 +1189,13 @@ async function adminApi(action,data={}){
 
   let result={};
 
+
   try{
 
     result =
-      text ? JSON.parse(text) : {};
+      text
+      ? JSON.parse(text)
+      : {};
 
   }
   catch(e){
@@ -799,17 +1203,21 @@ async function adminApi(action,data={}){
     result={
       raw:text
     };
+
   }
 
 
   if(!response.ok){
 
     throw new Error(
+
       result.error ||
       result.message ||
       result.raw ||
       "Admin API error"
+
     );
+
   }
 
 
@@ -818,16 +1226,18 @@ async function adminApi(action,data={}){
     throw new Error(
       result.error
     );
+
   }
 
 
   return result;
+
 }
 
 
-/* =========================
-   DASHBOARD
-========================= */
+/* =====================================================
+   LOAD DASHBOARD
+===================================================== */
 
 async function loadDashboard(){
 
@@ -840,11 +1250,14 @@ async function loadDashboard(){
 
 
     const result =
-      await adminApi("dashboard");
+      await adminApi(
+        "dashboard"
+      );
 
 
     const data =
-      result.data || result;
+      result.data ||
+      result;
 
 
     const profiles =
@@ -869,51 +1282,74 @@ async function loadDashboard(){
       [];
 
 
-    renderCustomers(profiles);
+    renderCustomers(
+      profiles
+    );
 
-    renderTransactions(transactions);
 
-    renderWithdrawals(withdrawals);
+    renderTransactions(
+      transactions
+    );
 
-    renderActions(actions);
+
+    renderWithdrawals(
+      withdrawals
+    );
+
+
+    renderActions(
+      actions
+    );
 
 
     const customers =
       profiles.filter(
-        x => x.role === "customer"
+        x =>
+          x.role === "customer"
       );
 
 
     const totalBalance =
       customers.reduce(
-        (sum,x) =>
-          sum + Number(x.balance || 0),
+        (sum,x)=>
+          sum +
+          Number(
+            x.balance || 0
+          ),
         0
       );
 
 
-    document.getElementById(
-      "statCustomers"
-    ).textContent =
-      customers.length;
+    document
+      .getElementById(
+        "statCustomers"
+      )
+      .textContent =
+        customers.length;
 
 
-    document.getElementById(
-      "statBalance"
-    ).textContent =
-      money(totalBalance);
+    document
+      .getElementById(
+        "statBalance"
+      )
+      .textContent =
+        money(totalBalance);
 
 
-    document.getElementById(
-      "statTransactions"
-    ).textContent =
-      transactions.length;
+    document
+      .getElementById(
+        "statTransactions"
+      )
+      .textContent =
+        transactions.length;
 
 
-    document.getElementById(
-      "statWithdrawals"
-    ).textContent =
-      withdrawals.length;
+    document
+      .getElementById(
+        "statWithdrawals"
+      )
+      .textContent =
+        withdrawals.length;
 
 
     showMessage(
@@ -926,54 +1362,75 @@ async function loadDashboard(){
 
     console.error(error);
 
+
     showMessage(
       "appMessage",
       "Dashboard error: " +
       error.message
     );
+
   }
 
 }
 
 
-/* =========================
+/* =====================================================
    CREATE CUSTOMER
-========================= */
+===================================================== */
 
 async function createCustomer(){
 
   const user_id =
-    document.getElementById(
-      "newUserId"
-    ).value.trim();
+    document
+      .getElementById(
+        "newUserId"
+      )
+      .value
+      .trim();
+
 
   const username =
-    document.getElementById(
-      "newUsername"
-    ).value.trim();
+    document
+      .getElementById(
+        "newUsername"
+      )
+      .value
+      .trim();
+
 
   const email =
-    document.getElementById(
-      "newEmail"
-    ).value.trim();
+    document
+      .getElementById(
+        "newEmail"
+      )
+      .value
+      .trim();
+
 
   const password =
-    document.getElementById(
-      "newPassword"
-    ).value;
+    document
+      .getElementById(
+        "newPassword"
+      )
+      .value;
+
 
   const initial_balance =
     Number(
-      document.getElementById(
-        "newBalance"
-      ).value || 0
+      document
+        .getElementById(
+          "newBalance"
+        )
+        .value || 0
     );
 
 
-  if(!user_id ||
-     !username ||
-     !email ||
-     !password){
+  if(
+    !user_id ||
+    !username ||
+    !email ||
+    !password
+  ){
 
     showMessage(
       "appMessage",
@@ -981,6 +1438,7 @@ async function createCustomer(){
     );
 
     return;
+
   }
 
 
@@ -992,44 +1450,59 @@ async function createCustomer(){
     );
 
 
-    const result =
-      await adminApi(
-        "create_customer",
-        {
-          user_id,
-          username,
-          email,
-          password,
-          initial_balance
-        }
-      );
+    await adminApi(
+      "create_customer",
+      {
+
+        user_id,
+        username,
+        email,
+        password,
+        initial_balance
+
+      }
+    );
 
 
     showMessage(
       "appMessage",
-      "Customer সফলভাবে তৈরি হয়েছে।"
+      "✅ Customer সফলভাবে তৈরি হয়েছে।"
     );
 
 
-    document.getElementById(
-      "newUserId"
-    ).value="";
+    document
+      .getElementById(
+        "newUserId"
+      )
+      .value="";
 
-    document.getElementById(
-      "newUsername"
-    ).value="";
 
-    document.getElementById(
-      "newEmail"
-    ).value="";
+    document
+      .getElementById(
+        "newUsername"
+      )
+      .value="";
 
-    document.getElementById(
-      "newPassword"
-    ).value="";
 
-    document.getElementById(
-      "newBalance"
-    ).value="";
+    document
+      .getElementById(
+        "newEmail"
+      )
+      .value="";
+
+
+    document
+      .getElementById(
+        "newPassword"
+      )
+      .value="";
+
+
+    document
+      .getElementById(
+        "newBalance"
+      )
+      .value="";
 
 
     await loadDashboard();
@@ -1037,40 +1510,49 @@ async function createCustomer(){
   }
   catch(error){
 
-    console.error(error);
-
     showMessage(
       "appMessage",
       "Customer create error: " +
       error.message
     );
+
   }
 
 }
 
 
-/* =========================
+/* =====================================================
    BALANCE ADJUSTMENT
-========================= */
+===================================================== */
 
 async function adjustBalance(){
 
   const userId =
-    document.getElementById(
-      "adjustUserId"
-    ).value.trim();
+    document
+      .getElementById(
+        "adjustUserId"
+      )
+      .value
+      .trim();
+
 
   const amount =
     Number(
-      document.getElementById(
-        "adjustAmount"
-      ).value
+      document
+        .getElementById(
+          "adjustAmount"
+        )
+        .value
     );
 
+
   const reason =
-    document.getElementById(
-      "adjustReason"
-    ).value.trim();
+    document
+      .getElementById(
+        "adjustReason"
+      )
+      .value
+      .trim();
 
 
   if(!userId){
@@ -1081,6 +1563,7 @@ async function adjustBalance(){
     );
 
     return;
+
   }
 
 
@@ -1092,6 +1575,7 @@ async function adjustBalance(){
     );
 
     return;
+
   }
 
 
@@ -1100,30 +1584,42 @@ async function adjustBalance(){
     await adminApi(
       "adjust_balance",
       {
+
         user_id:userId,
+
         amount:amount,
+
         reason:reason
+
       }
     );
 
 
     showMessage(
       "appMessage",
-      "Balance successfully adjusted."
+      "✅ Balance successfully adjusted."
     );
 
 
-    document.getElementById(
-      "adjustUserId"
-    ).value="";
+    document
+      .getElementById(
+        "adjustUserId"
+      )
+      .value="";
 
-    document.getElementById(
-      "adjustAmount"
-    ).value="";
 
-    document.getElementById(
-      "adjustReason"
-    ).value="";
+    document
+      .getElementById(
+        "adjustAmount"
+      )
+      .value="";
+
+
+    document
+      .getElementById(
+        "adjustReason"
+      )
+      .value="";
 
 
     await loadDashboard();
@@ -1136,14 +1632,15 @@ async function adjustBalance(){
       "Balance adjustment error: " +
       error.message
     );
+
   }
 
 }
 
 
-/* =========================
+/* =====================================================
    USER STATUS
-========================= */
+===================================================== */
 
 async function changeUserStatus(
   userId,
@@ -1155,12 +1652,16 @@ async function changeUserStatus(
     await adminApi(
       "user_status",
       {
+
         user_id:userId,
+
         status:status,
+
         reason:
           status === "blocked"
           ? "Blocked by admin"
           : "Unblocked by admin"
+
       }
     );
 
@@ -1175,14 +1676,15 @@ async function changeUserStatus(
       "Status update error: " +
       error.message
     );
+
   }
 
 }
 
 
-/* =========================
-   TRANSACTION STATUS
-========================= */
+/* =====================================================
+   TRANSFER STATUS
+===================================================== */
 
 async function changeTransferStatus(
   transactionId,
@@ -1200,9 +1702,14 @@ async function changeTransferStatus(
     await adminApi(
       "transfer_status",
       {
-        transaction_id:transactionId,
+
+        transaction_id:
+          transactionId,
+
         status:status,
+
         note:note
+
       }
     );
 
@@ -1217,14 +1724,15 @@ async function changeTransferStatus(
       "Transaction update error: " +
       error.message
     );
+
   }
 
 }
 
 
-/* =========================
+/* =====================================================
    WITHDRAWAL STATUS
-========================= */
+===================================================== */
 
 async function changeWithdrawalStatus(
   withdrawalId,
@@ -1242,9 +1750,14 @@ async function changeWithdrawalStatus(
     await adminApi(
       "withdrawal_status",
       {
-        withdrawal_id:withdrawalId,
+
+        withdrawal_id:
+          withdrawalId,
+
         status:status,
+
         note:note
+
       }
     );
 
@@ -1259,16 +1772,19 @@ async function changeWithdrawalStatus(
       "Withdrawal update error: " +
       error.message
     );
+
   }
 
 }
 
 
-/* =========================
+/* =====================================================
    RENDER CUSTOMERS
-========================= */
+===================================================== */
 
-function renderCustomers(rows){
+function renderCustomers(
+  rows
+){
 
   const body =
     document.getElementById(
@@ -1282,7 +1798,9 @@ function renderCustomers(rows){
   rows.forEach(row=>{
 
     const tr =
-      document.createElement("tr");
+      document.createElement(
+        "tr"
+      );
 
 
     const statusButton =
@@ -1292,7 +1810,10 @@ function renderCustomers(rows){
 
       `<button
         class="danger"
-        onclick="changeUserStatus('${row.id}','blocked')"
+        onclick="changeUserStatus(
+          '${row.id}',
+          'blocked'
+        )"
       >
         Block
       </button>`
@@ -1301,30 +1822,70 @@ function renderCustomers(rows){
 
       `<button
         class="success"
-        onclick="changeUserStatus('${row.id}','active')"
+        onclick="changeUserStatus(
+          '${row.id}',
+          'active'
+        )"
       >
         Unblock
       </button>`;
 
 
+    const messageButton =
+      row.role === "customer"
+
+      ?
+
+      `<button
+        class="primary"
+        onclick="openMessageModal(
+          '${row.id}'
+        )"
+      >
+        💬 Message
+      </button>`
+
+      :
+
+      "";
+
+
     tr.innerHTML=`
 
-      <td>${esc(row.user_id)}</td>
-
-      <td>${esc(row.username)}</td>
-
-      <td>${esc(row.role)}</td>
-
-      <td>${money(row.balance)}</td>
-
-      <td>${esc(row.status)}</td>
-
-      <td>${formatDate(row.created_at)}</td>
+      <td>
+        ${esc(row.user_id)}
+      </td>
 
       <td>
+        ${esc(row.username)}
+      </td>
+
+      <td>
+        ${esc(row.role)}
+      </td>
+
+      <td>
+        ${money(row.balance)}
+      </td>
+
+      <td>
+        ${esc(row.status)}
+      </td>
+
+      <td>
+        ${formatDate(row.created_at)}
+      </td>
+
+      <td>
+
         <div class="actions">
+
+          ${messageButton}
+
           ${statusButton}
+
         </div>
+
       </td>
 
     `;
@@ -1337,11 +1898,13 @@ function renderCustomers(rows){
 }
 
 
-/* =========================
+/* =====================================================
    RENDER TRANSACTIONS
-========================= */
+===================================================== */
 
-function renderTransactions(rows){
+function renderTransactions(
+  rows
+){
 
   const body =
     document.getElementById(
@@ -1355,20 +1918,32 @@ function renderTransactions(rows){
   rows.forEach(row=>{
 
     const tr =
-      document.createElement("tr");
+      document.createElement(
+        "tr"
+      );
 
 
     tr.innerHTML=`
 
-      <td>${esc(row.transaction_id)}</td>
+      <td>
+        ${esc(row.transaction_id)}
+      </td>
 
-      <td>${money(row.amount)}</td>
+      <td>
+        ${money(row.amount)}
+      </td>
 
-      <td>${esc(row.type)}</td>
+      <td>
+        ${esc(row.type)}
+      </td>
 
-      <td>${esc(row.status)}</td>
+      <td>
+        ${esc(row.status)}
+      </td>
 
-      <td>${formatDate(row.created_at)}</td>
+      <td>
+        ${formatDate(row.created_at)}
+      </td>
 
       <td>
 
@@ -1376,21 +1951,32 @@ function renderTransactions(rows){
 
           <button
             class="success"
-            onclick="changeTransferStatus('${row.transaction_id}','approved')"
+            onclick="changeTransferStatus(
+              '${row.transaction_id}',
+              'approved'
+            )"
           >
             Approve
           </button>
 
+
           <button
             class="danger"
-            onclick="changeTransferStatus('${row.transaction_id}','rejected')"
+            onclick="changeTransferStatus(
+              '${row.transaction_id}',
+              'rejected'
+            )"
           >
             Reject
           </button>
 
+
           <button
             class="warning"
-            onclick="changeTransferStatus('${row.transaction_id}','frozen')"
+            onclick="changeTransferStatus(
+              '${row.transaction_id}',
+              'frozen'
+            )"
           >
             Freeze
           </button>
@@ -1409,11 +1995,13 @@ function renderTransactions(rows){
 }
 
 
-/* =========================
+/* =====================================================
    RENDER WITHDRAWALS
-========================= */
+===================================================== */
 
-function renderWithdrawals(rows){
+function renderWithdrawals(
+  rows
+){
 
   const body =
     document.getElementById(
@@ -1427,24 +2015,40 @@ function renderWithdrawals(rows){
   rows.forEach(row=>{
 
     const tr =
-      document.createElement("tr");
+      document.createElement(
+        "tr"
+      );
 
 
     tr.innerHTML=`
 
-      <td>${esc(row.withdrawal_id)}</td>
+      <td>
+        ${esc(row.withdrawal_id)}
+      </td>
 
-      <td>${money(row.amount)}</td>
+      <td>
+        ${money(row.amount)}
+      </td>
 
-      <td>${esc(row.bank_name)}</td>
+      <td>
+        ${esc(row.bank_name)}
+      </td>
 
-      <td>${esc(row.account_holder)}</td>
+      <td>
+        ${esc(row.account_holder)}
+      </td>
 
-      <td>${esc(row.ifsc)}</td>
+      <td>
+        ${esc(row.ifsc)}
+      </td>
 
-      <td>${esc(row.status)}</td>
+      <td>
+        ${esc(row.status)}
+      </td>
 
-      <td>${formatDate(row.created_at)}</td>
+      <td>
+        ${formatDate(row.created_at)}
+      </td>
 
       <td>
 
@@ -1452,21 +2056,32 @@ function renderWithdrawals(rows){
 
           <button
             class="success"
-            onclick="changeWithdrawalStatus('${row.withdrawal_id}','approved')"
+            onclick="changeWithdrawalStatus(
+              '${row.withdrawal_id}',
+              'approved'
+            )"
           >
             Approve
           </button>
 
+
           <button
             class="danger"
-            onclick="changeWithdrawalStatus('${row.withdrawal_id}','rejected')"
+            onclick="changeWithdrawalStatus(
+              '${row.withdrawal_id}',
+              'rejected'
+            )"
           >
             Reject
           </button>
 
+
           <button
             class="warning"
-            onclick="changeWithdrawalStatus('${row.withdrawal_id}','frozen')"
+            onclick="changeWithdrawalStatus(
+              '${row.withdrawal_id}',
+              'frozen'
+            )"
           >
             Freeze
           </button>
@@ -1485,11 +2100,13 @@ function renderWithdrawals(rows){
 }
 
 
-/* =========================
+/* =====================================================
    RENDER ADMIN LOG
-========================= */
+===================================================== */
 
-function renderActions(rows){
+function renderActions(
+  rows
+){
 
   const body =
     document.getElementById(
@@ -1503,20 +2120,32 @@ function renderActions(rows){
   rows.forEach(row=>{
 
     const tr =
-      document.createElement("tr");
+      document.createElement(
+        "tr"
+      );
 
 
     tr.innerHTML=`
 
-      <td>${esc(row.action_id)}</td>
+      <td>
+        ${esc(row.action_id)}
+      </td>
 
-      <td>${esc(row.action)}</td>
+      <td>
+        ${esc(row.action)}
+      </td>
 
-      <td>${money(row.amount)}</td>
+      <td>
+        ${money(row.amount)}
+      </td>
 
-      <td>${esc(row.reason)}</td>
+      <td>
+        ${esc(row.reason)}
+      </td>
 
-      <td>${formatDate(row.created_at)}</td>
+      <td>
+        ${formatDate(row.created_at)}
+      </td>
 
     `;
 
@@ -1528,31 +2157,520 @@ function renderActions(rows){
 }
 
 
-/* =========================
+/* =====================================================
+   OPEN MESSAGE MODAL
+===================================================== */
+
+let selectedReceiverId = null;
+
+let selectedReceiver = null;
+
+
+async function openMessageModal(
+  receiverId
+){
+
+  if(!initSupabase())
+    return;
+
+
+  selectedReceiverId =
+    receiverId;
+
+
+  selectedReceiver = null;
+
+
+  document
+    .getElementById(
+      "messageModal"
+    )
+    .classList
+    .remove("hidden");
+
+
+  document
+    .getElementById(
+      "recipientBox"
+    )
+    .textContent =
+      "User information loading...";
+
+
+  document
+    .getElementById(
+      "messageSubject"
+    )
+    .value="";
+
+
+  document
+    .getElementById(
+      "messageText"
+    )
+    .value="";
+
+
+  document
+    .getElementById(
+      "messageHistory"
+    )
+    .innerHTML="";
+
+
+  try{
+
+    const result =
+      await supabaseClient
+      .from("profiles")
+      .select(
+        "id,user_id,username,email,role,status"
+      )
+      .eq(
+        "id",
+        receiverId
+      )
+      .single();
+
+
+    if(result.error){
+
+      throw result.error;
+
+    }
+
+
+    selectedReceiver =
+      result.data;
+
+
+    document
+      .getElementById(
+        "recipientBox"
+      )
+      .innerHTML = `
+
+        <strong>
+          📩 To:
+        </strong>
+
+        ${esc(
+          selectedReceiver.username
+        )}
+
+        <br>
+
+        <span class="small">
+          User ID:
+          ${esc(
+            selectedReceiver.user_id
+          )}
+        </span>
+
+        <br>
+
+        <span class="small">
+          Status:
+          ${esc(
+            selectedReceiver.status
+          )}
+        </span>
+
+      `;
+
+
+    await loadMessageHistory(
+      receiverId
+    );
+
+  }
+  catch(error){
+
+    document
+      .getElementById(
+        "recipientBox"
+      )
+      .textContent =
+        "User information error: " +
+        error.message;
+
+  }
+
+}
+
+
+/* =====================================================
+   CLOSE MESSAGE MODAL
+===================================================== */
+
+function closeMessageModal(){
+
+  document
+    .getElementById(
+      "messageModal"
+    )
+    .classList
+    .add("hidden");
+
+
+  selectedReceiverId = null;
+
+  selectedReceiver = null;
+
+}
+
+
+/* =====================================================
+   SEND PERSONAL MESSAGE
+===================================================== */
+
+async function sendPersonalMessage(){
+
+  if(!selectedReceiverId){
+
+    showMessage(
+      "messageSendStatus",
+      "Receiver নির্বাচন করা হয়নি।"
+    );
+
+    return;
+
+  }
+
+
+  const subject =
+    document
+      .getElementById(
+        "messageSubject"
+      )
+      .value
+      .trim();
+
+
+  const message =
+    document
+      .getElementById(
+        "messageText"
+      )
+      .value
+      .trim();
+
+
+  if(!subject){
+
+    showMessage(
+      "messageSendStatus",
+      "Subject লিখুন।"
+    );
+
+    return;
+
+  }
+
+
+  if(!message){
+
+    showMessage(
+      "messageSendStatus",
+      "Message লিখুন।"
+    );
+
+    return;
+
+  }
+
+
+  const button =
+    document.getElementById(
+      "sendMessageButton"
+    );
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "Sending...";
+
+
+  try{
+
+    const sessionResult =
+      await supabaseClient
+      .auth
+      .getSession();
+
+
+    const session =
+      sessionResult.data.session;
+
+
+    if(!session){
+
+      throw new Error(
+        "Admin session পাওয়া যায়নি। আবার Login করুন।"
+      );
+
+    }
+
+
+    const messageId =
+      "MSG-" +
+      Date.now() +
+      "-" +
+      crypto
+        .randomUUID()
+        .replaceAll("-","")
+        .substring(0,8)
+        .toUpperCase();
+
+
+    const result =
+      await supabaseClient
+      .from("messages")
+      .insert({
+
+        message_id:
+          messageId,
+
+        sender_id:
+          session.user.id,
+
+        receiver_id:
+          selectedReceiverId,
+
+        subject:
+          subject,
+
+        message:
+          message,
+
+        is_read:
+          false
+
+      });
+
+
+    if(result.error){
+
+      throw result.error;
+
+    }
+
+
+    showMessage(
+      "messageSendStatus",
+      "✅ Message সফলভাবে পাঠানো হয়েছে।"
+    );
+
+
+    document
+      .getElementById(
+        "messageSubject"
+      )
+      .value="";
+
+
+    document
+      .getElementById(
+        "messageText"
+      )
+      .value="";
+
+
+    await loadMessageHistory(
+      selectedReceiverId
+    );
+
+  }
+  catch(error){
+
+    console.error(
+      "SEND MESSAGE ERROR:",
+      error
+    );
+
+
+    showMessage(
+      "messageSendStatus",
+      "❌ Message পাঠানো যায়নি: " +
+      error.message
+    );
+
+  }
+  finally{
+
+    button.disabled = false;
+
+    button.textContent =
+      "📤 Send Message";
+
+  }
+
+}
+
+
+/* =====================================================
+   MESSAGE HISTORY
+===================================================== */
+
+async function loadMessageHistory(
+  receiverId
+){
+
+  const history =
+    document.getElementById(
+      "messageHistory"
+    );
+
+
+  history.innerHTML =
+    "<div class='small'>Message history loading...</div>";
+
+
+  try{
+
+    const result =
+      await supabaseClient
+      .from("messages")
+      .select(
+        "id,message_id,sender_id,receiver_id,subject,message,is_read,created_at,read_at"
+      )
+      .eq(
+        "receiver_id",
+        receiverId
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+      .limit(20);
+
+
+    if(result.error){
+
+      throw result.error;
+
+    }
+
+
+    const rows =
+      result.data || [];
+
+
+    if(rows.length === 0){
+
+      history.innerHTML =
+        "<div class='small'>এই User-এর কোনো message history নেই।</div>";
+
+      return;
+
+    }
+
+
+    history.innerHTML =
+      "<h3>Recent Messages</h3>";
+
+
+    rows.forEach(row=>{
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+
+      div.className =
+        "message-item " +
+        (
+          row.is_read
+          ? "read"
+          : "unread"
+        );
+
+
+      div.innerHTML = `
+
+        <strong>
+          ${esc(row.subject)}
+        </strong>
+
+        <div>
+          ${esc(row.message)}
+        </div>
+
+        <div class="small">
+
+          ${formatDate(
+            row.created_at
+          )}
+
+          &nbsp; • &nbsp;
+
+          ${
+            row.is_read
+            ? "Read"
+            : "Unread"
+          }
+
+        </div>
+
+      `;
+
+
+      history.appendChild(
+        div
+      );
+
+    });
+
+  }
+  catch(error){
+
+    history.innerHTML =
+      `<div class="small">
+        Message history error:
+        ${esc(error.message)}
+      </div>`;
+
+  }
+
+}
+
+
+/* =====================================================
    HELPERS
-========================= */
+===================================================== */
 
 function money(value){
 
   return "₹" +
-    Number(value || 0)
-    .toFixed(2);
+    Number(
+      value || 0
+    ).toFixed(2);
+
 }
 
 
 function formatDate(value){
 
-  if(!value) return "-";
+  if(!value)
+    return "-";
+
 
   try{
 
     return new Date(value)
-      .toLocaleString("en-IN");
+      .toLocaleString(
+        "en-IN"
+      );
 
   }
   catch(e){
 
     return value;
+
   }
 
 }
@@ -1560,81 +2678,133 @@ function formatDate(value){
 
 function esc(value){
 
-  if(value === null ||
-     value === undefined){
+  if(
+    value === null ||
+    value === undefined
+  ){
 
     return "";
+
   }
 
+
   return String(value)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+
 }
 
 
-/* =========================
+/* =====================================================
    AUTO SESSION CHECK
-========================= */
+===================================================== */
 
 async function checkExistingSession(){
 
-  if(!initSupabase()) return;
+  if(!initSupabase())
+    return;
 
 
   try{
 
     const result =
-      await supabaseClient.auth.getSession();
+      await supabaseClient
+      .auth
+      .getSession();
 
 
     const session =
       result.data.session;
 
 
-    if(!session) return;
+    if(!session)
+      return;
 
 
     const profileResult =
       await supabaseClient
       .from("profiles")
-      .select("id,user_id,username,role,balance,status")
-      .eq("id",session.user.id)
+      .select(
+        "id,user_id,username,role,balance,status"
+      )
+      .eq(
+        "id",
+        session.user.id
+      )
       .single();
 
 
     if(
+
       profileResult.error ||
+
       !profileResult.data ||
-      profileResult.data.role !== "admin" ||
-      profileResult.data.status !== "active"
+
+      profileResult.data.role !==
+        "admin" ||
+
+      profileResult.data.status !==
+        "active"
+
     ){
 
-      await supabaseClient.auth.signOut();
+      await supabaseClient
+        .auth
+        .signOut();
 
       return;
+
     }
 
 
-    document.getElementById(
-      "loginPage"
-    ).classList.add("hidden");
+    document
+      .getElementById(
+        "loginPage"
+      )
+      .classList
+      .add("hidden");
 
 
-    document.getElementById(
-      "adminApp"
-    ).classList.remove("hidden");
+    document
+      .getElementById(
+        "adminApp"
+      )
+      .classList
+      .remove("hidden");
 
 
-    document.getElementById(
-      "adminInfo"
-    ).textContent =
-      "Logged in as: " +
-      profileResult.data.username +
-      " | " +
-      profileResult.data.user_id;
+    document
+      .getElementById(
+        "adminInfo"
+      )
+      .textContent =
+        "Logged in as: " +
+        profileResult.data.username +
+        " | " +
+        profileResult.data.user_id;
 
 
     await loadDashboard();
@@ -1652,9 +2822,9 @@ async function checkExistingSession(){
 }
 
 
-/* =========================
+/* =====================================================
    START
-========================= */
+===================================================== */
 
 window.addEventListener(
   "load",
@@ -1667,7 +2837,34 @@ window.addEventListener(
   }
 );
 
+
+/* =====================================================
+   CLOSE MODAL WHEN CLICK OUTSIDE
+===================================================== */
+
+document.addEventListener(
+  "click",
+  function(event){
+
+    const modal =
+      document.getElementById(
+        "messageModal"
+      );
+
+
+    if(
+      event.target === modal
+    ){
+
+      closeMessageModal();
+
+    }
+
+  }
+);
+
 </script>
 
 </body>
+
 </html>
