@@ -1,824 +1,244 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DhanFlow Admin Panel</title>
-  <meta name="theme-color" content="#101827">
-
+  <title>DhanFlow Admin</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
-    :root {
-      --bg: #0b1220;
-      --panel: #131e30;
-      --panel2: #19263b;
-      --text: #f1f5f9;
-      --muted: #9caec5;
-      --border: #2b3b52;
-      --green: #22c55e;
-      --red: #ef4444;
-      --yellow: #f59e0b;
-      --blue: #60a5fa;
-    }
-
     * { box-sizing: border-box; }
-
     body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
+      margin: 0; padding: 20px; min-height: 100vh;
+      background: #0b1220; color: #f1f5f9;
+      font: 16px Arial, sans-serif;
     }
-
-    button, input, select, textarea { font: inherit; }
-
-    button {
-      border: 0;
-      border-radius: 9px;
-      padding: 10px 13px;
-      cursor: pointer;
-      font-weight: 700;
+    header, main {
+      max-width: 650px; margin: 20px auto;
     }
-
-    button:disabled { opacity: .5; cursor: not-allowed; }
-
-    .primary { background: #2563eb; color: white; }
-    .success { background: #166534; color: white; }
-    .danger { background: #991b1b; color: white; }
-    .warning { background: #92400e; color: white; }
-    .neutral { background: #334155; color: white; }
-
     header {
-      padding: 17px;
-      background: #111c2d;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+      padding: 18px; background: #131e30;
+      border-radius: 12px;
     }
-
-    header h1 { margin: 0; font-size: 21px; }
-    header p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
-
-    .layout {
-      display: grid;
-      grid-template-columns: 220px minmax(0, 1fr);
-      min-height: calc(100vh - 70px);
-    }
-
-    nav {
-      padding: 14px;
-      background: #0e1929;
-      border-right: 1px solid var(--border);
-    }
-
-    nav button {
-      width: 100%;
-      margin-bottom: 7px;
-      text-align: left;
-      color: var(--text);
-      background: transparent;
-    }
-
-    nav button.active, nav button:hover { background: var(--panel2); }
-
-    main { padding: 18px; min-width: 0; }
-
-    .notice {
-      padding: 12px;
-      border: 1px solid var(--border);
-      background: var(--panel);
-      border-radius: 10px;
-      color: var(--muted);
+    h1 { margin: 0 0 6px; font-size: 24px; }
+    p { color: #b8c6d9; line-height: 1.5; }
+    section {
+      background: #131e30; padding: 20px;
+      border: 1px solid #2b3b52; border-radius: 12px;
       margin-bottom: 16px;
-      font-size: 13px;
-      line-height: 1.5;
     }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-bottom: 18px;
+    label { display: block; margin: 14px 0; }
+    input {
+      width: 100%; padding: 12px; margin-top: 7px;
+      background: #0b1423; color: white;
+      border: 1px solid #40516b; border-radius: 8px;
     }
-
-    .card, .section {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      padding: 15px;
-      min-width: 0;
+    button {
+      width: 100%; padding: 12px; margin-top: 10px;
+      border: 0; border-radius: 8px;
+      background: #2563eb; color: white;
+      font-weight: bold; cursor: pointer;
     }
-
-    .metric-label { color: var(--muted); font-size: 13px; }
-    .metric-value { font-size: 25px; font-weight: 800; margin-top: 9px; overflow-wrap: anywhere; }
-
-    .section { margin-bottom: 16px; }
-    .section h2 { margin: 0 0 14px; font-size: 18px; }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+    button:disabled { opacity: .6; }
+    .secondary { background: #334155; }
+    #message {
+      white-space: pre-wrap; overflow-wrap: anywhere;
+      line-height: 1.6; margin-top: 14px;
     }
-
-    label { display: block; color: var(--muted); font-size: 13px; }
-
-    input, select, textarea {
-      display: block;
-      width: 100%;
-      margin-top: 6px;
-      padding: 11px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #0b1423;
-      color: var(--text);
-      outline: none;
-    }
-
-    textarea { resize: vertical; min-height: 75px; }
-
-    .form-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-
-    .table-wrap { overflow-x: auto; }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 13px;
-      min-width: 760px;
-    }
-
-    th, td {
-      text-align: left;
-      padding: 11px 9px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-    }
-
-    th { color: var(--muted); font-weight: 600; }
-    td { overflow-wrap: anywhere; }
-
-    .actions { display: flex; flex-wrap: wrap; gap: 6px; }
-    .actions button { font-size: 12px; padding: 8px 9px; }
-
-    .pill {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 30px;
-      font-size: 11px;
-      background: #334155;
-    }
-
-    .pill.pending { background: #78350f; }
-    .pill.approved, .pill.active { background: #14532d; }
-    .pill.rejected, .pill.blocked { background: #7f1d1d; }
-    .pill.frozen { background: #713f12; }
-
-    .toolbar {
-      display: flex;
-      gap: 9px;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-
-    .toolbar input { max-width: 350px; margin: 0; }
-
-    .hidden { display: none !important; }
-    .muted { color: var(--muted); }
-    .message { margin: 12px 0; white-space: pre-wrap; font-size: 13px; }
+    .hidden { display: none; }
     .error { color: #fca5a5; }
     .ok { color: #86efac; }
-
-    #loginScreen {
-      max-width: 420px;
-      margin: 55px auto;
-      padding: 20px;
-    }
-
-    #loginScreen h2 { margin-top: 0; }
-    #loginScreen button { width: 100%; margin-top: 13px; }
-
-    .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-    @media (max-width: 850px) {
-      .layout { grid-template-columns: 1fr; }
-      nav {
-        display: flex;
-        gap: 5px;
-        overflow-x: auto;
-        border-right: 0;
-        border-bottom: 1px solid var(--border);
-      }
-      nav button { width: auto; white-space: nowrap; margin: 0; }
-      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      main { padding: 12px; }
-    }
-
-    @media (max-width: 480px) {
-      .form-grid { grid-template-columns: 1fr; }
-      header h1 { font-size: 18px; }
-      .metric-value { font-size: 21px; }
-    }
   </style>
 </head>
-
 <body>
   <header>
-    <div>
-      <h1>DhanFlow Admin</h1>
-      <p>Internal Wallet Management System</p>
-    </div>
-    <div class="top-actions">
-      <button class="neutral" id="refreshBtn">Refresh</button>
-      <button class="danger" id="logoutBtn">Logout</button>
-    </div>
+    <h1>DhanFlow Admin</h1>
+    <p>Internal Wallet Management System</p>
   </header>
 
-  <section id="loginScreen" class="section">
-    <h2>Admin Login</h2>
-    <p class="muted">Sign in with your existing DhanFlow admin account.</p>
-    <form id="loginForm">
-      <label>Email
-        <input id="loginEmail" type="email" required autocomplete="username">
-      </label>
-      <label style="margin-top:12px">Password
-        <input id="loginPassword" type="password" required autocomplete="current-password">
-      </label>
-      <button class="primary" type="submit">Login</button>
-    </form>
-    <div id="loginMessage" class="message"></div>
-  </section>
+  <main>
+    <section id="loginSection">
+      <h2>Admin Login</h2>
+      <form id="loginForm">
+        <label>Email
+          <input id="email" type="email" required autocomplete="username">
+        </label>
+        <label>Password
+          <input id="password" type="password" required
+                 autocomplete="current-password">
+        </label>
+        <button id="loginButton" type="submit">Login</button>
+      </form>
+      <div id="message" role="status" aria-live="polite"></div>
+    </section>
 
-  <div id="app" class="layout hidden">
-    <nav id="nav">
-      <button class="active" data-page="dashboard">Dashboard</button>
-      <button data-page="customers">Customers</button>
-      <button data-page="create">Create Customer</button>
-      <button data-page="balance">Balance Adjustment</button>
-      <button data-page="transfers">Transfers</button>
-      <button data-page="withdrawals">Withdrawals</button>
-      <button data-page="history">Admin History</button>
-    </nav>
-
-    <main>
-      <div class="notice">
-        <strong>Important:</strong> This panel updates DhanFlow's internal records.
-        Approving a withdrawal does not itself transfer money to a bank account.
-        Verify all amounts and IDs before taking action.
-      </div>
-
-      <section id="page-dashboard" class="page">
-        <div class="grid">
-          <div class="card"><div class="metric-label">Total Profiles</div><div class="metric-value" id="metricUsers">—</div></div>
-          <div class="card"><div class="metric-label">Customers</div><div class="metric-value" id="metricCustomers">—</div></div>
-          <div class="card"><div class="metric-label">Pending Transfers</div><div class="metric-value" id="metricTransfers">—</div></div>
-          <div class="card"><div class="metric-label">Pending Withdrawals</div><div class="metric-value" id="metricWithdrawals">—</div></div>
-        </div>
-        <div class="section">
-          <h2>Recent Withdrawals</h2>
-          <div id="recentWithdrawals" class="muted">Loading…</div>
-        </div>
-        <div class="section">
-          <h2>Recent Transactions</h2>
-          <div id="recentTransactions" class="muted">Loading…</div>
-        </div>
-      </section>
-
-      <section id="page-customers" class="page hidden">
-        <div class="section">
-          <h2>Customers</h2>
-          <div class="toolbar">
-            <input id="customerSearch" placeholder="Search user ID or username">
-            <button class="neutral" id="customerSearchBtn">Search</button>
-          </div>
-          <div id="customersTable"></div>
-        </div>
-      </section>
-
-      <section id="page-create" class="page hidden">
-        <div class="section">
-          <h2>Create Customer</h2>
-          <form id="createForm">
-            <div class="form-grid">
-              <label>User ID<input name="user_id" required></label>
-              <label>Username<input name="username" required></label>
-              <label>Email<input name="email" type="email" required></label>
-              <label>Password<input name="password" type="password" minlength="6" required></label>
-              <label>Initial Balance (₹)<input name="initial_balance" type="number" min="0" step="0.01" value="0" required></label>
-            </div>
-            <div class="form-actions"><button class="primary" type="submit">Create Customer</button></div>
-          </form>
-          <div id="createMessage" class="message"></div>
-        </div>
-      </section>
-
-      <section id="page-balance" class="page hidden">
-        <div class="section">
-          <h2>Balance Adjustment</h2>
-          <p class="muted">Positive amount adds to the internal balance; negative amount subtracts from it. Use only with a valid, documented reason.</p>
-          <form id="balanceForm">
-            <div class="form-grid">
-              <label>Customer User ID<input name="user_id" required></label>
-              <label>Amount (₹)<input name="amount" type="number" step="0.01" required placeholder="e.g. 100 or -50"></label>
-            </div>
-            <label style="margin-top:12px">Reason<textarea name="reason" required></textarea></label>
-            <div class="form-actions"><button class="primary" type="submit">Adjust Balance</button></div>
-          </form>
-          <div id="balanceMessage" class="message"></div>
-        </div>
-      </section>
-
-      <section id="page-transfers" class="page hidden">
-        <div class="section">
-          <h2>Transfers</h2>
-          <div id="transfersTable"></div>
-        </div>
-      </section>
-
-      <section id="page-withdrawals" class="page hidden">
-        <div class="section">
-          <h2>Withdrawals</h2>
-          <p class="muted">The numeric database ID is used for the status RPC. The WDL reference is shown separately.</p>
-          <div id="withdrawalsTable"></div>
-        </div>
-      </section>
-
-      <section id="page-history" class="page hidden">
-        <div class="section">
-          <h2>Admin Action History</h2>
-          <div id="historyTable"></div>
-        </div>
-      </section>
-
-      <div id="globalMessage" class="message"></div>
-      <footer class="muted" style="padding:15px 0;font-size:12px">
-        DhanFlow © 2026 · Internal Wallet Management System
-      </footer>
-    </main>
-  </div>
+    <section id="dashboard" class="hidden">
+      <h2>Login সফল</h2>
+      <p id="accountInfo"></p>
+      <p>এখন Admin API সংযোগ পরীক্ষা করতে পারো।</p>
+      <button id="apiButton">Test Admin API</button>
+      <button id="logoutButton" class="secondary">Logout</button>
+      <div id="apiMessage" role="status" aria-live="polite"></div>
+    </section>
+  </main>
 
   <script>
-    /*
-      CONFIGURATION:
-      Replace these two values with your existing Supabase project URL
-      and publishable/anon key. Never put the service_role key here.
-    */
-    const SUPABASE_URL = "https://oxwjnravklpcdhfxibya.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
+    // Supabase Project URL এবং Publishable/anon key
+    const SUPABASE_URL =
+      "https://oxwjnravklpcdhfxibya.supabase.co";
 
-    const $ = (id) => document.getElementById(id);
-    const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-    })[c]);
+    const SUPABASE_ANON_KEY =
+      "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
 
-    const money = (value) => "₹" + Number(value ?? 0).toLocaleString("en-IN", {
-      minimumFractionDigits: 2, maximumFractionDigits: 2
-    });
+    const $ = id => document.getElementById(id);
+    let client = null;
 
-    const dateText = (value) => value ? new Date(value).toLocaleString() : "—";
-    const statusPill = (value) => {
-      const s = String(value ?? "unknown").toLowerCase();
-      return `<span class="pill ${esc(s)}">${esc(s)}</span>`;
-    };
-
-    let supabase;
-    let session = null;
-    let dashboardData = {
-      profiles: [], transactions: [], withdrawals: [], admin_actions: []
-    };
-
-    function showMessage(id, message, type = "") {
-      const element = $(id);
-      if (!element) return;
-      element.className = "message " + type;
-      element.textContent = message;
+    function message(id, text, type = "") {
+      const el = $(id);
+      el.textContent = text;
+      el.className = type;
     }
 
-    function validateConfig() {
+    function setLoggedIn(yes) {
+      $("loginSection").classList.toggle("hidden", yes);
+      $("dashboard").classList.toggle("hidden", !yes);
+    }
+
+    function init() {
+      if (!window.supabase) {
+        throw new Error(
+          "Supabase library লোড হয়নি। ইন্টারনেট সংযোগ পরীক্ষা করো।"
+        );
+      }
+
       if (
-        SUPABASE_URL.includes("YOUR_SUPABASE") ||
-        SUPABASE_ANON_KEY.includes("YOUR_SUPABASE")
+        !SUPABASE_URL.startsWith("https://") ||
+        SUPABASE_ANON_KEY === "PASTE_YOUR_PUBLISHABLE_KEY_HERE" ||
+        !SUPABASE_ANON_KEY.trim()
       ) {
-        throw new Error("First enter your Supabase URL and publishable/anon key in the configuration section.");
-      }
-      if (!window.supabase) throw new Error("Supabase JavaScript library did not load.");
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
-
-    async function adminApi(action, data = {}) {
-      const { data: current } = await supabase.auth.getSession();
-      const token = current?.session?.access_token;
-      if (!token) throw new Error("Your session has expired. Please log in again.");
-
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/admin-api`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-          "apikey": SUPABASE_ANON_KEY
-        },
-        body: JSON.stringify({ action, data })
-      });
-
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok || result.error || result.ok === false) {
-        throw new Error(result.error || `Request failed (${response.status})`);
-      }
-      return result.data ?? result;
-    }
-
-    function setLoggedIn(isLoggedIn) {
-      $("loginScreen").classList.toggle("hidden", isLoggedIn);
-      $("app").classList.toggle("hidden", !isLoggedIn);
-    }
-
-    async function checkSession() {
-      const { data } = await supabase.auth.getSession();
-      session = data.session;
-      if (!session) {
-        setLoggedIn(false);
-        return;
+        throw new Error(
+          "Supabase URL ও Publishable/anon key বসাও।"
+        );
       }
 
-      try {
-        await loadDashboard();
-        setLoggedIn(true);
-      } catch (error) {
-        setLoggedIn(false);
-        showMessage("loginMessage", error.message, "error");
-      }
-    }
-
-    async function loadDashboard() {
-      const result = await adminApi("dashboard");
-      dashboardData = {
-        profiles: Array.isArray(result.profiles) ? result.profiles : [],
-        transactions: Array.isArray(result.transactions) ? result.transactions : [],
-        withdrawals: Array.isArray(result.withdrawals) ? result.withdrawals : [],
-        admin_actions: Array.isArray(result.admin_actions) ? result.admin_actions : []
-      };
-      renderAll();
-    }
-
-    function renderAll() {
-      const d = dashboardData;
-      $("metricUsers").textContent = d.profiles.length;
-      $("metricCustomers").textContent = d.profiles.filter(x => x.role === "customer").length;
-      $("metricTransfers").textContent = d.transactions.filter(x => String(x.status).toLowerCase() === "pending").length;
-      $("metricWithdrawals").textContent = d.withdrawals.filter(x => String(x.status).toLowerCase() === "pending").length;
-
-      renderCustomers();
-      renderTransfers();
-      renderWithdrawals();
-      renderHistory();
-
-      $("recentWithdrawals").innerHTML = tableHtml(
-        ["DB ID", "Withdrawal Ref", "User ID", "Amount", "Status", "Created"],
-        d.withdrawals.slice(0, 5).map(w => [
-          w.id, w.withdrawal_id, w.user_id, money(w.amount),
-          statusPill(w.status), dateText(w.created_at)
-        ])
-      );
-
-      $("recentTransactions").innerHTML = tableHtml(
-        ["Transaction ID", "Type", "Amount", "Status", "Created"],
-        d.transactions.slice(0, 5).map(t => [
-          t.transaction_id ?? t.id, t.type, money(t.amount),
-          statusPill(t.status), dateText(t.created_at)
-        ])
+      client = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
       );
     }
 
-    function tableHtml(headers, rows) {
-      if (!rows.length) return '<p class="muted">No records found.</p>';
-      return `<div class="table-wrap"><table><thead><tr>${
-        headers.map(h => `<th>${esc(h)}</th>`).join("")
-      }</tr></thead><tbody>${
-        rows.map(row => `<tr>${row.map(cell => `<td>${cell ?? "—"}</td>`).join("")}</tr>`).join("")
-      }</tbody></table></div>`;
-    }
-
-    function renderCustomers() {
-      const query = $("customerSearch").value.trim().toLowerCase();
-      const rows = dashboardData.profiles
-        .filter(p => p.role === "customer")
-        .filter(p => !query || `${p.user_id} ${p.username} ${p.id}`.toLowerCase().includes(query))
-        .map(p => [
-          esc(p.user_id),
-          esc(p.username),
-          money(p.balance),
-          statusPill(p.status),
-          `<div class="actions">
-            <button class="${p.status === "blocked" ? "success" : "danger"}"
-              onclick="changeUserStatus('${esc(p.user_id)}','${p.status === "blocked" ? "active" : "blocked"}')">
-              ${p.status === "blocked" ? "Unblock" : "Block"}
-            </button>
-            <button class="neutral" onclick="prefillBalance('${esc(p.user_id)}')">Adjust</button>
-          </div>`
-        ]);
-
-      $("customersTable").innerHTML = tableHtml(
-        ["User ID", "Username", "Balance", "Status", "Actions"], rows
-      );
-    }
-
-    function renderTransfers() {
-      const rows = dashboardData.transactions.map(t => {
-        const pending = String(t.status).toLowerCase() === "pending";
-        const id = t.transaction_id ?? t.id;
-        const actions = pending ? `<div class="actions">
-          <button class="success" onclick="changeTransferStatus('${esc(id)}','approved')">Approve</button>
-          <button class="danger" onclick="changeTransferStatus('${esc(id)}','rejected')">Reject</button>
-          <button class="warning" onclick="changeTransferStatus('${esc(id)}','frozen')">Freeze</button>
-        </div>` : "—";
-
-        return [
-          esc(id), esc(t.sender_id), esc(t.receiver_id), money(t.amount),
-          esc(t.type), statusPill(t.status), dateText(t.created_at), actions
-        ];
-      });
-
-      $("transfersTable").innerHTML = tableHtml(
-        ["Transaction ID", "Sender", "Receiver", "Amount", "Type", "Status", "Created", "Actions"],
-        rows
-      );
-    }
-
-    function renderWithdrawals() {
-      const rows = dashboardData.withdrawals.map(w => {
-        const pending = String(w.status).toLowerCase() === "pending";
-
-        /*
-          IMPORTANT:
-          admin_update_withdrawal expects p_withdrawal_id BIGINT.
-          Therefore use numeric w.id, NOT the WDL-... withdrawal_id string.
-        */
-        const numericId = Number(w.id);
-        const validId = Number.isSafeInteger(numericId) && numericId > 0;
-
-        const actions = pending && validId ? `<div class="actions">
-          <button class="success" onclick="changeWithdrawalStatus(${numericId},'approved')">Approve</button>
-          <button class="danger" onclick="changeWithdrawalStatus(${numericId},'rejected')">Reject</button>
-          <button class="warning" onclick="changeWithdrawalStatus(${numericId},'frozen')">Freeze</button>
-        </div>` : (pending ? '<span class="error">Invalid numeric DB ID</span>' : "—");
-
-        return [
-          esc(w.id),
-          esc(w.withdrawal_id),
-          esc(w.user_id),
-          money(w.amount),
-          esc(w.bank_name),
-          esc(w.account_holder),
-          esc(w.account_number),
-          esc(w.ifsc),
-          statusPill(w.status),
-          dateText(w.created_at),
-          actions
-        ];
-      });
-
-      $("withdrawalsTable").innerHTML = tableHtml(
-        ["DB ID", "Withdrawal Ref", "User ID", "Amount", "Bank", "Account Holder", "Account No.", "IFSC", "Status", "Created", "Actions"],
-        rows
-      );
-    }
-
-    function renderHistory() {
-      const rows = dashboardData.admin_actions.map(a => [
-        esc(a.action_id),
-        esc(a.action),
-        esc(a.target_user_id),
-        a.amount == null ? "—" : money(a.amount),
-        esc(a.reason),
-        esc(a.transaction_id),
-        dateText(a.created_at)
-      ]);
-
-      $("historyTable").innerHTML = tableHtml(
-        ["Action ID", "Action", "Target User", "Amount", "Reason", "Transaction ID", "Date"],
-        rows
-      );
-    }
-
-    async function refreshDashboard() {
-      $("refreshBtn").disabled = true;
-      showMessage("globalMessage", "Refreshing…");
-      try {
-        await loadDashboard();
-        showMessage("globalMessage", "Dashboard refreshed.", "ok");
-      } catch (error) {
-        showMessage("globalMessage", error.message, "error");
-      } finally {
-        $("refreshBtn").disabled = false;
-      }
-    }
-
-    async function changeUserStatus(userId, status) {
-      const reason = prompt(`Reason for ${status} user ${userId}:`);
-      if (reason === null) return;
-
-      try {
-        await adminApi("user_status", { user_id: userId, status, reason });
-        await loadDashboard();
-        showMessage("globalMessage", `User status changed to ${status}.`, "ok");
-      } catch (error) {
-        showMessage("globalMessage", error.message, "error");
-      }
-    }
-
-    function prefillBalance(userId) {
-      $("balanceForm").elements.user_id.value = userId;
-      document.querySelector('[data-page="balance"]').click();
-    }
-
-    async function changeTransferStatus(transactionId, status) {
-      if (!confirm(`Set transfer ${transactionId} to ${status}?`)) return;
-      const note = prompt("Admin note (optional):") ?? "";
-
-      try {
-        await adminApi("transfer_status", {
-          transaction_id: transactionId,
-          status,
-          note
-        });
-        await loadDashboard();
-        showMessage("globalMessage", `Transfer updated: ${status}`, "ok");
-      } catch (error) {
-        showMessage("globalMessage", error.message, "error");
-      }
-    }
-
-    async function changeWithdrawalStatus(withdrawalDbId, status) {
-      const numericId = Number(withdrawalDbId);
-
-      if (!Number.isSafeInteger(numericId) || numericId <= 0) {
-        showMessage("globalMessage", "Invalid numeric withdrawal database ID.", "error");
-        return;
-      }
-
-      const withdrawal = dashboardData.withdrawals.find(
-        w => Number(w.id) === numericId
-      );
-
-      if (!withdrawal) {
-        showMessage("globalMessage", "Withdrawal not found in the latest dashboard data. Refresh and try again.", "error");
-        return;
-      }
-
-      if (String(withdrawal.status).toLowerCase() !== "pending") {
-        showMessage("globalMessage", "This withdrawal is no longer pending. Refresh the dashboard.", "error");
-        return;
-      }
-
-      const amountText = money(withdrawal.amount);
-      const confirmation = confirm(
-        `Confirm ${status.toUpperCase()}?\n\n` +
-        `Database ID: ${numericId}\n` +
-        `Reference: ${withdrawal.withdrawal_id}\n` +
-        `Amount: ${amountText}\n` +
-        `Current status: ${withdrawal.status}\n\n` +
-        `This changes the internal withdrawal status only; it does not send a bank transfer.`
-      );
-
-      if (!confirmation) return;
-
-      const note = prompt("Admin note (optional):");
-      if (note === null) return;
-
-      try {
-        await adminApi("withdrawal_status", {
-          withdrawal_id: numericId,
-          status,
-          note
-        });
-        await loadDashboard();
-        showMessage("globalMessage", `Withdrawal ${numericId} updated to ${status}.`, "ok");
-      } catch (error) {
-        showMessage("globalMessage", error.message, "error");
-      }
-    }
-
-    $("loginForm").addEventListener("submit", async (event) => {
+    $("loginForm").addEventListener("submit", async event => {
       event.preventDefault();
-      showMessage("loginMessage", "Logging in…");
+
+      const button = $("loginButton");
+      button.disabled = true;
+      button.textContent = "লগইন হচ্ছে…";
+      message("message", "Supabase-এ সংযোগ করা হচ্ছে…");
 
       try {
-        const email = $("loginEmail").value.trim();
-        const password = $("loginPassword").value;
+        const email = $("email").value.trim();
+        const password = $("password").value;
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email, password
-        });
+        const { data, error } =
+          await client.auth.signInWithPassword({ email, password });
 
         if (error) throw error;
-        session = data.session;
+        if (!data.session) {
+          throw new Error("Login session তৈরি হয়নি।");
+        }
 
-        await loadDashboard();
+        $("accountInfo").textContent =
+          "Signed in: " + (data.user.email || email);
+
         setLoggedIn(true);
-        showMessage("loginMessage", "");
-      } catch (error) {
-        showMessage("loginMessage", error.message, "error");
-      }
-    });
-
-    $("logoutBtn").addEventListener("click", async () => {
-      await supabase.auth.signOut();
-      session = null;
-      setLoggedIn(false);
-    });
-
-    $("refreshBtn").addEventListener("click", refreshDashboard);
-    $("customerSearchBtn").addEventListener("click", renderCustomers);
-    $("customerSearch").addEventListener("input", renderCustomers);
-
-    $("createForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const form = new FormData(event.currentTarget);
-
-      const payload = {
-        user_id: String(form.get("user_id")).trim(),
-        username: String(form.get("username")).trim(),
-        email: String(form.get("email")).trim(),
-        password: String(form.get("password")),
-        initial_balance: Number(form.get("initial_balance"))
-      };
-
-      if (!confirm(`Create customer ${payload.user_id} with initial balance ${money(payload.initial_balance)}?`)) return;
-
-      try {
-        await adminApi("create_customer", payload);
-        event.currentTarget.reset();
-        showMessage("createMessage", "Customer created successfully.", "ok");
-        await loadDashboard();
-      } catch (error) {
-        showMessage("createMessage", error.message, "error");
-      }
-    });
-
-    $("balanceForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const form = new FormData(event.currentTarget);
-
-      const payload = {
-        user_id: String(form.get("user_id")).trim(),
-        amount: Number(form.get("amount")),
-        reason: String(form.get("reason")).trim()
-      };
-
-      if (!payload.reason) {
-        showMessage("balanceMessage", "Reason is required.", "error");
-        return;
-      }
-
-      if (!Number.isFinite(payload.amount) || payload.amount === 0) {
-        showMessage("balanceMessage", "Enter a valid non-zero amount.", "error");
-        return;
-      }
-
-      if (!confirm(`Adjust ${payload.user_id} balance by ${money(payload.amount)}?\nReason: ${payload.reason}`)) return;
-
-      try {
-        const result = await adminApi("adjust_balance", payload);
-        showMessage(
-          "balanceMessage",
-          `Balance adjustment completed.\nUser: ${result.user_id ?? payload.user_id}\nNew balance: ${money(result.new_balance)}`,
-          "ok"
-        );
-        await loadDashboard();
-      } catch (error) {
-        showMessage("balanceMessage", error.message, "error");
-      }
-    });
-
-    document.querySelectorAll("[data-page]").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll("[data-page]").forEach(b => b.classList.remove("active"));
-        button.classList.add("active");
-
-        document.querySelectorAll(".page").forEach(page => page.classList.add("hidden"));
-        $("page-" + button.dataset.page).classList.remove("hidden");
-      });
-    });
-
-    (async function init() {
-      try {
-        validateConfig();
-        await checkSession();
+        message("message", "");
       } catch (error) {
         setLoggedIn(false);
-        showMessage("loginMessage", error.message, "error");
+        message(
+          "message",
+          "Login ব্যর্থ: " + (error.message || String(error)),
+          "error"
+        );
+      } finally {
+        button.disabled = false;
+        button.textContent = "Login";
       }
-    })();
+    });
+
+    $("apiButton").addEventListener("click", async () => {
+      const button = $("apiButton");
+      button.disabled = true;
+      message("apiMessage", "Admin API পরীক্ষা হচ্ছে…");
+
+      try {
+        const { data: sessionData, error: sessionError } =
+          await client.auth.getSession();
+
+        if (sessionError) throw sessionError;
+
+        const token = sessionData.session?.access_token;
+        if (!token) throw new Error("Login session পাওয়া যায়নি।");
+
+        const response = await fetch(
+          SUPABASE_URL + "/functions/v1/admin-api",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token,
+              "apikey": SUPABASE_ANON_KEY
+            },
+            body: JSON.stringify({
+              action: "dashboard",
+              data: {}
+            })
+          }
+        );
+
+        const body = await response.text();
+
+        if (!response.ok) {
+          throw new Error(
+            "HTTP " + response.status + "\n" + body
+          );
+        }
+
+        message(
+          "apiMessage",
+          "API response:\n" + body,
+          "ok"
+        );
+      } catch (error) {
+        message(
+          "apiMessage",
+          "API পরীক্ষা ব্যর্থ:\n" +
+          (error.message || String(error)),
+          "error"
+        );
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    $("logoutButton").addEventListener("click", async () => {
+      try {
+        await client.auth.signOut();
+      } finally {
+        setLoggedIn(false);
+        $("password").value = "";
+        message("message", "Logout সম্পন্ন হয়েছে।");
+      }
+    });
+
+    window.addEventListener("error", event => {
+      message("message", "JavaScript error: " + event.message, "error");
+    });
+
+    try {
+      init();
+    } catch (error) {
+      message("message", error.message, "error");
+    }
   </script>
 </body>
 </html>
