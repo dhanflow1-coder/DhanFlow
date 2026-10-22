@@ -1,244 +1,514 @@
 
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DhanFlow Admin</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; padding: 20px; min-height: 100vh;
-      background: #0b1220; color: #f1f5f9;
-      font: 16px Arial, sans-serif;
-    }
-    header, main {
-      max-width: 650px; margin: 20px auto;
-    }
-    header {
-      padding: 18px; background: #131e30;
-      border-radius: 12px;
-    }
-    h1 { margin: 0 0 6px; font-size: 24px; }
-    p { color: #b8c6d9; line-height: 1.5; }
-    section {
-      background: #131e30; padding: 20px;
-      border: 1px solid #2b3b52; border-radius: 12px;
-      margin-bottom: 16px;
-    }
-    label { display: block; margin: 14px 0; }
-    input {
-      width: 100%; padding: 12px; margin-top: 7px;
-      background: #0b1423; color: white;
-      border: 1px solid #40516b; border-radius: 8px;
-    }
-    button {
-      width: 100%; padding: 12px; margin-top: 10px;
-      border: 0; border-radius: 8px;
-      background: #2563eb; color: white;
-      font-weight: bold; cursor: pointer;
-    }
-    button:disabled { opacity: .6; }
-    .secondary { background: #334155; }
-    #message {
-      white-space: pre-wrap; overflow-wrap: anywhere;
-      line-height: 1.6; margin-top: 14px;
-    }
-    .hidden { display: none; }
-    .error { color: #fca5a5; }
-    .ok { color: #86efac; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DhanFlow Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--blue:#155eef;--navy:#14213d;--bg:#f5f7fb;--line:#e5eaf2;--text:#172033;--muted:#667085;--green:#067647;--red:#b42318}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;border-radius:8px;padding:10px 14px;background:var(--blue);color:#fff;font-weight:600}
+button:disabled{opacity:.55;cursor:not-allowed}
+.secondary{background:#eaf0ff;color:#1746a2}
+.danger{background:#b42318}
+.success{background:#067647}
+header{background:#fff;border-bottom:1px solid var(--line);padding:15px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:800}
+.logo{background:var(--blue);color:white;border-radius:10px;padding:10px}
+small,.muted{color:var(--muted)}
+.layout{display:flex;min-height:calc(100vh - 65px)}
+nav{width:220px;background:#fff;border-right:1px solid var(--line);padding:16px 12px;flex-shrink:0}
+nav button{width:100%;text-align:left;background:transparent;color:#344054;margin-bottom:5px}
+nav button.active,nav button:hover{background:#eaf0ff;color:var(--blue)}
+main{padding:24px;width:100%;min-width:0;max-width:1600px;margin:auto}
+h1{font-size:25px;margin:0 0 6px}
+h2{font-size:18px;margin:0 0 15px}
+.page{display:none}.page.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:22px 0}
+.card,.panel{background:#fff;border:1px solid var(--line);border-radius:13px;padding:18px;min-width:0}
+.card .number{font-size:25px;font-weight:800;margin-top:10px;overflow-wrap:anywhere}
+.panel{margin-bottom:18px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+form{display:grid;gap:11px}
+label{display:grid;gap:6px;font-size:13px;font-weight:700;color:#344054}
+input,select,textarea{width:100%;border:1px solid #d0d5dd;border-radius:8px;padding:11px;background:#fff;color:var(--text)}
+textarea{min-height:75px;resize:vertical}
+.actions{display:flex;flex-wrap:wrap;gap:7px}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:#475467;background:#f9fafb}
+td .actions button{padding:7px 9px;font-size:12px}
+.badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#eef2f6;font-size:11px}
+.badge.active,.badge.approved{background:#dcfae6;color:#067647}
+.badge.blocked,.badge.rejected{background:#fee4e2;color:#b42318}
+.badge.pending,.badge.frozen{background:#fff0c2;color:#854a0e}
+.notice{padding:12px;border-radius:9px;margin:12px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.notice.error{background:#fee4e2;color:#912018}
+.notice.ok{background:#dcfae6;color:#05603a}
+.hidden{display:none!important}
+#loginScreen{max-width:420px;margin:8vh auto;padding:24px}
+#loginScreen .panel{padding:26px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}
+.toolbar input{max-width:350px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+@media(max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}nav{width:175px}.grid2{grid-template-columns:1fr}}
+@media(max-width:600px){header{padding:12px} .brand{font-size:18px} .layout{display:block}nav{width:100%;display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px;gap:5px}nav button{width:auto;white-space:nowrap;margin:0;padding:10px;font-size:12px}main{padding:13px}.cards{gap:9px}.card{padding:12px}.card .number{font-size:20px}h1{font-size:22px}.panel{padding:13px}#loginScreen{margin:5vh 12px}}
+</style>
 </head>
 <body>
-  <header>
-    <h1>DhanFlow Admin</h1>
-    <p>Internal Wallet Management System</p>
-  </header>
+
+<header>
+  <div class="brand"><span class="logo">DF</span><span>DhanFlow <small>Admin</small></span></div>
+  <div class="actions">
+    <span id="adminEmail" class="muted"></span>
+    <button id="logoutBtn" class="secondary hidden" type="button">Logout</button>
+  </div>
+</header>
+
+<section id="loginScreen">
+  <div class="panel">
+    <h1>Welcome back</h1>
+    <p class="muted">Sign in to DhanFlow Admin Panel</p>
+    <form id="loginForm">
+      <label>Email<input id="email" type="email" autocomplete="username" required></label>
+      <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+      <button id="loginBtn" type="submit">Login</button>
+    </form>
+    <div id="loginMessage" aria-live="polite"></div>
+  </div>
+</section>
+
+<div id="app" class="layout hidden">
+  <nav id="nav">
+    <button class="active" data-page="dashboard">▦ Dashboard</button>
+    <button data-page="customers">♙ Customers</button>
+    <button data-page="create">＋ Create Customer</button>
+    <button data-page="balance">⇄ Balance Adjustment</button>
+    <button data-page="transactions">▤ Transactions</button>
+    <button data-page="withdrawals">⇩ Withdrawals</button>
+    <button data-page="audit">☷ Admin History</button>
+  </nav>
 
   <main>
-    <section id="loginSection">
-      <h2>Admin Login</h2>
-      <form id="loginForm">
-        <label>Email
-          <input id="email" type="email" required autocomplete="username">
-        </label>
-        <label>Password
-          <input id="password" type="password" required
-                 autocomplete="current-password">
-        </label>
-        <button id="loginButton" type="submit">Login</button>
-      </form>
-      <div id="message" role="status" aria-live="polite"></div>
+    <div id="globalMessage" aria-live="polite"></div>
+
+    <section class="page active" id="page-dashboard">
+      <h1>Dashboard</h1><p class="muted">Overview of your internal wallet system.</p>
+      <div class="cards">
+        <div class="card"><span class="muted">Total Customers</span><div id="totalCustomers" class="number">—</div></div>
+        <div class="card"><span class="muted">Active Customers</span><div id="activeCustomers" class="number">—</div></div>
+        <div class="card"><span class="muted">Pending Withdrawals</span><div id="pendingWithdrawals" class="number">—</div></div>
+        <div class="card"><span class="muted">Transactions</span><div id="totalTransactions" class="number">—</div></div>
+      </div>
+      <div class="panel">
+        <div class="actions" style="justify-content:space-between;align-items:center">
+          <h2>Recent Transactions</h2><button class="secondary" id="refreshBtn" type="button">Refresh Data</button>
+        </div>
+        <div class="tablewrap"><table><thead><tr><th>ID</th><th>Type</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="recentTransactions"></tbody></table></div>
+      </div>
     </section>
 
-    <section id="dashboard" class="hidden">
-      <h2>Login সফল</h2>
-      <p id="accountInfo"></p>
-      <p>এখন Admin API সংযোগ পরীক্ষা করতে পারো।</p>
-      <button id="apiButton">Test Admin API</button>
-      <button id="logoutButton" class="secondary">Logout</button>
-      <div id="apiMessage" role="status" aria-live="polite"></div>
+    <section class="page" id="page-customers">
+      <h1>Customers</h1><p class="muted">Search accounts and manage customer status.</p>
+      <div class="toolbar"><input id="customerSearch" placeholder="Search User ID, name or status"><button id="customerRefresh" type="button">Refresh</button></div>
+      <div class="panel tablewrap"><table><thead><tr><th>User ID</th><th>Name</th><th>Balance</th><th>Status</th><th>Created</th><th>Action</th></tr></thead><tbody id="customersTable"></tbody></table></div>
     </section>
+
+    <section class="page" id="page-create">
+      <h1>Create Customer</h1><p class="muted">Create a new customer account.</p>
+      <div class="panel" style="max-width:650px">
+        <form id="createForm">
+          <label>User ID<input id="newUserId" required maxlength="80"></label>
+          <label>Customer Name<input id="newUsername" required maxlength="120"></label>
+          <label>Email<input id="newEmail" type="email" required></label>
+          <label>Temporary Password<input id="newPassword" type="password" minlength="6" required autocomplete="new-password"></label>
+          <label>Initial Balance<input id="initialBalance" type="number" min="0" step="1" value="0" required></label>
+          <p class="muted">Initial balance uses the same numeric unit stored by your database. Share login details securely with the customer.</p>
+          <button type="submit">Create Customer</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="page" id="page-balance">
+      <h1>Balance Adjustment</h1><p class="muted">Add or subtract an amount from an active customer account.</p>
+      <div class="panel" style="max-width:650px">
+        <form id="balanceForm">
+          <label>Customer User ID or username<input id="balanceUserId" required></label>
+          <label>Amount (+ to add, − to subtract)<input id="balanceAmount" type="number" step="1" required placeholder="e.g. 500 or -100"></label>
+          <label>Reason (required)<textarea id="balanceReason" required minlength="3" placeholder="Explain why this adjustment is required"></textarea></label>
+          <button type="submit">Adjust Balance</button>
+        </form>
+        <div id="balanceResult" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-transactions">
+      <h1>Transactions</h1><p class="muted">Review transfer transactions and update their status.</p>
+      <div class="toolbar"><input id="transactionSearch" placeholder="Search transaction ID, sender, receiver"><button id="transactionRefresh" type="button">Refresh</button></div>
+      <div class="panel tablewrap"><table><thead><tr><th>Transaction ID</th><th>Type</th><th>Sender</th><th>Receiver</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="transactionsTable"></tbody></table></div>
+    </section>
+
+    <section class="page" id="page-withdrawals">
+      <h1>Withdrawals</h1><p class="muted">Review requests. Approval here updates the internal system; it does not itself send bank funds.</p>
+      <div class="toolbar"><input id="withdrawalSearch" placeholder="Search withdrawal ID or customer"><button id="withdrawalRefresh" type="button">Refresh</button></div>
+      <div class="panel tablewrap"><table><thead><tr><th>Request ID</th><th>Customer</th><th>Bank</th><th>Account Holder</th><th>Account Number</th><th>IFSC</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead><tbody id="withdrawalsTable"></tbody></table></div>
+    </section>
+
+    <section class="page" id="page-audit">
+      <h1>Admin Action History</h1><p class="muted">Recent administrative activity.</p>
+      <div class="toolbar"><input id="auditSearch" placeholder="Search action, target or reason"><button id="auditRefresh" type="button">Refresh</button></div>
+      <div class="panel tablewrap"><table><thead><tr><th>Action ID</th><th>Action</th><th>Target</th><th>Amount</th><th>Reason</th><th>Transaction</th><th>Date</th></tr></thead><tbody id="auditTable"></tbody></table></div>
+    </section>
+    <footer>DhanFlow © 2026 · Internal Wallet Management System</footer>
   </main>
+</div>
 
-  <script>
-    // Supabase Project URL এবং Publishable/anon key
-    const SUPABASE_URL =
-      "https://oxwjnravklpcdhfxibya.supabase.co";
+<script>
+(() => {
+"use strict";
 
-    const SUPABASE_ANON_KEY =
-      "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
+const SUPABASE_URL = "https://oxwjnravklpcdhfxibya.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
 
-    const $ = id => document.getElementById(id);
-    let client = null;
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let session = null;
+let cache = {profiles:[], transactions:[], withdrawals:[], admin_actions:[]};
 
-    function message(id, text, type = "") {
-      const el = $(id);
-      el.textContent = text;
-      el.className = type;
-    }
+const $ = id => document.getElementById(id);
+const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, c => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
 
-    function setLoggedIn(yes) {
-      $("loginSection").classList.toggle("hidden", yes);
-      $("dashboard").classList.toggle("hidden", !yes);
-    }
+const fmt = value => {
+  if (value === null || value === undefined || value === "") return "—";
+  const n = Number(value);
+  return Number.isFinite(n) ? n.toLocaleString("en-IN",{maximumFractionDigits:2}) : escapeHTML(value);
+};
+const dateFmt = value => {
+  if (!value) return "—";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString();
+};
+const badge = status => {
+  const s = String(status ?? "unknown").toLowerCase();
+  return `<span class="badge ${escapeHTML(s)}">${escapeHTML(s)}</span>`;
+};
+const msg = (target, text, type="ok") => {
+  $(target).innerHTML = `<div class="notice ${type}">${escapeHTML(text)}</div>`;
+};
+const clearMsg = target => $(target).replaceChildren();
+const customerById = id => cache.profiles.find(p => p.id === id);
+const customerName = id => {
+  const p = customerById(id);
+  return p ? `${p.username} (${p.user_id})` : (id || "—");
+};
 
-    function init() {
-      if (!window.supabase) {
-        throw new Error(
-          "Supabase library লোড হয়নি। ইন্টারনেট সংযোগ পরীক্ষা করো।"
-        );
-      }
+async function api(action, data={}) {
+  if (!session?.access_token) throw new Error("Please log in again.");
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/admin-api`, {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "apikey":SUPABASE_ANON_KEY,
+      "Authorization":`Bearer ${session.access_token}`
+    },
+    body:JSON.stringify({action,data})
+  });
+  let result;
+  try { result = await response.json(); }
+  catch { throw new Error(`API returned an invalid response (HTTP ${response.status}).`); }
+  if (!response.ok || result?.ok === false || result?.error) {
+    throw new Error(result?.error || `Request failed (HTTP ${response.status}).`);
+  }
+  return result;
+}
 
-      if (
-        !SUPABASE_URL.startsWith("https://") ||
-        SUPABASE_ANON_KEY === "PASTE_YOUR_PUBLISHABLE_KEY_HERE" ||
-        !SUPABASE_ANON_KEY.trim()
-      ) {
-        throw new Error(
-          "Supabase URL ও Publishable/anon key বসাও।"
-        );
-      }
+async function runButton(button, fn) {
+  const old = button.textContent;
+  button.disabled = true;
+  button.textContent = "Please wait…";
+  try { await fn(); }
+  catch (e) { showGlobalError(e); }
+  finally { button.disabled = false; button.textContent = old; }
+}
+function showGlobalError(e) {
+  msg("globalMessage", e?.message || String(e), "error");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function showLogin() {
+  $("app").classList.add("hidden");
+  $("loginScreen").classList.remove("hidden");
+  $("logoutBtn").classList.add("hidden");
+  $("adminEmail").textContent = "";
+}
+function showApp(user) {
+  $("loginScreen").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("logoutBtn").classList.remove("hidden");
+  $("adminEmail").textContent = user?.email || "";
+  clearMsg("globalMessage");
+}
 
-      client = window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-      );
-    }
+async function loadDashboard() {
+  const result = await api("dashboard");
+  const d = result.data || result;
+  for (const key of ["profiles","transactions","withdrawals","admin_actions"]) {
+    if (!Array.isArray(d[key])) throw new Error(`Dashboard response is missing ${key}.`);
+    cache[key] = d[key];
+  }
+  renderAll();
+}
 
-    $("loginForm").addEventListener("submit", async event => {
-      event.preventDefault();
+function renderAll() {
+  const customers = cache.profiles.filter(p => p.role === "customer");
+  $("totalCustomers").textContent = fmt(customers.length);
+  $("activeCustomers").textContent = fmt(customers.filter(p => p.status === "active").length);
+  $("pendingWithdrawals").textContent = fmt(cache.withdrawals.filter(w => w.status === "pending").length);
+  $("totalTransactions").textContent = fmt(cache.transactions.length);
 
-      const button = $("loginButton");
-      button.disabled = true;
-      button.textContent = "লগইন হচ্ছে…";
-      message("message", "Supabase-এ সংযোগ করা হচ্ছে…");
+  $("recentTransactions").innerHTML = cache.transactions.slice(0,10).map(t => `
+    <tr><td>${escapeHTML(t.transaction_id)}</td><td>${escapeHTML(t.type)}</td>
+    <td>${fmt(t.amount)}</td><td>${badge(t.status)}</td><td>${dateFmt(t.created_at)}</td></tr>
+  `).join("") || emptyRow(5);
 
-      try {
-        const email = $("email").value.trim();
-        const password = $("password").value;
+  renderCustomers();
+  renderTransactions();
+  renderWithdrawals();
+  renderAudit();
+}
+function emptyRow(n) {
+  return `<tr><td colspan="${n}" class="muted">No records found.</td></tr>`;
+}
+function renderCustomers() {
+  const q = $("customerSearch").value.trim().toLowerCase();
+  const rows = cache.profiles.filter(p => p.role === "customer").filter(p =>
+    [p.user_id,p.username,p.status].some(v => String(v ?? "").toLowerCase().includes(q))
+  );
+  $("customersTable").innerHTML = rows.map(p => `
+    <tr>
+      <td>${escapeHTML(p.user_id)}</td><td>${escapeHTML(p.username)}</td>
+      <td>${fmt(p.balance)}</td><td>${badge(p.status)}</td><td>${dateFmt(p.created_at)}</td>
+      <td><div class="actions">
+        <button class="${p.status === "blocked" ? "success" : "danger"}" data-status-id="${escapeHTML(p.user_id)}" data-status="${p.status === "blocked" ? "active" : "blocked"}">${p.status === "blocked" ? "Unblock" : "Block"}</button>
+        <button class="secondary" data-adjust-id="${escapeHTML(p.user_id)}">Adjust</button>
+      </div></td>
+    </tr>`).join("") || emptyRow(6);
+}
+function renderTransactions() {
+  const q = $("transactionSearch").value.trim().toLowerCase();
+  const rows = cache.transactions.filter(t =>
+    [t.transaction_id,t.type,t.sender_id,t.receiver_id,t.status].some(v => String(v ?? "").toLowerCase().includes(q))
+  );
+  $("transactionsTable").innerHTML = rows.map(t => `
+    <tr>
+      <td>${escapeHTML(t.transaction_id)}</td><td>${escapeHTML(t.type)}</td>
+      <td>${escapeHTML(customerName(t.sender_id))}</td><td>${escapeHTML(customerName(t.receiver_id))}</td>
+      <td>${fmt(t.amount)}</td><td>${badge(t.status)}</td><td>${dateFmt(t.created_at)}</td>
+      <td>${t.type === "transfer" ? `<div class="actions">
+        <button data-transfer-id="${escapeHTML(t.transaction_id)}" data-transfer-status="approved">Approve</button>
+        <button class="danger" data-transfer-id="${escapeHTML(t.transaction_id)}" data-transfer-status="rejected">Reject</button>
+        <button class="secondary" data-transfer-id="${escapeHTML(t.transaction_id)}" data-transfer-status="frozen">Freeze</button>
+      </div>` : "—"}</td>
+    </tr>`).join("") || emptyRow(8);
+}
+function renderWithdrawals() {
+  const q = $("withdrawalSearch").value.trim().toLowerCase();
+  const rows = cache.withdrawals.filter(w =>
+    [w.withdrawal_id,w.user_id,w.bank_name,w.account_holder,w.status].some(v => String(v ?? "").toLowerCase().includes(q))
+  );
+  $("withdrawalsTable").innerHTML = rows.map(w => `
+    <tr>
+      <td>${escapeHTML(w.withdrawal_id)}</td>
+      <td>${escapeHTML(customerName(w.user_id))}</td>
+      <td>${escapeHTML(w.bank_name)}</td><td>${escapeHTML(w.account_holder)}</td>
+      <td>${escapeHTML(w.account_number)}</td><td>${escapeHTML(w.ifsc)}</td>
+      <td>${fmt(w.amount)}</td><td>${badge(w.status)}</td><td>${dateFmt(w.created_at)}</td>
+      <td><div class="actions">
+        <button data-withdraw-id="${Number(w.id)}" data-withdraw-status="approved">Approve</button>
+        <button class="danger" data-withdraw-id="${Number(w.id)}" data-withdraw-status="rejected">Reject</button>
+        <button class="secondary" data-withdraw-id="${Number(w.id)}" data-withdraw-status="frozen">Freeze</button>
+      </div></td>
+    </tr>`).join("") || emptyRow(10);
+}
+function renderAudit() {
+  const q = $("auditSearch").value.trim().toLowerCase();
+  const rows = cache.admin_actions.filter(a =>
+    [a.action_id,a.action,a.target_user_id,a.reason,a.transaction_id].some(v => String(v ?? "").toLowerCase().includes(q))
+  );
+  $("auditTable").innerHTML = rows.map(a => `
+    <tr><td>${escapeHTML(a.action_id)}</td><td>${escapeHTML(a.action)}</td>
+    <td>${escapeHTML(customerName(a.target_user_id))}</td><td>${fmt(a.amount)}</td>
+    <td style="white-space:normal;min-width:160px">${escapeHTML(a.reason)}</td>
+    <td>${escapeHTML(a.transaction_id)}</td><td>${dateFmt(a.created_at)}</td></tr>
+  `).join("") || emptyRow(7);
+}
 
-        const { data, error } =
-          await client.auth.signInWithPassword({ email, password });
-
-        if (error) throw error;
-        if (!data.session) {
-          throw new Error("Login session তৈরি হয়নি।");
-        }
-
-        $("accountInfo").textContent =
-          "Signed in: " + (data.user.email || email);
-
-        setLoggedIn(true);
-        message("message", "");
-      } catch (error) {
-        setLoggedIn(false);
-        message(
-          "message",
-          "Login ব্যর্থ: " + (error.message || String(error)),
-          "error"
-        );
-      } finally {
-        button.disabled = false;
-        button.textContent = "Login";
-      }
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const button = $("loginBtn");
+  button.disabled = true;
+  button.textContent = "Signing in…";
+  clearMsg("loginMessage");
+  try {
+    const {data,error} = await client.auth.signInWithPassword({
+      email:$("email").value.trim(),
+      password:$("password").value
     });
+    if (error) throw error;
+    session = data.session;
+    if (!session) throw new Error("Login succeeded but no session was returned.");
+    showApp(data.user);
+    await loadDashboard();
+  } catch (e) {
+    showLogin();
+    msg("loginMessage", e.message || String(e), "error");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Login";
+  }
+});
 
-    $("apiButton").addEventListener("click", async () => {
-      const button = $("apiButton");
-      button.disabled = true;
-      message("apiMessage", "Admin API পরীক্ষা হচ্ছে…");
+$("logoutBtn").addEventListener("click", async () => {
+  try { await client.auth.signOut(); }
+  finally { session = null; cache = {profiles:[],transactions:[],withdrawals:[],admin_actions:[]}; showLogin(); }
+});
 
-      try {
-        const { data: sessionData, error: sessionError } =
-          await client.auth.getSession();
+$("nav").addEventListener("click", e => {
+  const button = e.target.closest("[data-page]");
+  if (!button) return;
+  document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("active", b === button));
+  document.querySelectorAll(".page").forEach(p => p.classList.toggle("active", p.id === `page-${button.dataset.page}`));
+  clearMsg("globalMessage");
+});
 
-        if (sessionError) throw sessionError;
+$("refreshBtn").addEventListener("click", e => runButton(e.currentTarget, loadDashboard));
+$("customerRefresh").addEventListener("click", e => runButton(e.currentTarget, loadDashboard));
+$("transactionRefresh").addEventListener("click", e => runButton(e.currentTarget, loadDashboard));
+$("withdrawalRefresh").addEventListener("click", e => runButton(e.currentTarget, loadDashboard));
+$("auditRefresh").addEventListener("click", e => runButton(e.currentTarget, loadDashboard));
 
-        const token = sessionData.session?.access_token;
-        if (!token) throw new Error("Login session পাওয়া যায়নি।");
+$("customerSearch").addEventListener("input", renderCustomers);
+$("transactionSearch").addEventListener("input", renderTransactions);
+$("withdrawalSearch").addEventListener("input", renderWithdrawals);
+$("auditSearch").addEventListener("input", renderAudit);
 
-        const response = await fetch(
-          SUPABASE_URL + "/functions/v1/admin-api",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + token,
-              "apikey": SUPABASE_ANON_KEY
-            },
-            body: JSON.stringify({
-              action: "dashboard",
-              data: {}
-            })
-          }
-        );
+$("createForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const button = e.submitter;
+  await runButton(button, async () => {
+    const data = {
+      user_id:$("newUserId").value.trim(),
+      username:$("newUsername").value.trim(),
+      email:$("newEmail").value.trim(),
+      password:$("newPassword").value,
+      initial_balance:Number($("initialBalance").value)
+    };
+    if (!Number.isFinite(data.initial_balance) || data.initial_balance < 0) throw new Error("Enter a valid initial balance.");
+    const result = await api("create_customer", data);
+    alert(result.message || "Customer created successfully.");
+    $("createForm").reset();
+    await loadDashboard();
+    document.querySelector('[data-page="customers"]').click();
+  });
+});
 
-        const body = await response.text();
+$("balanceForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const button = e.submitter;
+  await runButton(button, async () => {
+    const data = {
+      user_id:$("balanceUserId").value.trim(),
+      amount:Number($("balanceAmount").value),
+      reason:$("balanceReason").value.trim()
+    };
+    if (!data.user_id) throw new Error("Customer User ID is required.");
+    if (!Number.isFinite(data.amount) || data.amount === 0) throw new Error("Amount must be a non-zero number.");
+    if (data.reason.length < 3) throw new Error("Please enter a reason.");
+    const action = data.amount > 0 ? "add" : "subtract";
+    if (!confirm(`Confirm ${action} ${fmt(Math.abs(data.amount))} for ${data.user_id}?`)) return;
+    const result = await api("adjust_balance", data);
+    msg("balanceResult", `${result.message || "Balance adjusted."}\nCustomer: ${result.username || data.user_id}\nOld balance: ${fmt(result.old_balance)}\nNew balance: ${fmt(result.new_balance)}\nTransaction ID: ${result.transaction_id || "—"}`, "ok");
+    $("balanceAmount").value = "";
+    $("balanceReason").value = "";
+    await loadDashboard();
+  });
+});
 
-        if (!response.ok) {
-          throw new Error(
-            "HTTP " + response.status + "\n" + body
-          );
-        }
-
-        message(
-          "apiMessage",
-          "API response:\n" + body,
-          "ok"
-        );
-      } catch (error) {
-        message(
-          "apiMessage",
-          "API পরীক্ষা ব্যর্থ:\n" +
-          (error.message || String(error)),
-          "error"
-        );
-      } finally {
-        button.disabled = false;
-      }
+$("customersTable").addEventListener("click", async e => {
+  const statusBtn = e.target.closest("[data-status-id]");
+  const adjustBtn = e.target.closest("[data-adjust-id]");
+  if (statusBtn) {
+    await runButton(statusBtn, async () => {
+      const user_id = statusBtn.dataset.statusId;
+      const status = statusBtn.dataset.status;
+      const reason = prompt(`Reason for setting ${user_id} to ${status}:`, status === "blocked" ? "Blocked by admin" : "Unblocked by admin");
+      if (reason === null) return;
+      await api("user_status", {user_id,status,reason});
+      await loadDashboard();
+      msg("globalMessage", `Customer ${status === "blocked" ? "blocked" : "unblocked"} successfully.`);
     });
+  }
+  if (adjustBtn) {
+    $("balanceUserId").value = adjustBtn.dataset.adjustId;
+    document.querySelector('[data-page="balance"]').click();
+    $("balanceAmount").focus();
+  }
+});
 
-    $("logoutButton").addEventListener("click", async () => {
-      try {
-        await client.auth.signOut();
-      } finally {
-        setLoggedIn(false);
-        $("password").value = "";
-        message("message", "Logout সম্পন্ন হয়েছে।");
-      }
-    });
+$("transactionsTable").addEventListener("click", async e => {
+  const button = e.target.closest("[data-transfer-id]");
+  if (!button) return;
+  await runButton(button, async () => {
+    const transaction_id = button.dataset.transferId;
+    const status = button.dataset.transferStatus;
+    const note = prompt(`Optional note for ${status} transaction ${transaction_id}:`, `Transaction ${status} by admin`);
+    if (note === null) return;
+    if (!confirm(`Confirm setting transaction ${transaction_id} to ${status}?`)) return;
+    await api("transfer_status", {transaction_id,status,note});
+    await loadDashboard();
+    msg("globalMessage", `Transaction ${status} successfully.`);
+  });
+});
 
-    window.addEventListener("error", event => {
-      message("message", "JavaScript error: " + event.message, "error");
-    });
+$("withdrawalsTable").addEventListener("click", async e => {
+  const button = e.target.closest("[data-withdraw-id]");
+  if (!button) return;
+  await runButton(button, async () => {
+    const withdrawal_id = button.dataset.withdrawId;
+    const status = button.dataset.withdrawStatus;
+    const note = prompt(`Optional admin note for withdrawal #${withdrawal_id}:`, `Withdrawal ${status} by admin`);
+    if (note === null) return;
+    if (!confirm(`Confirm withdrawal #${withdrawal_id} status: ${status}? This updates the internal system only.`)) return;
+    await api("withdrawal_status", {withdrawal_id,status,note});
+    await loadDashboard();
+    msg("globalMessage", `Withdrawal status updated to ${status}. This does not confirm a bank payout.`);
+  });
+});
 
-    try {
-      init();
-    } catch (error) {
-      message("message", error.message, "error");
+client.auth.onAuthStateChange((_event, newSession) => {
+  session = newSession;
+});
+
+(async function init() {
+  try {
+    const {data,error} = await client.auth.getSession();
+    if (error) throw error;
+    if (data.session) {
+      session = data.session;
+      showApp(data.session.user);
+      await loadDashboard();
     }
-  </script>
+  } catch (e) {
+    showLogin();
+    msg("loginMessage", e.message || String(e), "error");
+  }
+})();
+})();
+</script>
 </body>
 </html>
