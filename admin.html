@@ -1,2870 +1,824 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DhanFlow Admin Panel</title>
+  <meta name="theme-color" content="#101827">
 
-<meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #131e30;
+      --panel2: #19263b;
+      --text: #f1f5f9;
+      --muted: #9caec5;
+      --border: #2b3b52;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #60a5fa;
+    }
 
-<title>DhanFlow Admin Panel</title>
+    * { box-sizing: border-box; }
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-<style>
+    button, input, select, textarea { font: inherit; }
 
-*{
-  box-sizing:border-box;
-}
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 13px;
+      cursor: pointer;
+      font-weight: 700;
+    }
 
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#0b1220;
-  color:#fff;
-}
+    button:disabled { opacity: .5; cursor: not-allowed; }
 
-.container{
-  width:100%;
-  max-width:1150px;
-  margin:auto;
-  padding:18px;
-}
+    .primary { background: #2563eb; color: white; }
+    .success { background: #166534; color: white; }
+    .danger { background: #991b1b; color: white; }
+    .warning { background: #92400e; color: white; }
+    .neutral { background: #334155; color: white; }
 
-.card{
-  background:#121c2e;
-  border:1px solid #26344d;
-  border-radius:16px;
-  padding:20px;
-  margin-bottom:20px;
-}
+    header {
+      padding: 17px;
+      background: #111c2d;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-h1,h2,h3{
-  margin-top:0;
-}
+    header h1 { margin: 0; font-size: 21px; }
+    header p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
 
-input,
-select,
-textarea{
-  width:100%;
-  padding:13px;
-  margin:7px 0 12px;
-  border-radius:9px;
-  border:1px solid #34445f;
-  background:#0b1424;
-  color:#fff;
-  font-size:15px;
-}
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      min-height: calc(100vh - 70px);
+    }
 
-textarea{
-  min-height:130px;
-  resize:vertical;
-}
+    nav {
+      padding: 14px;
+      background: #0e1929;
+      border-right: 1px solid var(--border);
+    }
 
-button{
-  border:0;
-  border-radius:9px;
-  padding:11px 16px;
-  cursor:pointer;
-  font-size:14px;
-  font-weight:bold;
-}
+    nav button {
+      width: 100%;
+      margin-bottom: 7px;
+      text-align: left;
+      color: var(--text);
+      background: transparent;
+    }
 
-button:disabled{
-  opacity:.6;
-  cursor:not-allowed;
-}
+    nav button.active, nav button:hover { background: var(--panel2); }
 
-.primary{
-  background:#2563eb;
-  color:white;
-}
+    main { padding: 18px; min-width: 0; }
 
-.success{
-  background:#16a34a;
-  color:white;
-}
+    .notice {
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 10px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
 
-.danger{
-  background:#dc2626;
-  color:white;
-}
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
 
-.warning{
-  background:#d97706;
-  color:white;
-}
+    .card, .section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 15px;
+      min-width: 0;
+    }
 
-.secondary{
-  background:#475569;
-  color:white;
-}
+    .metric-label { color: var(--muted); font-size: 13px; }
+    .metric-value { font-size: 25px; font-weight: 800; margin-top: 9px; overflow-wrap: anywhere; }
 
-.full{
-  width:100%;
-}
+    .section { margin-bottom: 16px; }
+    .section h2 { margin: 0 0 14px; font-size: 18px; }
 
-.hidden{
-  display:none !important;
-}
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
 
-.message{
-  margin-top:12px;
-  padding:12px;
-  border-radius:8px;
-  background:#1e293b;
-  line-height:1.5;
-}
+    label { display: block; color: var(--muted); font-size: 13px; }
 
-.login-box{
-  max-width:430px;
-  margin:70px auto;
-}
+    input, select, textarea {
+      display: block;
+      width: 100%;
+      margin-top: 6px;
+      padding: 11px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #0b1423;
+      color: var(--text);
+      outline: none;
+    }
 
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
+    textarea { resize: vertical; min-height: 75px; }
 
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:15px;
-}
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
 
-.stat{
-  background:#172338;
-  padding:18px;
-  border-radius:12px;
-}
+    .table-wrap { overflow-x: auto; }
 
-.stat strong{
-  display:block;
-  font-size:28px;
-  margin-top:8px;
-}
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 13px;
+      min-width: 760px;
+    }
 
-.table-wrap{
-  overflow-x:auto;
-}
+    th, td {
+      text-align: left;
+      padding: 11px 9px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:850px;
-}
+    th { color: var(--muted); font-weight: 600; }
+    td { overflow-wrap: anywhere; }
 
-th,
-td{
-  padding:11px;
-  border-bottom:1px solid #29364c;
-  text-align:left;
-  vertical-align:top;
-}
+    .actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .actions button { font-size: 12px; padding: 8px 9px; }
 
-th{
-  background:#18253a;
-}
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 30px;
+      font-size: 11px;
+      background: #334155;
+    }
 
-.small{
-  font-size:13px;
-  color:#aebbd0;
-}
+    .pill.pending { background: #78350f; }
+    .pill.approved, .pill.active { background: #14532d; }
+    .pill.rejected, .pill.blocked { background: #7f1d1d; }
+    .pill.frozen { background: #713f12; }
 
-.actions{
-  display:flex;
-  gap:7px;
-  flex-wrap:wrap;
-}
+    .toolbar {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
 
-.section-title{
-  margin-top:30px;
-}
+    .toolbar input { max-width: 350px; margin: 0; }
 
-/* MODAL */
+    .hidden { display: none !important; }
+    .muted { color: var(--muted); }
+    .message { margin: 12px 0; white-space: pre-wrap; font-size: 13px; }
+    .error { color: #fca5a5; }
+    .ok { color: #86efac; }
 
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.75);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding:15px;
-  z-index:9999;
-}
+    #loginScreen {
+      max-width: 420px;
+      margin: 55px auto;
+      padding: 20px;
+    }
 
-.modal-box{
-  width:100%;
-  max-width:520px;
-  background:#121c2e;
-  border:1px solid #33445f;
-  border-radius:16px;
-  padding:22px;
-  box-shadow:0 20px 60px rgba(0,0,0,.5);
-}
+    #loginScreen h2 { margin-top: 0; }
+    #loginScreen button { width: 100%; margin-top: 13px; }
 
-.modal-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
+    .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-.close-btn{
-  background:#334155;
-  color:white;
-  font-size:18px;
-  padding:8px 12px;
-}
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: 1fr; }
+      nav {
+        display: flex;
+        gap: 5px;
+        overflow-x: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+      }
+      nav button { width: auto; white-space: nowrap; margin: 0; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      main { padding: 12px; }
+    }
 
-.recipient-box{
-  background:#172338;
-  padding:12px;
-  border-radius:10px;
-  margin-bottom:15px;
-}
-
-.message-history{
-  max-height:300px;
-  overflow-y:auto;
-  margin-top:15px;
-}
-
-.message-item{
-  background:#172338;
-  border:1px solid #2b3b55;
-  border-radius:10px;
-  padding:12px;
-  margin-bottom:10px;
-}
-
-.message-item strong{
-  display:block;
-  margin-bottom:5px;
-}
-
-.unread{
-  border-left:4px solid #2563eb;
-}
-
-.read{
-  opacity:.8;
-}
-
-.badge{
-  display:inline-block;
-  padding:4px 8px;
-  border-radius:20px;
-  font-size:11px;
-  background:#334155;
-}
-
-@media(max-width:700px){
-
-  .container{
-    padding:10px;
-  }
-
-  .card{
-    padding:15px;
-  }
-
-  .stats{
-    grid-template-columns:repeat(2,1fr);
-    gap:10px;
-  }
-
-  .stat{
-    padding:14px;
-  }
-
-  .stat strong{
-    font-size:22px;
-  }
-
-  button{
-    padding:10px 12px;
-  }
-
-}
-
-</style>
-
+    @media (max-width: 480px) {
+      .form-grid { grid-template-columns: 1fr; }
+      header h1 { font-size: 18px; }
+      .metric-value { font-size: 21px; }
+    }
+  </style>
 </head>
 
-
 <body>
+  <header>
+    <div>
+      <h1>DhanFlow Admin</h1>
+      <p>Internal Wallet Management System</p>
+    </div>
+    <div class="top-actions">
+      <button class="neutral" id="refreshBtn">Refresh</button>
+      <button class="danger" id="logoutBtn">Logout</button>
+    </div>
+  </header>
 
+  <section id="loginScreen" class="section">
+    <h2>Admin Login</h2>
+    <p class="muted">Sign in with your existing DhanFlow admin account.</p>
+    <form id="loginForm">
+      <label>Email
+        <input id="loginEmail" type="email" required autocomplete="username">
+      </label>
+      <label style="margin-top:12px">Password
+        <input id="loginPassword" type="password" required autocomplete="current-password">
+      </label>
+      <button class="primary" type="submit">Login</button>
+    </form>
+    <div id="loginMessage" class="message"></div>
+  </section>
 
-<!-- =========================
-     LOGIN
-========================= -->
+  <div id="app" class="layout hidden">
+    <nav id="nav">
+      <button class="active" data-page="dashboard">Dashboard</button>
+      <button data-page="customers">Customers</button>
+      <button data-page="create">Create Customer</button>
+      <button data-page="balance">Balance Adjustment</button>
+      <button data-page="transfers">Transfers</button>
+      <button data-page="withdrawals">Withdrawals</button>
+      <button data-page="history">Admin History</button>
+    </nav>
 
-<div id="loginPage" class="container">
-
-  <div class="card login-box">
-
-    <h1>DhanFlow</h1>
-
-    <p class="small">
-      Admin Login
-    </p>
-
-    <label>Email</label>
-
-    <input
-      id="loginEmail"
-      type="email"
-      placeholder="Admin email"
-      autocomplete="username"
-    >
-
-    <label>Password</label>
-
-    <input
-      id="loginPassword"
-      type="password"
-      placeholder="Admin password"
-      autocomplete="current-password"
-    >
-
-    <button
-      id="loginButton"
-      class="primary full"
-      type="button"
-      onclick="login()"
-    >
-      Login
-    </button>
-
-    <div
-      id="loginMessage"
-      class="message hidden"
-    ></div>
-
-  </div>
-
-</div>
-
-
-<!-- =========================
-     ADMIN APP
-========================= -->
-
-<div
-  id="adminApp"
-  class="container hidden"
->
-
-  <!-- TOP BAR -->
-
-  <div class="card">
-
-    <div class="topbar">
-
-      <div>
-
-        <h1>DhanFlow Admin</h1>
-
-        <div
-          id="adminInfo"
-          class="small"
-        ></div>
-
+    <main>
+      <div class="notice">
+        <strong>Important:</strong> This panel updates DhanFlow's internal records.
+        Approving a withdrawal does not itself transfer money to a bank account.
+        Verify all amounts and IDs before taking action.
       </div>
 
-      <button
-        class="danger"
-        type="button"
-        onclick="logout()"
-      >
-        Logout
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- STATS -->
-
-  <div class="stats">
-
-    <div class="stat">
-
-      <div class="small">
-        Customers
-      </div>
-
-      <strong id="statCustomers">
-        0
-      </strong>
-
-    </div>
-
-
-    <div class="stat">
-
-      <div class="small">
-        Total Balance
-      </div>
-
-      <strong id="statBalance">
-        ₹0.00
-      </strong>
-
-    </div>
-
-
-    <div class="stat">
-
-      <div class="small">
-        Transactions
-      </div>
-
-      <strong id="statTransactions">
-        0
-      </strong>
-
-    </div>
-
-
-    <div class="stat">
-
-      <div class="small">
-        Withdrawals
-      </div>
-
-      <strong id="statWithdrawals">
-        0
-      </strong>
-
-    </div>
-
-  </div>
-
-
-  <!-- REFRESH -->
-
-  <div class="card">
-
-    <button
-      class="primary"
-      type="button"
-      onclick="loadDashboard()"
-    >
-      🔄 Refresh Dashboard
-    </button>
-
-    <div
-      id="appMessage"
-      class="message hidden"
-    ></div>
-
-  </div>
-
-
-  <!-- CREATE CUSTOMER -->
-
-  <div class="card">
-
-    <h2>
-      Create Customer
-    </h2>
-
-    <input
-      id="newUserId"
-      placeholder="User ID e.g. USER001"
-    >
-
-    <input
-      id="newUsername"
-      placeholder="Username"
-    >
-
-    <input
-      id="newEmail"
-      type="email"
-      placeholder="Customer Email"
-    >
-
-    <input
-      id="newPassword"
-      type="password"
-      placeholder="Customer Password"
-    >
-
-    <input
-      id="newBalance"
-      type="number"
-      min="0"
-      step="0.01"
-      placeholder="Initial Balance"
-    >
-
-    <button
-      class="success"
-      type="button"
-      onclick="createCustomer()"
-    >
-      Create Customer
-    </button>
-
-  </div>
-
-
-  <!-- BALANCE ADJUSTMENT -->
-
-  <div class="card">
-
-    <h2>
-      Balance Adjustment
-    </h2>
-
-    <input
-      id="adjustUserId"
-      placeholder="Customer UUID"
-    >
-
-    <input
-      id="adjustAmount"
-      type="number"
-      step="0.01"
-      placeholder="Amount (+ deposit / - deduction)"
-    >
-
-    <textarea
-      id="adjustReason"
-      placeholder="Reason"
-    ></textarea>
-
-    <button
-      class="warning"
-      type="button"
-      onclick="adjustBalance()"
-    >
-      Adjust Balance
-    </button>
-
-  </div>
-
-
-  <!-- CUSTOMERS -->
-
-  <div class="card">
-
-    <h2>
-      Customers
-    </h2>
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>User ID</th>
-
-            <th>Username</th>
-
-            <th>Role</th>
-
-            <th>Balance</th>
-
-            <th>Status</th>
-
-            <th>Created</th>
-
-            <th>Action</th>
-
-          </tr>
-
-        </thead>
-
-        <tbody
-          id="customersBody"
-        ></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- TRANSACTIONS -->
-
-  <div class="card">
-
-    <h2>
-      Transactions
-    </h2>
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>Transaction ID</th>
-
-            <th>Amount</th>
-
-            <th>Type</th>
-
-            <th>Status</th>
-
-            <th>Date</th>
-
-            <th>Action</th>
-
-          </tr>
-
-        </thead>
-
-        <tbody
-          id="transactionsBody"
-        ></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- WITHDRAWALS -->
-
-  <div class="card">
-
-    <h2>
-      Bank Withdrawals
-    </h2>
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>Withdrawal ID</th>
-
-            <th>Amount</th>
-
-            <th>Bank</th>
-
-            <th>Account Holder</th>
-
-            <th>IFSC</th>
-
-            <th>Status</th>
-
-            <th>Date</th>
-
-            <th>Action</th>
-
-          </tr>
-
-        </thead>
-
-        <tbody
-          id="withdrawalsBody"
-        ></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- ADMIN LOG -->
-
-  <div class="card">
-
-    <h2>
-      Admin Action Log
-    </h2>
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>Action ID</th>
-
-            <th>Action</th>
-
-            <th>Amount</th>
-
-            <th>Reason</th>
-
-            <th>Date</th>
-
-          </tr>
-
-        </thead>
-
-        <tbody
-          id="actionsBody"
-        ></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- =========================
-     MESSAGE MODAL
-========================= -->
-
-<div
-  id="messageModal"
-  class="modal hidden"
->
-
-  <div class="modal-box">
-
-    <div class="modal-header">
-
-      <h2>
-        💬 Send Personal Message
-      </h2>
-
-      <button
-        class="close-btn"
-        type="button"
-        onclick="closeMessageModal()"
-      >
-        ✕
-      </button>
-
-    </div>
-
-
-    <div
-      id="recipientBox"
-      class="recipient-box"
-    >
-      Loading user...
-    </div>
-
-
-    <label>
-      Subject
-    </label>
-
-    <input
-      id="messageSubject"
-      type="text"
-      maxlength="150"
-      placeholder="Message subject"
-    >
-
-
-    <label>
-      Message
-    </label>
-
-    <textarea
-      id="messageText"
-      maxlength="5000"
-      placeholder="Write your personal message..."
-    ></textarea>
-
-
-    <button
-      id="sendMessageButton"
-      class="primary full"
-      type="button"
-      onclick="sendPersonalMessage()"
-    >
-      📤 Send Message
-    </button>
-
-
-    <div
-      id="messageSendStatus"
-      class="message hidden"
-    ></div>
-
-
-    <div
-      id="messageHistory"
-      class="message-history"
-    ></div>
-
-  </div>
-
-</div>
-
-
-
-<script>
-
-/* =====================================================
-   SUPABASE CONFIG
-===================================================== */
-
-const SUPABASE_URL =
-"https://oxwjnravklpcdhfxibya.supabase.co";
-
-const SUPABASE_KEY =
-"sb_publishable_e8SsrFVAkRKIoLVtgOXNGA_KHwMstRC";
-
-let supabaseClient = null;
-
-
-/* =====================================================
-   MESSAGE HELPER
-===================================================== */
-
-function showMessage(id,text){
-
-  const el =
-    document.getElementById(id);
-
-  if(!el) return;
-
-  el.textContent = text;
-
-  el.classList.remove("hidden");
-
-}
-
-
-/* =====================================================
-   SUPABASE INITIALIZE
-===================================================== */
-
-function initSupabase(){
-
-  if(!window.supabase){
-
-    showMessage(
-      "loginMessage",
-      "Supabase library load হয়নি। Internet connection check করুন।"
-    );
-
-    return false;
-  }
-
-
-  if(!supabaseClient){
-
-    supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      );
-
-  }
-
-
-  return true;
-
-}
-
-
-/* =====================================================
-   LOGIN
-===================================================== */
-
-async function login(){
-
-  if(!initSupabase()) return;
-
-
-  const email =
-    document
-      .getElementById("loginEmail")
-      .value
-      .trim();
-
-
-  const password =
-    document
-      .getElementById("loginPassword")
-      .value;
-
-
-  if(!email){
-
-    showMessage(
-      "loginMessage",
-      "Admin email দিন।"
-    );
-
-    return;
-
-  }
-
-
-  if(!password){
-
-    showMessage(
-      "loginMessage",
-      "Admin password দিন।"
-    );
-
-    return;
-
-  }
-
-
-  const button =
-    document.getElementById(
-      "loginButton"
-    );
-
-
-  button.disabled = true;
-
-  button.textContent =
-    "Logging in...";
-
-
-  showMessage(
-    "loginMessage",
-    "Login হচ্ছে..."
-  );
-
-
-  try{
-
-    const result =
-      await supabaseClient
-      .auth
-      .signInWithPassword({
-
-        email:email,
-
-        password:password
-
-      });
-
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-
-    const user =
-      result.data.user;
-
-
-    if(!user){
-
-      throw new Error(
-        "User পাওয়া যায়নি।"
-      );
-
-    }
-
-
-    const profileResult =
-      await supabaseClient
-      .from("profiles")
-      .select(
-        "id,user_id,username,role,balance,status"
-      )
-      .eq("id",user.id)
-      .single();
-
-
-    if(profileResult.error){
-
-      throw new Error(
-        "Admin profile পাওয়া যায়নি: " +
-        profileResult.error.message
-      );
-
-    }
-
-
-    const profile =
-      profileResult.data;
-
-
-    if(profile.role !== "admin"){
-
-      await supabaseClient
-        .auth
-        .signOut();
-
-      throw new Error(
-        "এই account-এর admin permission নেই।"
-      );
-
-    }
-
-
-    if(profile.status !== "active"){
-
-      await supabaseClient
-        .auth
-        .signOut();
-
-      throw new Error(
-        "Admin account blocked/inactive।"
-      );
-
-    }
-
-
-    document
-      .getElementById("loginPage")
-      .classList
-      .add("hidden");
-
-
-    document
-      .getElementById("adminApp")
-      .classList
-      .remove("hidden");
-
-
-    document
-      .getElementById("adminInfo")
-      .textContent =
-        "Logged in as: " +
-        profile.username +
-        " | " +
-        profile.user_id;
-
-
-    document
-      .getElementById("loginMessage")
-      .classList
-      .add("hidden");
-
-
-    await loadDashboard();
-
-  }
-  catch(error){
-
-    console.error(
-      "LOGIN ERROR:",
-      error
-    );
-
-
-    showMessage(
-      "loginMessage",
-      "Login failed: " +
-      (error.message ||
-      "Unknown error")
-    );
-
-  }
-  finally{
-
-    button.disabled = false;
-
-    button.textContent =
-      "Login";
-
-  }
-
-}
-
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
-async function logout(){
-
-  if(!initSupabase())
-    return;
-
-
-  await supabaseClient
-    .auth
-    .signOut();
-
-
-  location.reload();
-
-}
-
-
-/* =====================================================
-   ADMIN API
-===================================================== */
-
-async function adminApi(
-  action,
-  data={}
-){
-
-  if(!initSupabase()){
-
-    throw new Error(
-      "Supabase initialize হয়নি।"
-    );
-
-  }
-
-
-  const sessionResult =
-    await supabaseClient
-    .auth
-    .getSession();
-
-
-  const session =
-    sessionResult.data.session;
-
-
-  if(!session){
-
-    throw new Error(
-      "Admin session পাওয়া যায়নি। আবার Login করুন।"
-    );
-
-  }
-
-
-  const response =
-    await fetch(
-
-      SUPABASE_URL +
-      "/functions/v1/admin-api",
-
-      {
-
-        method:"POST",
-
-        headers:{
-
-          "Content-Type":
-            "application/json",
-
-          "Authorization":
-            "Bearer " +
-            session.access_token
-
-        },
-
-        body:JSON.stringify({
-
-          action:action,
-
-          data:data
-
-        })
-
-      }
-
-    );
-
-
-  const text =
-    await response.text();
-
-
-  let result={};
-
-
-  try{
-
-    result =
-      text
-      ? JSON.parse(text)
-      : {};
-
-  }
-  catch(e){
-
-    result={
-      raw:text
-    };
-
-  }
-
-
-  if(!response.ok){
-
-    throw new Error(
-
-      result.error ||
-      result.message ||
-      result.raw ||
-      "Admin API error"
-
-    );
-
-  }
-
-
-  if(result.error){
-
-    throw new Error(
-      result.error
-    );
-
-  }
-
-
-  return result;
-
-}
-
-
-/* =====================================================
-   LOAD DASHBOARD
-===================================================== */
-
-async function loadDashboard(){
-
-  try{
-
-    showMessage(
-      "appMessage",
-      "Dashboard loading..."
-    );
-
-
-    const result =
-      await adminApi(
-        "dashboard"
-      );
-
-
-    const data =
-      result.data ||
-      result;
-
-
-    const profiles =
-      data.profiles ||
-      data.customers ||
-      [];
-
-
-    const transactions =
-      data.transactions ||
-      [];
-
-
-    const withdrawals =
-      data.withdrawals ||
-      [];
-
-
-    const actions =
-      data.admin_actions ||
-      data.actions ||
-      [];
-
-
-    renderCustomers(
-      profiles
-    );
-
-
-    renderTransactions(
-      transactions
-    );
-
-
-    renderWithdrawals(
-      withdrawals
-    );
-
-
-    renderActions(
-      actions
-    );
-
-
-    const customers =
-      profiles.filter(
-        x =>
-          x.role === "customer"
-      );
-
-
-    const totalBalance =
-      customers.reduce(
-        (sum,x)=>
-          sum +
-          Number(
-            x.balance || 0
-          ),
-        0
-      );
-
-
-    document
-      .getElementById(
-        "statCustomers"
-      )
-      .textContent =
-        customers.length;
-
-
-    document
-      .getElementById(
-        "statBalance"
-      )
-      .textContent =
-        money(totalBalance);
-
-
-    document
-      .getElementById(
-        "statTransactions"
-      )
-      .textContent =
-        transactions.length;
-
-
-    document
-      .getElementById(
-        "statWithdrawals"
-      )
-      .textContent =
-        withdrawals.length;
-
-
-    showMessage(
-      "appMessage",
-      "Dashboard updated."
-    );
-
-  }
-  catch(error){
-
-    console.error(error);
-
-
-    showMessage(
-      "appMessage",
-      "Dashboard error: " +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   CREATE CUSTOMER
-===================================================== */
-
-async function createCustomer(){
-
-  const user_id =
-    document
-      .getElementById(
-        "newUserId"
-      )
-      .value
-      .trim();
-
-
-  const username =
-    document
-      .getElementById(
-        "newUsername"
-      )
-      .value
-      .trim();
-
-
-  const email =
-    document
-      .getElementById(
-        "newEmail"
-      )
-      .value
-      .trim();
-
-
-  const password =
-    document
-      .getElementById(
-        "newPassword"
-      )
-      .value;
-
-
-  const initial_balance =
-    Number(
-      document
-        .getElementById(
-          "newBalance"
-        )
-        .value || 0
-    );
-
-
-  if(
-    !user_id ||
-    !username ||
-    !email ||
-    !password
-  ){
-
-    showMessage(
-      "appMessage",
-      "Customer-এর সব তথ্য পূরণ করুন।"
-    );
-
-    return;
-
-  }
-
-
-  try{
-
-    showMessage(
-      "appMessage",
-      "Customer তৈরি হচ্ছে..."
-    );
-
-
-    await adminApi(
-      "create_customer",
-      {
-
-        user_id,
-        username,
-        email,
-        password,
-        initial_balance
-
-      }
-    );
-
-
-    showMessage(
-      "appMessage",
-      "✅ Customer সফলভাবে তৈরি হয়েছে।"
-    );
-
-
-    document
-      .getElementById(
-        "newUserId"
-      )
-      .value="";
-
-
-    document
-      .getElementById(
-        "newUsername"
-      )
-      .value="";
-
-
-    document
-      .getElementById(
-        "newEmail"
-      )
-      .value="";
-
-
-    document
-      .getElementById(
-        "newPassword"
-      )
-      .value="";
-
-
-    document
-      .getElementById(
-        "newBalance"
-      )
-      .value="";
-
-
-    await loadDashboard();
-
-  }
-  catch(error){
-
-    showMessage(
-      "appMessage",
-      "Customer create error: " +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   BALANCE ADJUSTMENT
-===================================================== */
-
-async function adjustBalance(){
-
-  const userId =
-    document
-      .getElementById(
-        "adjustUserId"
-      )
-      .value
-      .trim();
-
-
-  const amount =
-    Number(
-      document
-        .getElementById(
-          "adjustAmount"
-        )
-        .value
-    );
-
-
-  const reason =
-    document
-      .getElementById(
-        "adjustReason"
-      )
-      .value
-      .trim();
-
-
-  if(!userId){
-
-    showMessage(
-      "appMessage",
-      "Customer UUID দিন।"
-    );
-
-    return;
-
-  }
-
-
-  if(!amount || amount === 0){
-
-    showMessage(
-      "appMessage",
-      "Valid amount দিন।"
-    );
-
-    return;
-
-  }
-
-
-  try{
-
-    await adminApi(
-      "adjust_balance",
-      {
-
-        user_id:userId,
-
-        amount:amount,
-
-        reason:reason
-
-      }
-    );
-
-
-    showMessage(
-      "appMessage",
-      "✅ Balance successfully adjusted."
-    );
-
-
-    document
-      .getElementById(
-        "adjustUserId"
-      )
-      .value="";
-
-
-    document
-      .getElementById(
-        "adjustAmount"
-      )
-      .value="";
-
-
-    document
-      .getElementById(
-        "adjustReason"
-      )
-      .value="";
-
-
-    await loadDashboard();
-
-  }
-  catch(error){
-
-    showMessage(
-      "appMessage",
-      "Balance adjustment error: " +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   USER STATUS
-===================================================== */
-
-async function changeUserStatus(
-  userId,
-  status
-){
-
-  try{
-
-    await adminApi(
-      "user_status",
-      {
-
-        user_id:userId,
-
-        status:status,
-
-        reason:
-          status === "blocked"
-          ? "Blocked by admin"
-          : "Unblocked by admin"
-
-      }
-    );
-
-
-    await loadDashboard();
-
-  }
-  catch(error){
-
-    showMessage(
-      "appMessage",
-      "Status update error: " +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   TRANSFER STATUS
-===================================================== */
-
-async function changeTransferStatus(
-  transactionId,
-  status
-){
-
-  const note =
-    prompt(
-      "Admin note/reason (optional):"
-    ) || "";
-
-
-  try{
-
-    await adminApi(
-      "transfer_status",
-      {
-
-        transaction_id:
-          transactionId,
-
-        status:status,
-
-        note:note
-
-      }
-    );
-
-
-    await loadDashboard();
-
-  }
-  catch(error){
-
-    showMessage(
-      "appMessage",
-      "Transaction update error: " +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   WITHDRAWAL STATUS
-===================================================== */
-
-async function changeWithdrawalStatus(
-  withdrawalId,
-  status
-){
-
-  const note =
-    prompt(
-      "Admin note/reason (optional):"
-    ) || "";
-
-
-  try{
-
-    await adminApi(
-      "withdrawal_status",
-      {
-
-        withdrawal_id:
-          withdrawalId,
-
-        status:status,
-
-        note:note
-
-      }
-    );
-
-
-    await loadDashboard();
-
-  }
-  catch(error){
-
-    showMessage(
-      "appMessage",
-      "Withdrawal update error: " +
-      error.message
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   RENDER CUSTOMERS
-===================================================== */
-
-function renderCustomers(
-  rows
-){
-
-  const body =
-    document.getElementById(
-      "customersBody"
-    );
-
-
-  body.innerHTML="";
-
-
-  rows.forEach(row=>{
-
-    const tr =
-      document.createElement(
-        "tr"
-      );
-
-
-    const statusButton =
-      row.status === "active"
-
-      ?
-
-      `<button
-        class="danger"
-        onclick="changeUserStatus(
-          '${row.id}',
-          'blocked'
-        )"
-      >
-        Block
-      </button>`
-
-      :
-
-      `<button
-        class="success"
-        onclick="changeUserStatus(
-          '${row.id}',
-          'active'
-        )"
-      >
-        Unblock
-      </button>`;
-
-
-    const messageButton =
-      row.role === "customer"
-
-      ?
-
-      `<button
-        class="primary"
-        onclick="openMessageModal(
-          '${row.id}'
-        )"
-      >
-        💬 Message
-      </button>`
-
-      :
-
-      "";
-
-
-    tr.innerHTML=`
-
-      <td>
-        ${esc(row.user_id)}
-      </td>
-
-      <td>
-        ${esc(row.username)}
-      </td>
-
-      <td>
-        ${esc(row.role)}
-      </td>
-
-      <td>
-        ${money(row.balance)}
-      </td>
-
-      <td>
-        ${esc(row.status)}
-      </td>
-
-      <td>
-        ${formatDate(row.created_at)}
-      </td>
-
-      <td>
-
-        <div class="actions">
-
-          ${messageButton}
-
-          ${statusButton}
-
+      <section id="page-dashboard" class="page">
+        <div class="grid">
+          <div class="card"><div class="metric-label">Total Profiles</div><div class="metric-value" id="metricUsers">—</div></div>
+          <div class="card"><div class="metric-label">Customers</div><div class="metric-value" id="metricCustomers">—</div></div>
+          <div class="card"><div class="metric-label">Pending Transfers</div><div class="metric-value" id="metricTransfers">—</div></div>
+          <div class="card"><div class="metric-label">Pending Withdrawals</div><div class="metric-value" id="metricWithdrawals">—</div></div>
         </div>
-
-      </td>
-
-    `;
-
-
-    body.appendChild(tr);
-
-  });
-
-}
-
-
-/* =====================================================
-   RENDER TRANSACTIONS
-===================================================== */
-
-function renderTransactions(
-  rows
-){
-
-  const body =
-    document.getElementById(
-      "transactionsBody"
-    );
-
-
-  body.innerHTML="";
-
-
-  rows.forEach(row=>{
-
-    const tr =
-      document.createElement(
-        "tr"
-      );
-
-
-    tr.innerHTML=`
-
-      <td>
-        ${esc(row.transaction_id)}
-      </td>
-
-      <td>
-        ${money(row.amount)}
-      </td>
-
-      <td>
-        ${esc(row.type)}
-      </td>
-
-      <td>
-        ${esc(row.status)}
-      </td>
-
-      <td>
-        ${formatDate(row.created_at)}
-      </td>
-
-      <td>
-
-        <div class="actions">
-
-          <button
-            class="success"
-            onclick="changeTransferStatus(
-              '${row.transaction_id}',
-              'approved'
-            )"
-          >
-            Approve
-          </button>
-
-
-          <button
-            class="danger"
-            onclick="changeTransferStatus(
-              '${row.transaction_id}',
-              'rejected'
-            )"
-          >
-            Reject
-          </button>
-
-
-          <button
-            class="warning"
-            onclick="changeTransferStatus(
-              '${row.transaction_id}',
-              'frozen'
-            )"
-          >
-            Freeze
-          </button>
-
+        <div class="section">
+          <h2>Recent Withdrawals</h2>
+          <div id="recentWithdrawals" class="muted">Loading…</div>
         </div>
-
-      </td>
-
-    `;
-
-
-    body.appendChild(tr);
-
-  });
-
-}
-
-
-/* =====================================================
-   RENDER WITHDRAWALS
-===================================================== */
-
-function renderWithdrawals(
-  rows
-){
-
-  const body =
-    document.getElementById(
-      "withdrawalsBody"
-    );
-
-
-  body.innerHTML="";
-
-
-  rows.forEach(row=>{
-
-    const tr =
-      document.createElement(
-        "tr"
-      );
-
-
-    tr.innerHTML=`
-
-      <td>
-        ${esc(row.withdrawal_id)}
-      </td>
-
-      <td>
-        ${money(row.amount)}
-      </td>
-
-      <td>
-        ${esc(row.bank_name)}
-      </td>
-
-      <td>
-        ${esc(row.account_holder)}
-      </td>
-
-      <td>
-        ${esc(row.ifsc)}
-      </td>
-
-      <td>
-        ${esc(row.status)}
-      </td>
-
-      <td>
-        ${formatDate(row.created_at)}
-      </td>
-
-      <td>
-
-        <div class="actions">
-
-          <button
-            class="success"
-            onclick="changeWithdrawalStatus(
-              '${row.withdrawal_id}',
-              'approved'
-            )"
-          >
-            Approve
-          </button>
-
-
-          <button
-            class="danger"
-            onclick="changeWithdrawalStatus(
-              '${row.withdrawal_id}',
-              'rejected'
-            )"
-          >
-            Reject
-          </button>
-
-
-          <button
-            class="warning"
-            onclick="changeWithdrawalStatus(
-              '${row.withdrawal_id}',
-              'frozen'
-            )"
-          >
-            Freeze
-          </button>
-
+        <div class="section">
+          <h2>Recent Transactions</h2>
+          <div id="recentTransactions" class="muted">Loading…</div>
         </div>
-
-      </td>
-
-    `;
-
-
-    body.appendChild(tr);
-
-  });
-
-}
-
-
-/* =====================================================
-   RENDER ADMIN LOG
-===================================================== */
-
-function renderActions(
-  rows
-){
-
-  const body =
-    document.getElementById(
-      "actionsBody"
-    );
-
-
-  body.innerHTML="";
-
-
-  rows.forEach(row=>{
-
-    const tr =
-      document.createElement(
-        "tr"
-      );
-
-
-    tr.innerHTML=`
-
-      <td>
-        ${esc(row.action_id)}
-      </td>
-
-      <td>
-        ${esc(row.action)}
-      </td>
-
-      <td>
-        ${money(row.amount)}
-      </td>
-
-      <td>
-        ${esc(row.reason)}
-      </td>
-
-      <td>
-        ${formatDate(row.created_at)}
-      </td>
-
-    `;
-
-
-    body.appendChild(tr);
-
-  });
-
-}
-
-
-/* =====================================================
-   OPEN MESSAGE MODAL
-===================================================== */
-
-let selectedReceiverId = null;
-
-let selectedReceiver = null;
-
-
-async function openMessageModal(
-  receiverId
-){
-
-  if(!initSupabase())
-    return;
-
-
-  selectedReceiverId =
-    receiverId;
-
-
-  selectedReceiver = null;
-
-
-  document
-    .getElementById(
-      "messageModal"
-    )
-    .classList
-    .remove("hidden");
-
-
-  document
-    .getElementById(
-      "recipientBox"
-    )
-    .textContent =
-      "User information loading...";
-
-
-  document
-    .getElementById(
-      "messageSubject"
-    )
-    .value="";
-
-
-  document
-    .getElementById(
-      "messageText"
-    )
-    .value="";
-
-
-  document
-    .getElementById(
-      "messageHistory"
-    )
-    .innerHTML="";
-
-
-  try{
-
-    const result =
-      await supabaseClient
-      .from("profiles")
-      .select(
-        "id,user_id,username,email,role,status"
-      )
-      .eq(
-        "id",
-        receiverId
-      )
-      .single();
-
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-
-    selectedReceiver =
-      result.data;
-
-
-    document
-      .getElementById(
-        "recipientBox"
-      )
-      .innerHTML = `
-
-        <strong>
-          📩 To:
-        </strong>
-
-        ${esc(
-          selectedReceiver.username
-        )}
-
-        <br>
-
-        <span class="small">
-          User ID:
-          ${esc(
-            selectedReceiver.user_id
-          )}
-        </span>
-
-        <br>
-
-        <span class="small">
-          Status:
-          ${esc(
-            selectedReceiver.status
-          )}
-        </span>
-
-      `;
-
-
-    await loadMessageHistory(
-      receiverId
-    );
-
-  }
-  catch(error){
-
-    document
-      .getElementById(
-        "recipientBox"
-      )
-      .textContent =
-        "User information error: " +
-        error.message;
-
-  }
-
-}
-
-
-/* =====================================================
-   CLOSE MESSAGE MODAL
-===================================================== */
-
-function closeMessageModal(){
-
-  document
-    .getElementById(
-      "messageModal"
-    )
-    .classList
-    .add("hidden");
-
-
-  selectedReceiverId = null;
-
-  selectedReceiver = null;
-
-}
-
-
-/* =====================================================
-   SEND PERSONAL MESSAGE
-===================================================== */
-
-async function sendPersonalMessage(){
-
-  if(!selectedReceiverId){
-
-    showMessage(
-      "messageSendStatus",
-      "Receiver নির্বাচন করা হয়নি।"
-    );
-
-    return;
-
-  }
-
-
-  const subject =
-    document
-      .getElementById(
-        "messageSubject"
-      )
-      .value
-      .trim();
-
-
-  const message =
-    document
-      .getElementById(
-        "messageText"
-      )
-      .value
-      .trim();
-
-
-  if(!subject){
-
-    showMessage(
-      "messageSendStatus",
-      "Subject লিখুন।"
-    );
-
-    return;
-
-  }
-
-
-  if(!message){
-
-    showMessage(
-      "messageSendStatus",
-      "Message লিখুন।"
-    );
-
-    return;
-
-  }
-
-
-  const button =
-    document.getElementById(
-      "sendMessageButton"
-    );
-
-
-  button.disabled = true;
-
-  button.textContent =
-    "Sending...";
-
-
-  try{
-
-    const sessionResult =
-      await supabaseClient
-      .auth
-      .getSession();
-
-
-    const session =
-      sessionResult.data.session;
-
-
-    if(!session){
-
-      throw new Error(
-        "Admin session পাওয়া যায়নি। আবার Login করুন।"
-      );
-
-    }
-
-
-    const messageId =
-      "MSG-" +
-      Date.now() +
-      "-" +
-      crypto
-        .randomUUID()
-        .replaceAll("-","")
-        .substring(0,8)
-        .toUpperCase();
-
-
-    const result =
-      await supabaseClient
-      .from("messages")
-      .insert({
-
-        message_id:
-          messageId,
-
-        sender_id:
-          session.user.id,
-
-        receiver_id:
-          selectedReceiverId,
-
-        subject:
-          subject,
-
-        message:
-          message,
-
-        is_read:
-          false
-
-      });
-
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-
-    showMessage(
-      "messageSendStatus",
-      "✅ Message সফলভাবে পাঠানো হয়েছে।"
-    );
-
-
-    document
-      .getElementById(
-        "messageSubject"
-      )
-      .value="";
-
-
-    document
-      .getElementById(
-        "messageText"
-      )
-      .value="";
-
-
-    await loadMessageHistory(
-      selectedReceiverId
-    );
-
-  }
-  catch(error){
-
-    console.error(
-      "SEND MESSAGE ERROR:",
-      error
-    );
-
-
-    showMessage(
-      "messageSendStatus",
-      "❌ Message পাঠানো যায়নি: " +
-      error.message
-    );
-
-  }
-  finally{
-
-    button.disabled = false;
-
-    button.textContent =
-      "📤 Send Message";
-
-  }
-
-}
-
-
-/* =====================================================
-   MESSAGE HISTORY
-===================================================== */
-
-async function loadMessageHistory(
-  receiverId
-){
-
-  const history =
-    document.getElementById(
-      "messageHistory"
-    );
-
-
-  history.innerHTML =
-    "<div class='small'>Message history loading...</div>";
-
-
-  try{
-
-    const result =
-      await supabaseClient
-      .from("messages")
-      .select(
-        "id,message_id,sender_id,receiver_id,subject,message,is_read,created_at,read_at"
-      )
-      .eq(
-        "receiver_id",
-        receiverId
-      )
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      )
-      .limit(20);
-
-
-    if(result.error){
-
-      throw result.error;
-
-    }
-
-
-    const rows =
-      result.data || [];
-
-
-    if(rows.length === 0){
-
-      history.innerHTML =
-        "<div class='small'>এই User-এর কোনো message history নেই।</div>";
-
-      return;
-
-    }
-
-
-    history.innerHTML =
-      "<h3>Recent Messages</h3>";
-
-
-    rows.forEach(row=>{
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
-        "message-item " +
-        (
-          row.is_read
-          ? "read"
-          : "unread"
-        );
-
-
-      div.innerHTML = `
-
-        <strong>
-          ${esc(row.subject)}
-        </strong>
-
-        <div>
-          ${esc(row.message)}
+      </section>
+
+      <section id="page-customers" class="page hidden">
+        <div class="section">
+          <h2>Customers</h2>
+          <div class="toolbar">
+            <input id="customerSearch" placeholder="Search user ID or username">
+            <button class="neutral" id="customerSearchBtn">Search</button>
+          </div>
+          <div id="customersTable"></div>
         </div>
+      </section>
 
-        <div class="small">
-
-          ${formatDate(
-            row.created_at
-          )}
-
-          &nbsp; • &nbsp;
-
-          ${
-            row.is_read
-            ? "Read"
-            : "Unread"
-          }
-
+      <section id="page-create" class="page hidden">
+        <div class="section">
+          <h2>Create Customer</h2>
+          <form id="createForm">
+            <div class="form-grid">
+              <label>User ID<input name="user_id" required></label>
+              <label>Username<input name="username" required></label>
+              <label>Email<input name="email" type="email" required></label>
+              <label>Password<input name="password" type="password" minlength="6" required></label>
+              <label>Initial Balance (₹)<input name="initial_balance" type="number" min="0" step="0.01" value="0" required></label>
+            </div>
+            <div class="form-actions"><button class="primary" type="submit">Create Customer</button></div>
+          </form>
+          <div id="createMessage" class="message"></div>
         </div>
+      </section>
 
-      `;
+      <section id="page-balance" class="page hidden">
+        <div class="section">
+          <h2>Balance Adjustment</h2>
+          <p class="muted">Positive amount adds to the internal balance; negative amount subtracts from it. Use only with a valid, documented reason.</p>
+          <form id="balanceForm">
+            <div class="form-grid">
+              <label>Customer User ID<input name="user_id" required></label>
+              <label>Amount (₹)<input name="amount" type="number" step="0.01" required placeholder="e.g. 100 or -50"></label>
+            </div>
+            <label style="margin-top:12px">Reason<textarea name="reason" required></textarea></label>
+            <div class="form-actions"><button class="primary" type="submit">Adjust Balance</button></div>
+          </form>
+          <div id="balanceMessage" class="message"></div>
+        </div>
+      </section>
 
+      <section id="page-transfers" class="page hidden">
+        <div class="section">
+          <h2>Transfers</h2>
+          <div id="transfersTable"></div>
+        </div>
+      </section>
 
-      history.appendChild(
-        div
-      );
+      <section id="page-withdrawals" class="page hidden">
+        <div class="section">
+          <h2>Withdrawals</h2>
+          <p class="muted">The numeric database ID is used for the status RPC. The WDL reference is shown separately.</p>
+          <div id="withdrawalsTable"></div>
+        </div>
+      </section>
 
+      <section id="page-history" class="page hidden">
+        <div class="section">
+          <h2>Admin Action History</h2>
+          <div id="historyTable"></div>
+        </div>
+      </section>
+
+      <div id="globalMessage" class="message"></div>
+      <footer class="muted" style="padding:15px 0;font-size:12px">
+        DhanFlow © 2026 · Internal Wallet Management System
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    /*
+      CONFIGURATION:
+      Replace these two values with your existing Supabase project URL
+      and publishable/anon key. Never put the service_role key here.
+    */
+    const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY";
+
+    const $ = (id) => document.getElementById(id);
+    const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[c]);
+
+    const money = (value) => "₹" + Number(value ?? 0).toLocaleString("en-IN", {
+      minimumFractionDigits: 2, maximumFractionDigits: 2
     });
 
-  }
-  catch(error){
+    const dateText = (value) => value ? new Date(value).toLocaleString() : "—";
+    const statusPill = (value) => {
+      const s = String(value ?? "unknown").toLowerCase();
+      return `<span class="pill ${esc(s)}">${esc(s)}</span>`;
+    };
 
-    history.innerHTML =
-      `<div class="small">
-        Message history error:
-        ${esc(error.message)}
-      </div>`;
+    let supabase;
+    let session = null;
+    let dashboardData = {
+      profiles: [], transactions: [], withdrawals: [], admin_actions: []
+    };
 
-  }
-
-}
-
-
-/* =====================================================
-   HELPERS
-===================================================== */
-
-function money(value){
-
-  return "₹" +
-    Number(
-      value || 0
-    ).toFixed(2);
-
-}
-
-
-function formatDate(value){
-
-  if(!value)
-    return "-";
-
-
-  try{
-
-    return new Date(value)
-      .toLocaleString(
-        "en-IN"
-      );
-
-  }
-  catch(e){
-
-    return value;
-
-  }
-
-}
-
-
-function esc(value){
-
-  if(
-    value === null ||
-    value === undefined
-  ){
-
-    return "";
-
-  }
-
-
-  return String(value)
-
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
-
-}
-
-
-/* =====================================================
-   AUTO SESSION CHECK
-===================================================== */
-
-async function checkExistingSession(){
-
-  if(!initSupabase())
-    return;
-
-
-  try{
-
-    const result =
-      await supabaseClient
-      .auth
-      .getSession();
-
-
-    const session =
-      result.data.session;
-
-
-    if(!session)
-      return;
-
-
-    const profileResult =
-      await supabaseClient
-      .from("profiles")
-      .select(
-        "id,user_id,username,role,balance,status"
-      )
-      .eq(
-        "id",
-        session.user.id
-      )
-      .single();
-
-
-    if(
-
-      profileResult.error ||
-
-      !profileResult.data ||
-
-      profileResult.data.role !==
-        "admin" ||
-
-      profileResult.data.status !==
-        "active"
-
-    ){
-
-      await supabaseClient
-        .auth
-        .signOut();
-
-      return;
-
+    function showMessage(id, message, type = "") {
+      const element = $(id);
+      if (!element) return;
+      element.className = "message " + type;
+      element.textContent = message;
     }
 
-
-    document
-      .getElementById(
-        "loginPage"
-      )
-      .classList
-      .add("hidden");
-
-
-    document
-      .getElementById(
-        "adminApp"
-      )
-      .classList
-      .remove("hidden");
-
-
-    document
-      .getElementById(
-        "adminInfo"
-      )
-      .textContent =
-        "Logged in as: " +
-        profileResult.data.username +
-        " | " +
-        profileResult.data.user_id;
-
-
-    await loadDashboard();
-
-  }
-  catch(error){
-
-    console.error(
-      "SESSION CHECK ERROR:",
-      error
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   START
-===================================================== */
-
-window.addEventListener(
-  "load",
-  function(){
-
-    initSupabase();
-
-    checkExistingSession();
-
-  }
-);
-
-
-/* =====================================================
-   CLOSE MODAL WHEN CLICK OUTSIDE
-===================================================== */
-
-document.addEventListener(
-  "click",
-  function(event){
-
-    const modal =
-      document.getElementById(
-        "messageModal"
-      );
-
-
-    if(
-      event.target === modal
-    ){
-
-      closeMessageModal();
-
+    function validateConfig() {
+      if (
+        SUPABASE_URL.includes("YOUR_SUPABASE") ||
+        SUPABASE_ANON_KEY.includes("YOUR_SUPABASE")
+      ) {
+        throw new Error("First enter your Supabase URL and publishable/anon key in the configuration section.");
+      }
+      if (!window.supabase) throw new Error("Supabase JavaScript library did not load.");
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
-  }
-);
+    async function adminApi(action, data = {}) {
+      const { data: current } = await supabase.auth.getSession();
+      const token = current?.session?.access_token;
+      if (!token) throw new Error("Your session has expired. Please log in again.");
 
-</script>
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/admin-api`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+          "apikey": SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({ action, data })
+      });
 
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.error || result.ok === false) {
+        throw new Error(result.error || `Request failed (${response.status})`);
+      }
+      return result.data ?? result;
+    }
+
+    function setLoggedIn(isLoggedIn) {
+      $("loginScreen").classList.toggle("hidden", isLoggedIn);
+      $("app").classList.toggle("hidden", !isLoggedIn);
+    }
+
+    async function checkSession() {
+      const { data } = await supabase.auth.getSession();
+      session = data.session;
+      if (!session) {
+        setLoggedIn(false);
+        return;
+      }
+
+      try {
+        await loadDashboard();
+        setLoggedIn(true);
+      } catch (error) {
+        setLoggedIn(false);
+        showMessage("loginMessage", error.message, "error");
+      }
+    }
+
+    async function loadDashboard() {
+      const result = await adminApi("dashboard");
+      dashboardData = {
+        profiles: Array.isArray(result.profiles) ? result.profiles : [],
+        transactions: Array.isArray(result.transactions) ? result.transactions : [],
+        withdrawals: Array.isArray(result.withdrawals) ? result.withdrawals : [],
+        admin_actions: Array.isArray(result.admin_actions) ? result.admin_actions : []
+      };
+      renderAll();
+    }
+
+    function renderAll() {
+      const d = dashboardData;
+      $("metricUsers").textContent = d.profiles.length;
+      $("metricCustomers").textContent = d.profiles.filter(x => x.role === "customer").length;
+      $("metricTransfers").textContent = d.transactions.filter(x => String(x.status).toLowerCase() === "pending").length;
+      $("metricWithdrawals").textContent = d.withdrawals.filter(x => String(x.status).toLowerCase() === "pending").length;
+
+      renderCustomers();
+      renderTransfers();
+      renderWithdrawals();
+      renderHistory();
+
+      $("recentWithdrawals").innerHTML = tableHtml(
+        ["DB ID", "Withdrawal Ref", "User ID", "Amount", "Status", "Created"],
+        d.withdrawals.slice(0, 5).map(w => [
+          w.id, w.withdrawal_id, w.user_id, money(w.amount),
+          statusPill(w.status), dateText(w.created_at)
+        ])
+      );
+
+      $("recentTransactions").innerHTML = tableHtml(
+        ["Transaction ID", "Type", "Amount", "Status", "Created"],
+        d.transactions.slice(0, 5).map(t => [
+          t.transaction_id ?? t.id, t.type, money(t.amount),
+          statusPill(t.status), dateText(t.created_at)
+        ])
+      );
+    }
+
+    function tableHtml(headers, rows) {
+      if (!rows.length) return '<p class="muted">No records found.</p>';
+      return `<div class="table-wrap"><table><thead><tr>${
+        headers.map(h => `<th>${esc(h)}</th>`).join("")
+      }</tr></thead><tbody>${
+        rows.map(row => `<tr>${row.map(cell => `<td>${cell ?? "—"}</td>`).join("")}</tr>`).join("")
+      }</tbody></table></div>`;
+    }
+
+    function renderCustomers() {
+      const query = $("customerSearch").value.trim().toLowerCase();
+      const rows = dashboardData.profiles
+        .filter(p => p.role === "customer")
+        .filter(p => !query || `${p.user_id} ${p.username} ${p.id}`.toLowerCase().includes(query))
+        .map(p => [
+          esc(p.user_id),
+          esc(p.username),
+          money(p.balance),
+          statusPill(p.status),
+          `<div class="actions">
+            <button class="${p.status === "blocked" ? "success" : "danger"}"
+              onclick="changeUserStatus('${esc(p.user_id)}','${p.status === "blocked" ? "active" : "blocked"}')">
+              ${p.status === "blocked" ? "Unblock" : "Block"}
+            </button>
+            <button class="neutral" onclick="prefillBalance('${esc(p.user_id)}')">Adjust</button>
+          </div>`
+        ]);
+
+      $("customersTable").innerHTML = tableHtml(
+        ["User ID", "Username", "Balance", "Status", "Actions"], rows
+      );
+    }
+
+    function renderTransfers() {
+      const rows = dashboardData.transactions.map(t => {
+        const pending = String(t.status).toLowerCase() === "pending";
+        const id = t.transaction_id ?? t.id;
+        const actions = pending ? `<div class="actions">
+          <button class="success" onclick="changeTransferStatus('${esc(id)}','approved')">Approve</button>
+          <button class="danger" onclick="changeTransferStatus('${esc(id)}','rejected')">Reject</button>
+          <button class="warning" onclick="changeTransferStatus('${esc(id)}','frozen')">Freeze</button>
+        </div>` : "—";
+
+        return [
+          esc(id), esc(t.sender_id), esc(t.receiver_id), money(t.amount),
+          esc(t.type), statusPill(t.status), dateText(t.created_at), actions
+        ];
+      });
+
+      $("transfersTable").innerHTML = tableHtml(
+        ["Transaction ID", "Sender", "Receiver", "Amount", "Type", "Status", "Created", "Actions"],
+        rows
+      );
+    }
+
+    function renderWithdrawals() {
+      const rows = dashboardData.withdrawals.map(w => {
+        const pending = String(w.status).toLowerCase() === "pending";
+
+        /*
+          IMPORTANT:
+          admin_update_withdrawal expects p_withdrawal_id BIGINT.
+          Therefore use numeric w.id, NOT the WDL-... withdrawal_id string.
+        */
+        const numericId = Number(w.id);
+        const validId = Number.isSafeInteger(numericId) && numericId > 0;
+
+        const actions = pending && validId ? `<div class="actions">
+          <button class="success" onclick="changeWithdrawalStatus(${numericId},'approved')">Approve</button>
+          <button class="danger" onclick="changeWithdrawalStatus(${numericId},'rejected')">Reject</button>
+          <button class="warning" onclick="changeWithdrawalStatus(${numericId},'frozen')">Freeze</button>
+        </div>` : (pending ? '<span class="error">Invalid numeric DB ID</span>' : "—");
+
+        return [
+          esc(w.id),
+          esc(w.withdrawal_id),
+          esc(w.user_id),
+          money(w.amount),
+          esc(w.bank_name),
+          esc(w.account_holder),
+          esc(w.account_number),
+          esc(w.ifsc),
+          statusPill(w.status),
+          dateText(w.created_at),
+          actions
+        ];
+      });
+
+      $("withdrawalsTable").innerHTML = tableHtml(
+        ["DB ID", "Withdrawal Ref", "User ID", "Amount", "Bank", "Account Holder", "Account No.", "IFSC", "Status", "Created", "Actions"],
+        rows
+      );
+    }
+
+    function renderHistory() {
+      const rows = dashboardData.admin_actions.map(a => [
+        esc(a.action_id),
+        esc(a.action),
+        esc(a.target_user_id),
+        a.amount == null ? "—" : money(a.amount),
+        esc(a.reason),
+        esc(a.transaction_id),
+        dateText(a.created_at)
+      ]);
+
+      $("historyTable").innerHTML = tableHtml(
+        ["Action ID", "Action", "Target User", "Amount", "Reason", "Transaction ID", "Date"],
+        rows
+      );
+    }
+
+    async function refreshDashboard() {
+      $("refreshBtn").disabled = true;
+      showMessage("globalMessage", "Refreshing…");
+      try {
+        await loadDashboard();
+        showMessage("globalMessage", "Dashboard refreshed.", "ok");
+      } catch (error) {
+        showMessage("globalMessage", error.message, "error");
+      } finally {
+        $("refreshBtn").disabled = false;
+      }
+    }
+
+    async function changeUserStatus(userId, status) {
+      const reason = prompt(`Reason for ${status} user ${userId}:`);
+      if (reason === null) return;
+
+      try {
+        await adminApi("user_status", { user_id: userId, status, reason });
+        await loadDashboard();
+        showMessage("globalMessage", `User status changed to ${status}.`, "ok");
+      } catch (error) {
+        showMessage("globalMessage", error.message, "error");
+      }
+    }
+
+    function prefillBalance(userId) {
+      $("balanceForm").elements.user_id.value = userId;
+      document.querySelector('[data-page="balance"]').click();
+    }
+
+    async function changeTransferStatus(transactionId, status) {
+      if (!confirm(`Set transfer ${transactionId} to ${status}?`)) return;
+      const note = prompt("Admin note (optional):") ?? "";
+
+      try {
+        await adminApi("transfer_status", {
+          transaction_id: transactionId,
+          status,
+          note
+        });
+        await loadDashboard();
+        showMessage("globalMessage", `Transfer updated: ${status}`, "ok");
+      } catch (error) {
+        showMessage("globalMessage", error.message, "error");
+      }
+    }
+
+    async function changeWithdrawalStatus(withdrawalDbId, status) {
+      const numericId = Number(withdrawalDbId);
+
+      if (!Number.isSafeInteger(numericId) || numericId <= 0) {
+        showMessage("globalMessage", "Invalid numeric withdrawal database ID.", "error");
+        return;
+      }
+
+      const withdrawal = dashboardData.withdrawals.find(
+        w => Number(w.id) === numericId
+      );
+
+      if (!withdrawal) {
+        showMessage("globalMessage", "Withdrawal not found in the latest dashboard data. Refresh and try again.", "error");
+        return;
+      }
+
+      if (String(withdrawal.status).toLowerCase() !== "pending") {
+        showMessage("globalMessage", "This withdrawal is no longer pending. Refresh the dashboard.", "error");
+        return;
+      }
+
+      const amountText = money(withdrawal.amount);
+      const confirmation = confirm(
+        `Confirm ${status.toUpperCase()}?\n\n` +
+        `Database ID: ${numericId}\n` +
+        `Reference: ${withdrawal.withdrawal_id}\n` +
+        `Amount: ${amountText}\n` +
+        `Current status: ${withdrawal.status}\n\n` +
+        `This changes the internal withdrawal status only; it does not send a bank transfer.`
+      );
+
+      if (!confirmation) return;
+
+      const note = prompt("Admin note (optional):");
+      if (note === null) return;
+
+      try {
+        await adminApi("withdrawal_status", {
+          withdrawal_id: numericId,
+          status,
+          note
+        });
+        await loadDashboard();
+        showMessage("globalMessage", `Withdrawal ${numericId} updated to ${status}.`, "ok");
+      } catch (error) {
+        showMessage("globalMessage", error.message, "error");
+      }
+    }
+
+    $("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      showMessage("loginMessage", "Logging in…");
+
+      try {
+        const email = $("loginEmail").value.trim();
+        const password = $("loginPassword").value;
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email, password
+        });
+
+        if (error) throw error;
+        session = data.session;
+
+        await loadDashboard();
+        setLoggedIn(true);
+        showMessage("loginMessage", "");
+      } catch (error) {
+        showMessage("loginMessage", error.message, "error");
+      }
+    });
+
+    $("logoutBtn").addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      session = null;
+      setLoggedIn(false);
+    });
+
+    $("refreshBtn").addEventListener("click", refreshDashboard);
+    $("customerSearchBtn").addEventListener("click", renderCustomers);
+    $("customerSearch").addEventListener("input", renderCustomers);
+
+    $("createForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+
+      const payload = {
+        user_id: String(form.get("user_id")).trim(),
+        username: String(form.get("username")).trim(),
+        email: String(form.get("email")).trim(),
+        password: String(form.get("password")),
+        initial_balance: Number(form.get("initial_balance"))
+      };
+
+      if (!confirm(`Create customer ${payload.user_id} with initial balance ${money(payload.initial_balance)}?`)) return;
+
+      try {
+        await adminApi("create_customer", payload);
+        event.currentTarget.reset();
+        showMessage("createMessage", "Customer created successfully.", "ok");
+        await loadDashboard();
+      } catch (error) {
+        showMessage("createMessage", error.message, "error");
+      }
+    });
+
+    $("balanceForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+
+      const payload = {
+        user_id: String(form.get("user_id")).trim(),
+        amount: Number(form.get("amount")),
+        reason: String(form.get("reason")).trim()
+      };
+
+      if (!payload.reason) {
+        showMessage("balanceMessage", "Reason is required.", "error");
+        return;
+      }
+
+      if (!Number.isFinite(payload.amount) || payload.amount === 0) {
+        showMessage("balanceMessage", "Enter a valid non-zero amount.", "error");
+        return;
+      }
+
+      if (!confirm(`Adjust ${payload.user_id} balance by ${money(payload.amount)}?\nReason: ${payload.reason}`)) return;
+
+      try {
+        const result = await adminApi("adjust_balance", payload);
+        showMessage(
+          "balanceMessage",
+          `Balance adjustment completed.\nUser: ${result.user_id ?? payload.user_id}\nNew balance: ${money(result.new_balance)}`,
+          "ok"
+        );
+        await loadDashboard();
+      } catch (error) {
+        showMessage("balanceMessage", error.message, "error");
+      }
+    });
+
+    document.querySelectorAll("[data-page]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-page]").forEach(b => b.classList.remove("active"));
+        button.classList.add("active");
+
+        document.querySelectorAll(".page").forEach(page => page.classList.add("hidden"));
+        $("page-" + button.dataset.page).classList.remove("hidden");
+      });
+    });
+
+    (async function init() {
+      try {
+        validateConfig();
+        await checkSession();
+      } catch (error) {
+        setLoggedIn(false);
+        showMessage("loginMessage", error.message, "error");
+      }
+    })();
+  </script>
 </body>
-
 </html>
